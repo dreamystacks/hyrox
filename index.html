@@ -194,6 +194,11 @@ body::before{content:"";position:fixed;left:-25%;right:-25%;top:-4%;height:74vh;
 .td-ticks{display:grid;grid-template-columns:repeat(27,1fr);gap:3px;align-items:end;height:18px}.td-ticks i{height:10px;border-radius:2px;background:color-mix(in srgb,var(--text) 14%,transparent)}.td-ticks i.deload{height:7px}.td-ticks i.past{background:linear-gradient(180deg,var(--lime),var(--accent2))}.td-ticks i.now{height:18px;background:linear-gradient(180deg,var(--lime),var(--accent2));box-shadow:0 0 12px var(--lime)}
 .td-strip{margin-bottom:16px}
 .td-km{margin:0 0 22px}.td-line{height:4px;border-radius:4px;background:color-mix(in srgb,var(--text) 12%,transparent);overflow:hidden}.td-line i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--lime),var(--accent2))}
+
+/* continuous top: no header band */
+.topbar{position:relative;background:transparent;border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+body::before{top:-14%!important;height:84vh!important}
+.view{padding-top:6px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style></head><body>
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-volt-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
