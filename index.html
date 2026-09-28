@@ -163,6 +163,15 @@ b,strong{font-weight:600}
 .gx-cue{display:grid;grid-template-columns:78px 1fr;gap:8px;padding:8px 0;border-top:1px solid color-mix(in srgb,var(--line) 60%,transparent)}.gx-cue b{font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding-top:2px}.gx-cue p{margin:0;font-size:.86rem;line-height:1.45}.gx-cue.bad b{color:var(--red)}
 .gx-video{display:block;margin-top:12px;text-align:center;padding:12px;border-radius:12px;background:var(--chip);color:var(--text);text-decoration:none;font-weight:600;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
 #modal .guide-card{box-shadow:none;border:0}
+
+.wo-restbar,.wo-rest{position:sticky;top:calc(-14px - env(safe-area-inset-top));z-index:3;box-shadow:0 10px 24px var(--bg)}.wo-rest{background:var(--bg);padding:8px 0}
+.wo-item.sets{display:block;padding:14px}.wo-item.sets.on{opacity:.6}.wo-item.sets.on b{text-decoration:none}
+.wo-sethead{display:flex;align-items:flex-start;gap:10px}.wo-sethead span{flex:1}
+.wo-sets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.wo-set{width:46px;height:46px;border-radius:12px;border:1.5px solid var(--line2);background:var(--inset);color:var(--text);font-family:var(--font-num);font-size:1.25rem;font-weight:500;touch-action:manipulation}
+.wo-set.done{background:var(--lime);border-color:var(--lime);color:var(--on-accent);font-family:var(--font-ui);font-size:1rem}
+.wo-set.live{border-color:var(--lime);animation:pulse 1s infinite}
+.wo-setbar{height:3px;background:var(--chip);border-radius:3px;margin-top:12px;overflow:hidden}.wo-setbar i{display:block;height:100%;background:var(--lime);transition:width .3s}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style></head><body>
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-volt-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
@@ -407,16 +416,37 @@ function setCheck(key,val){const s2=load(checkKey(),{});s2[key]=val;store(checkK
 function openWorkout(){const x=woState();if(!x)return;document.body.classList.add('focus');$('workout').classList.add('show');renderWorkout();clearInterval(woTick);woTick=setInterval(woTickFn,250);keepAwake()}
 function closeWorkout(){$('workout').classList.remove('show');document.body.classList.remove('focus');clearInterval(woTick);restEnd=0}
 function beep(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();[0,.22,.44].forEach(t=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=880;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.001,audioCtx.currentTime+t);g.gain.exponentialRampToValueAtTime(.3,audioCtx.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+t+.18);o.start(audioCtx.currentTime+t);o.stop(audioCtx.currentTime+t+.2)})}catch{}try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch{}}
-function woTickFn(){const x=woState();if(!x)return;const c=$('woClock');if(c&&!x.pausedAt)c.textContent=fmt(woElapsed(x));const rb=$('woRest');if(restEnd&&rb){const left=restEnd-Date.now();if(left<=0){restEnd=0;rb.querySelector('strong').textContent='Go';rb.querySelector('small').textContent='Rest done';rb.querySelector('.fill').style.width='100%';rb.classList.add('doneflash');beep();setTimeout(()=>{if(!restEnd)renderWorkout()},2600)}else{rb.querySelector('strong').textContent=fmt(left+999);rb.querySelector('.fill').style.width=(100-left/restLen*100)+'%'}}}
-function renderWorkout(){const x=woState();if(!x){closeWorkout();return}const {w,day,label,items}=woItems(x),checks=load(checkKey(),{}),done=items.filter((_,i)=>checks[`w${w.week}-${day}-${i}`]).length;
+function woTickFn(){const x=woState();if(!x)return;const c=$('woClock');if(c&&!x.pausedAt)c.textContent=fmt(woElapsed(x));const rb=$('woRest');if(restEnd&&rb){const left=restEnd-Date.now();if(left<=0){restEnd=0;if(workPhase){const wp=workPhase;workPhase=null;beep();completeSet(wp.key,wp.parent,wp.total,wp.rest,+wp.key.split('-s').pop());return}rb.querySelector('strong').textContent='Go';rb.querySelector('small').textContent='Rest done';rb.querySelector('.fill').style.width='100%';rb.classList.add('doneflash');beep();setTimeout(()=>{if(!restEnd)renderWorkout()},2600)}else{rb.querySelector('strong').textContent=fmt(left+999);rb.querySelector('.fill').style.width=(100-left/restLen*100)+'%'}}}
+const REST_BY_KEY={trap:120,rdl:120,squat:150,split:90,sledpush:120,sledpull:120,lunge:90,pullup:120,bench:120,dbbench:120,ohp:120,rowlift:90,carry:60,skierg:60,rowerg:90,run:90,lateral:60,inclinecurl:60,hammercurl:60,tricepoh:60,pushdown:60,reardelt:60,hanging:60,crunch:60};
+function parseSets(it){const t=it.title,src=t+' '+(it.detail||'');let m,out=null;
+ if(m=t.match(/(\d+)\s*[x×]\s*(\d+)\s*s\b/i))out={n:+m[1],hold:+m[2]*1000,label:m[2]+' s hold'};
+ else if(m=t.match(/(\d+)\s*[x×]\s*\(?\s*(\d+(?:\.\d+)?\s*(?:m|km))\b/i))out={n:+m[1],label:m[2].replace(/\s+/,' ')};
+ else if(m=t.match(/(\d+)\s*[x×]\s*(\d+(?:-\d+)?)(\/leg)?/i))out={n:+m[1],label:m[2]+(m[3]?' / leg':'')+' reps'};
+ else if(m=t.match(/(\d+)\s*sets?\b/i))out={n:+m[1],label:''};
+ if(!out||out.n<2||out.n>12)return null;
+ let r=src.match(/(\d+)\s*s(?:ec)?\s*rest/i),rm=src.match(/(\d+)\s*min\s*rest/i);out.rest=r?+r[1]:rm?+rm[1]*60:(REST_BY_KEY[it.keys[0]]||90);return out}
+function fmtRest(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+let workPhase=null;
+function unlockAudio(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch{}}
+function completeSet(sk,key,total,rest,n){setCheck(sk,true);const c=load(checkKey(),{});let all=true;for(let i=1;i<=total;i++)if(!c[key+'-s'+i])all=false;if(all&&!c[key])setCheck(key,true);workPhase=null;if(all&&n>=total){restEnd=0;renderWorkout();toastMsg('Exercise done');return}startRest(rest,'Rest after set '+n)}
+function startRest(sec,label){restLen=sec*1000;restEnd=Date.now()+restLen;restLabel=label||'Rest';renderWorkout()}
+let restLabel='Rest';
+function renderWorkout(){const x=woState();if(!x){closeWorkout();return}const _st=$('workout').scrollTop;setTimeout(()=>{$('workout').scrollTop=_st},0);const {w,day,label,items}=woItems(x),checks=load(checkKey(),{}),done=items.filter((_,i)=>checks[`w${w.week}-${day}-${i}`]).length;
  $('workout').innerHTML=`<div class="wo-top"><div class="wo-kicker">Week ${w.week} · ${day} · ${esc(w.phase)}</div><div class="wo-live ${x.pausedAt?'paused':''}"><i></i>${x.pausedAt?'Paused':'Live'}</div></div><div class="wo-title">${esc(label)}</div>
  <div class="wo-clock" id="woClock">${fmt(woElapsed(x))}</div><div class="wo-sub">${done}/${items.length} done</div>
- ${restEnd?`<div class="wo-restbar" id="woRest"><strong>${fmt(restEnd-Date.now()+999)}</strong><small>Rest · tap to skip</small><div class="fill" style="width:0"></div></div>`:`<div class="wo-rest"><button data-rest="60">Rest 1:00</button><button data-rest="90">Rest 1:30</button><button data-rest="120">Rest 2:00</button></div>`}
- <div class="wo-list">${items.map((it,i)=>{const key=`w${w.week}-${day}-${i}`,on=!!checks[key];return`<div class="wo-item ${on?'on':''}" data-wo="${key}" role="button"><span class="ck">${on?'✓':''}</span><span><b>${esc(it.title)}</b>${it.detail?`<small>${esc(it.detail)}</small>`:''}</span>${it.keys[0]?`<button class="form" data-guide="${it.keys[0]}">Form</button>`:''}</div>`}).join('')}</div>
+ ${restEnd?`<div class="wo-restbar" id="woRest"><strong>${fmt(restEnd-Date.now()+999)}</strong><small>${esc(restLabel)} · tap to skip</small><div class="fill" style="width:0"></div></div>`:`<div class="wo-rest"><button data-rest="60">Rest 1:00</button><button data-rest="90">Rest 1:30</button><button data-rest="120">Rest 2:00</button></div>`}
+ <div class="wo-list">${items.map((it,i)=>{const key=`w${w.week}-${day}-${i}`,on=!!checks[key],ps=parseSets(it);
+ if(!ps)return`<div class="wo-item ${on?'on':''}" data-wo="${key}" role="button"><span class="ck">${on?'✓':''}</span><span><b>${esc(it.title)}</b>${it.detail?`<small>${esc(it.detail)}</small>`:''}</span>${it.keys[0]?`<button class="form" data-guide="${it.keys[0]}">Form</button>`:''}</div>`;
+ const sd=Array.from({length:ps.n},(_,n)=>!!checks[key+'-s'+(n+1)]),dn=sd.filter(Boolean).length;
+ return`<div class="wo-item sets ${on?'on':''}"><div class="wo-sethead"><span><b>${esc(it.title)}</b><small>${ps.n} sets${ps.label?' · '+esc(ps.label):''} · rest ${fmtRest(ps.rest)}</small></span>${it.keys[0]?`<button class="form" data-guide="${it.keys[0]}">Form</button>`:''}</div><div class="wo-sets">${sd.map((d,n)=>`<button class="wo-set ${d?'done':''} ${workPhase&&workPhase.key===key+'-s'+(n+1)?'live':''}" data-set="${key}|${n+1}|${ps.n}|${ps.rest}|${ps.hold||0}" aria-label="Set ${n+1}">${d?'✓':n+1}</button>`).join('')}</div><div class="wo-setbar"><i style="width:${dn/ps.n*100}%"></i></div></div>`}).join('')}</div>
  <div class="wo-bottom"><button class="wo-finish" id="woFinish">Finish workout</button><div class="wo-row"><button class="secondary" id="woPause">${x.pausedAt?'Resume':'Pause'}</button><button class="secondary danger" id="woDiscard">Discard</button></div></div>`;
  const W=$('workout');W.querySelectorAll('[data-guide]').forEach(b=>b.onclick=e=>{e.stopPropagation();openGuide(b.dataset.guide)});
  W.querySelectorAll('[data-wo]').forEach(r=>r.onclick=()=>{const c2=load(checkKey(),{});setCheck(r.dataset.wo,!c2[r.dataset.wo]);renderWorkout()});
- W.querySelectorAll('[data-rest]').forEach(b=>b.onclick=()=>{try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume()}catch{}restLen=+b.dataset.rest*1000;restEnd=Date.now()+restLen;renderWorkout()});
+ W.querySelectorAll('[data-rest]').forEach(b=>b.onclick=()=>{unlockAudio();workPhase=null;startRest(+b.dataset.rest,'Rest')});
+ W.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>{unlockAudio();const [key,n,total,rest,hold]=b.dataset.set.split('|'),sk=key+'-s'+n,c=load(checkKey(),{});
+  if(c[sk]){setCheck(sk,false);if(c[key])setCheck(key,false);workPhase=null;renderWorkout();return}
+  if(+hold){workPhase={key:sk,parent:key,total:+total,rest:+rest};startRest(+hold/1000,'Set '+n+' · hold');return}
+  completeSet(sk,key,+total,+rest,+n)});
  const rb=$('woRest');if(rb)rb.onclick=()=>{restEnd=0;renderWorkout()};
  $('woPause').onclick=()=>{const y=woState();if(y.pausedAt){y.paused+=Date.now()-y.pausedAt;y.pausedAt=null}else y.pausedAt=Date.now();woSave(y);renderWorkout()};
  $('woDiscard').onclick=()=>{if(!confirm('Discard this workout? Nothing will be logged.'))return;localStorage.removeItem(k('workout'));closeWorkout();renderToday()};
