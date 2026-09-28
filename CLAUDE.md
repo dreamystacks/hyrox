@@ -59,6 +59,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - **Progress:**
   - Coach card and weekly report: `renderCoach`, `renderReport`.
   - Levels and standards: `renderStanding` (finish ladder), `renderCurves`, `renderStdTable` (constants `STD`, `FINISH`, `RUNPACE`).
+  - **Levels rule:** `STD`/`FINISH` levels are in race (fatigued) times. Only logged sim data meets them: station splits from full volume sims (`stationSeries`) and full sim totals (`latestFullSim`). Fresh benchmarks (`BENCH`) are only compared to their own target ("X s to target" / "Target hit ✓").
   - Body weight: `renderBW`, plotted as a weekly average line with a dot per weigh-in.
 - **Settings sheet:** athlete switch, theme, sync, weight unit, check for updates, guides.
 - **Themes:** 5 accents (`ACCENTS`) × Dark, Light or Auto, set through `data-theme="{accent}-{mode}"` on `<html>`. Use the CSS variables `--g1/--g2` (gradient), `--lime` (accent), `--bg`, `--card`, `--text` and `--muted`. Fonts are SF Pro (system) for text and Barlow Condensed (`--font-num`) for numbers.
