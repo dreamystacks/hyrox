@@ -1,8 +1,8 @@
 # HYROX Brisbane 2027 training app
 
-Private training app for two athletes, **Fred** (owner, `fred`) and **Will** (`will`), for HYROX Brisbane on Apr 3 or 4, 2027 (Open men, goal 1:25). The plan runs 27 weeks from Mon Sep 28, 2026.
+Private training app for three athletes, **Fred** (owner, `fred`), **Will** (`will`) and **Grady** (`grady`), for HYROX Brisbane on Apr 3 or 4, 2027 (Open men, goal 1:25). The plan runs 27 weeks from Mon Sep 28, 2026.
 
-Live at https://dreamystacks.github.io/hyrox/. It's installed on both iPhones as a home screen web app (standalone PWA). Deploying means pushing to `main`, and GitHub Pages publishes in about a minute.
+Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' iPhones as a home screen web app (standalone PWA). Deploying means pushing to `main`, and GitHub Pages publishes in about a minute.
 
 ## Working with Fred
 - He's a systems and optimisation person who thinks top down: vision, then plan, then execution. Keep the overall goal visible and don't get lost in micro detail.
@@ -28,6 +28,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on both iPhones as
 | `tests/smoke.js` | Playwright smoke test. |
 
 ### Data and sync
+- **Athletes:** `ATHLETES={fred,will,grady}` is the single source. Every per athlete loop (picker, `merge`, `markAllDirty`, segment controls) uses `Object.keys(ATHLETES)`, so adding someone is one line plus the coach prompt.
 - **Local first.** Everything lives in `localStorage`, namespaced per athlete: `nsKey(a,name)` gives `hrx_${a}_${name}_v2`, and `k(name)` does the same for the active athlete. Main names: `logs`, `bench`, `checks` (+`checksT`), `unit` (`kg`/`lb`), `workout`, `emom`, `pick`, `wtload`.
 - **Backend:** a Google Sheet "HYROX Database" in Fred's Drive, reached through a standalone Apps Script web app (Execute as Me, access Anyone).
   - Tabs: `Logs`, `Benchmarks` (athlete, test, week, time, updated_at), `State` (checks JSON).
