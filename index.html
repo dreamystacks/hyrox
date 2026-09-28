@@ -187,6 +187,13 @@ body::before{content:"";position:fixed;left:-25%;right:-25%;top:-4%;height:74vh;
 #workout::after{content:"";position:fixed;left:-25%;right:-25%;top:-18%;height:70vh;z-index:-1;pointer-events:none;background:radial-gradient(38% 48% at 12% 12%,color-mix(in srgb,var(--lime) 70%,transparent),transparent 70%),radial-gradient(42% 52% at 92% 38%,color-mix(in srgb,var(--accent2) 60%,transparent),transparent 70%),radial-gradient(30% 36% at 62% 4%,var(--glow),transparent 70%);filter:blur(44px);opacity:calc(var(--glow-op) * .8)}
 #workout{isolation:isolate}
 #splash{background:var(--bg)}
+
+.td-head{display:flex;justify-content:space-between;align-items:flex-start}.td-count{text-align:right;line-height:1}.td-count .section-title{display:block;margin:4px 0 2px;font-family:var(--font-ui);font-variant-numeric:tabular-nums}.td-count small{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.td-date{margin-top:0}
+.td-season{margin:20px 0 18px}.td-row{display:flex;justify-content:space-between;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px}.td-row b{color:var(--text);font-family:var(--font-num);font-size:.9rem;letter-spacing:.02em;font-weight:500}
+.td-ticks{display:grid;grid-template-columns:repeat(27,1fr);gap:3px;align-items:end;height:18px}.td-ticks i{height:10px;border-radius:2px;background:color-mix(in srgb,var(--text) 14%,transparent)}.td-ticks i.deload{height:7px}.td-ticks i.past{background:linear-gradient(180deg,var(--lime),var(--accent2))}.td-ticks i.now{height:18px;background:linear-gradient(180deg,var(--lime),var(--accent2));box-shadow:0 0 12px var(--lime)}
+.td-strip{margin-bottom:16px}
+.td-km{margin:0 0 22px}.td-line{height:4px;border-radius:4px;background:color-mix(in srgb,var(--text) 12%,transparent);overflow:hidden}.td-line i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--lime),var(--accent2))}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style></head><body>
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-volt-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
@@ -418,9 +425,10 @@ function renderToday(){const root=$('today');if(!root)return;const now=new Date(
  if(pre){main=`<div class="td-label">Starts tomorrow</div>`+dayBlock(PLAN[0],0,PLAN[0].date,true)}
  else{main=`<div class="td-label">Today</div>`+dayBlock(w,pos.dow,isoLocal(now),true);
   for(let k=1;k<=7;k++){const d=new Date(now);d.setDate(d.getDate()+k);const pp=planPos(d);if(pp.diff>188)break;const ww=PLAN[pp.week-1],[day,label,key]=dayDefs[pp.dow],raw=rawFor(ww,key,day);if(day==='Wed'||(day==='Sun'&&!/^Optional/i.test(raw)))continue;next=`<div class="card td-next"><div><small>Up next · ${d.toLocaleDateString(undefined,{weekday:'long'})}</small><b>${esc(label)}</b><small>${esc(raw.split('\n')[0]).slice(0,70)}${raw.length>70?'…':''}</small></div><span class="muted" style="font-size:1.3rem">›</span></div>`;break}}
- root.innerHTML=`<h2 class="section-title">${pre?'Ready?':'Today'}</h2><div class="td-date">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</div>
- <div class="td-hero"><div class="td-kpi"><strong>${daysToRace}</strong><span>days to go</span></div><div class="td-kpi"><strong>${pre?'1':w.week}<span style="font-size:.9rem;color:var(--muted)">/27</span></strong><span>${esc(w.phase)} week</span></div><div class="td-kpi"><strong>${km.toFixed(km%1?1:0)}<span style="font-size:.9rem;color:var(--muted)">/${w.runKm}</span></strong><span>km this week</span></div></div>
- <div class="td-strip">${strip}</div>${main}${next}`;
+ root.innerHTML=`<div class="td-head"><h2 class="section-title">${pre?'Ready?':'Today'}</h2><div class="td-count"><span class="section-title">${daysToRace}</span><small>days to go</small></div></div><div class="td-date">${now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</div>
+ <div class="td-season"><div class="td-row"><span>Week ${pre?1:w.week} · ${esc(w.phase)}</span><span>Race · Apr 3</span></div><div class="td-ticks">${PLAN.map(pw=>`<i class="${pw.week<(pre?1:w.week)?'past':pw.week===(pre?1:w.week)?'now':''} ${[4,8,12,16,20].includes(pw.week)?'deload':''}"></i>`).join('')}</div></div>
+ <div class="td-strip">${strip}</div>
+ <div class="td-km"><div class="td-row"><span>Run this week</span><span><b>${km.toFixed(km%1?1:0)}</b> / ${w.runKm} km</span></div><div class="td-line"><i style="width:${Math.min(100,km/w.runKm*100)}%"></i></div></div>${main}${next}`;
  wireActions(root);const nx=root.querySelector('.td-next');if(nx)nx.onclick=()=>{currentWeek=planPos(new Date(Date.now()+86400000)).week;renderPlan();showView('plan')};restoreChecks()}
 // ---------- workout mode ----------
 let woTick=null,restEnd=0,restLen=0,audioCtx=null;
