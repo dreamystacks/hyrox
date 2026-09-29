@@ -49,7 +49,8 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - `guideKeys()` goes through `MATCHERS` to reach `GUIDES` keys. `EXPHOTO` maps muscles, `VIDQ` holds YouTube search queries, and `RETIRED_GUIDES` hides guides.
 
 ### Features map (search these function names)
-- **Today:** `renderToday`, `planPos`, session picker (`k('pick')`), weigh-in row (`bwDue`). Once a log exists for today, the pickers and buttons are replaced by `doneCard` (stats, stations, runs, weights vs last time via `prevLoadBefore`, notes); `upNext` stays below.
+- **Today:** `renderToday`, `planPos`, session picker (`k('pick')`), weigh-in row (`bwDue`). Once a log exists for today, the pickers and buttons are replaced by `doneCard` (stats, stations, runs, weights vs last time via `prevLoadBefore`, notes); `upNext` stays below. "Log rest day" (`logRestDay`) saves a log with session `Rest day` (duration 0); it shows as done but never counts as a workout in History or the coach.
+- **Guides:** `addRules()` adds `std` (Race standard box + rulebook footer) and `dbl` (collapsed Doubles rules) to some `GUIDES` entries.
 - **Workout mode:** `startWorkout`, `renderWorkout`, `woTickFn`, `completeSet`, `finishWorkout`, rest and hold timers, the EMOM runner (`emomRun`, `beepOnce`), and the feel prompt (`20+`/`10-20`/`missed`).
   - All state is in `k('workout')` and timestamp based (survives app close): `rest`, `work` (hold), `rep` (running rep or item timer, `t0` in workout elapsed ms), `times` (per item key), `sim` (`t0`, `marks`), `notes` (per item key), `wnote`, `rir`, `loads`, `feel`, `min`.
   - Sticky `.wo-sticky` bar (safe area aware, opaque once scrolled) holds the clock, Notes, Minimize and the active strip (EMOM, rep, sim Next, rest).
