@@ -58,7 +58,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
   - Timed items (`timedKind`): run reps with a distance (Tue intervals) and single run or station items get Start/Stop.
   - Minimize (`minimizeWorkout`) keeps timers running; `#woPill` reopens. The SW never reloads while `woState()` exists.
   - Units: Settings sets the main unit (`setUnit`); tapping a unit label in workout mode switches only that exercise (`setExUnit`, stored in `k('eunit')`, read by `unitFor(ek)`). Loads lines are always written in the main unit (`toMain`), so the coach format never mixes units.
-  - Sled: Settings "Sled weight" (`k('sled')`, kg, per athlete, not synced). When set, sled push/pull fields take plates only (`dispLoad`, `sledOff`) and the log stores the total incl. sled.
+  - Sled loader (`sledHTML`): sled push/pull cards take the empty sled weight plus 45/25/10 lb plate counts, remembered per exercise in `k('sledcfg')` (kg + plate counts). `sledTotal` is what gets logged. `RACE_WT` shows kg and lb.
   - `wtInfo` strips plan weights from workout titles; the plan number becomes the first suggestion ("Plan weight") and `RACE_WT` shows the HYROX Open race weight as a reference.
   - Finish writes notes: `Workout …`, `Sim week N · total …`, `Runs: …`, `Loads (u): Name 100 (3/3 · RIR 2)`, `Note: …`, `Exercise: …`; station splits go to the stations field (exact seconds kept by `collectStations`).
 - **Weights:**
