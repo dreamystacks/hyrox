@@ -55,7 +55,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - `openFinish(payload)` is the only way a workout, hockey or legacy sim timer gets saved. The workout state is cleared only on Save (`after` callback); Back returns to the workout untouched; "More details" opens the full log form prefilled.
 - The log form (`#log`) is only reached from History: "+ Add session" (`#addSession`) or the edit button. Cancel returns to History. Do not add other entry points.
 - Plan cards show "Start" only for today or missed days of the current week (logged with today's date); "Log hockey" on Thursdays. Future and past weeks show nothing.
-- Today holds: header, one compact week line, weigh-in row when due, one session card (Start first, picker and rest day link at the bottom), Up next. Season ticks, day strip and run km bar live in the Plan week header.
+- Today holds: header, one compact week line, weigh-in row when due, one session card (the title is the session picker: a styled row with a chevron over an invisible native `select#sessionPick`; Start right under it, rest day link at the bottom), Up next. Season ticks, day strip and run km bar live in the Plan week header.
 
 ### Features map (search these function names)
 - **Today:** `renderToday`, `planPos`, session picker (`k('pick')`), weigh-in row (`bwDue`). Once a log exists for today, the pickers and buttons are replaced by `doneCard` (stats, stations, runs, weights vs last time via `prevLoadBefore`, notes); `upNext` stays below. "Log rest day" (`logRestDay`) saves a log with session `Rest day` (duration 0); it shows as done but never counts as a workout in History or the coach.
