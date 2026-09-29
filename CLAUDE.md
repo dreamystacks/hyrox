@@ -49,6 +49,14 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - `parseSets()` handles sets, holds, rest (`REST_BY_KEY`) and 180 s for heavy lifts of 5 reps or fewer. It returns null for EMOM items.
 - `guideKeys()` goes through `MATCHERS` to reach `GUIDES` keys. `EXPHOTO` maps muscles, `VIDQ` holds YouTube search queries, and `RETIRED_GUIDES` hides guides.
 
+### Navigation (v42)
+- Bottom bar: Plan · History · **Today** (raised centre button, app opens here) · Progress · Guides. There is no Log tab. Settings has no Guides row.
+- Main loop: Today → Start → workout guides you (auto scrolls to the next exercise after the last set, RIR or EMOM) → Finish → finish sheet (RPE 1 to 10 + knee 0 to 10, one Save) → Today shows the Done card.
+- `openFinish(payload)` is the only way a workout, hockey or legacy sim timer gets saved. The workout state is cleared only on Save (`after` callback); Back returns to the workout untouched; "More details" opens the full log form prefilled.
+- The log form (`#log`) is only reached from History: "+ Add session" (`#addSession`) or the edit button. Cancel returns to History. Do not add other entry points.
+- Plan cards show "Start" only for today or missed days of the current week (logged with today's date); "Log hockey" on Thursdays. Future and past weeks show nothing.
+- Today holds: header, one compact week line, weigh-in row when due, one session card (Start first, picker and rest day link at the bottom), Up next. Season ticks, day strip and run km bar live in the Plan week header.
+
 ### Features map (search these function names)
 - **Today:** `renderToday`, `planPos`, session picker (`k('pick')`), weigh-in row (`bwDue`). Once a log exists for today, the pickers and buttons are replaced by `doneCard` (stats, stations, runs, weights vs last time via `prevLoadBefore`, notes); `upNext` stays below. "Log rest day" (`logRestDay`) saves a log with session `Rest day` (duration 0); it shows as done but never counts as a workout in History or the coach.
 - **Guides:** `addRules()` adds `std` (Race standard box + rulebook footer) and `dbl` (collapsed Doubles rules) to some `GUIDES` entries.
