@@ -39,6 +39,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 
 ### Plan and sessions
 - `const PLAN=[...]` holds 27 weeks with keys week, date, phase, focus, mon, tue, fri, sat, sun, runKm, notes. Wed is rest, Thu is hockey (see `rawFor()`). Deload weeks are 4, 8, 12, 16 and 20. Benchmark weeks are 1, 8, 16 and 20.
+- Display names (`DAY_NAME`, applied to `dayDefs` and `sessionLabel`): Legs lift + EMOM, Run + Arms, Rest, Hockey, Upper + EMOM, Sim, Recovery. `daySub` makes the short subtitle; `exParts`/`moveShort`/`exRowHTML` turn plan text into a short name plus chips. Plan text and item details sit behind "Show details" (`.src-d`, `.ex-d`); guides open from the ⓘ button (`ibtn`). Log select option values stay the internal names.
 - `dayDefs` holds the day labels. Internal session names are legacy and must stay as they are, because they're stored in logs: `'Mon: Lower + sled'` and `'Fri: Upper + erg + arms B'`. `sessionLabel()` maps them to display names.
 - `sessionItems(day,raw,w)` turns plan text into exercise items. Mon and Fri go through `emomSession()`, which is **line based and keeps the order of the source text**:
   - Monday is the main lift, then the secondary leg lift (hack squat in weeks 1 to 8, RDL in weeks 9 to 21), then the legs & grip EMOM.
