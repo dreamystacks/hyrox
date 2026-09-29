@@ -1,6 +1,6 @@
-# Weekly AI coach: scheduled task prompt (copy)
+# Weekly AI coach: scheduled task prompt (live)
 
-Live copy: scheduled task "HYROX weekly AI coach" (`trig_014ofjxYnXwYGhiNEjs8D3rf`), Saturdays at 6:52 PM America/Toronto, with push and email notifications and automatic approval. Keep this file in sync when the prompt changes; the live prompt is the one that runs.
+This file is the live prompt. The scheduled task "HYROX weekly AI coach" (`trig_014ofjxYnXwYGhiNEjs8D3rf`, Saturdays at 6:52 PM America/Toronto, push and email notifications, automatic approval) reads it from the repo at run time. Edit it here, in the same commit as any change to log formats, session names or data.
 
 ---
 

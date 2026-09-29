@@ -88,7 +88,9 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - The scheduled task "HYROX weekly AI coach" runs Saturdays at 6:52 PM America/Toronto (`trig_014ofjxYnXwYGhiNEjs8D3rf`).
 - It reads the Sheet through the Google Drive connector and the plan from this repo, then writes `coach.json` and `coach-history/`.
 - The app loads `coach.json` with no-store: `loadCoach`, `coachFor`, tweaks on Today cards, and `loads` that pre-fill weight fields.
-- If you change the data model or the plan structure, update the task prompt too (`coach/PROMPT.md` holds the copy).
+- **`coach/PROMPT.md` is the live prompt, not a copy.** The scheduled task reads it from the repo at run time, so whatever is on `main` is what the coach follows on Saturday.
+- **Any change to log formats, session names or stored data must update `coach/PROMPT.md` in the same commit.** That covers the notes lines (`Loads`, `Runs`, `Sim week`, `Note:`), the stations string, session names such as `Rest day`, Benchmarks or `bw` rows, `PLAN` keys, and `coach.json` fields.
+- **Commit messages are how the coach chat stays in sync.** It reads the git log, so write descriptive messages: what changed, why, and the coach impact (or "coach impact: none").
 
 ## iOS gotchas we already hit
 - **No `position:fixed` pseudo-elements inside the fixed, scrolling `#workout` overlay.** iOS painted them over the content and the screen went blank except the sticky rest bar. Put gradients directly on the element's background instead.
