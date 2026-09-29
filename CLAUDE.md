@@ -49,12 +49,20 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - `guideKeys()` goes through `MATCHERS` to reach `GUIDES` keys. `EXPHOTO` maps muscles, `VIDQ` holds YouTube search queries, and `RETIRED_GUIDES` hides guides.
 
 ### Features map (search these function names)
-- **Today:** `renderToday`, `planPos`, session picker (`k('pick')`), weigh-in row (`bwDue`).
-- **Workout mode:** `startWorkout`, `renderWorkout`, `woTickFn`, `completeSet`, rest and hold timers, the EMOM runner (`emomRun`, `beepOnce`), and the feel prompt (`20+`/`10-20`/`missed`).
+- **Today:** `renderToday`, `planPos`, session picker (`k('pick')`), weigh-in row (`bwDue`). Once a log exists for today, the pickers and buttons are replaced by `doneCard` (stats, stations, runs, weights vs last time via `prevLoadBefore`, notes); `upNext` stays below.
+- **Workout mode:** `startWorkout`, `renderWorkout`, `woTickFn`, `completeSet`, `finishWorkout`, rest and hold timers, the EMOM runner (`emomRun`, `beepOnce`), and the feel prompt (`20+`/`10-20`/`missed`).
+  - All state is in `k('workout')` and timestamp based (survives app close): `rest`, `work` (hold), `rep` (running rep or item timer, `t0` in workout elapsed ms), `times` (per item key), `sim` (`t0`, `marks`), `notes` (per item key), `wnote`, `rir`, `loads`, `feel`, `min`.
+  - Sticky `.wo-sticky` bar (safe area aware, opaque once scrolled) holds the clock, Notes, Minimize and the active strip (EMOM, rep, sim Next, rest).
+  - Saturday sims run inside workout mode (`simSegments` + sim card + pinned Next). The old `openTimer` modal only resumes timers started before v35.
+  - Timed items (`timedKind`): run reps with a distance (Tue intervals) and single run or station items get Start/Stop.
+  - Minimize (`minimizeWorkout`) keeps timers running; `#woPill` reopens. The SW never reloads while `woState()` exists.
+  - `setUnit` converts typed loads on kg/lb switch (workout unit label or Settings).
+  - Finish writes notes: `Workout …`, `Sim week N · total …`, `Runs: …`, `Loads (u): Name 100 (3/3 · RIR 2)`, `Note: …`, `Exercise: …`; station splits go to the stations field (exact seconds kept by `collectStations`).
 - **Weights:**
   - `LOADABLE` holds each exercise's weight increment. `suggestLoad` checks the coach override first, then applies progression rules and the 80% deload.
-  - `parseLoads` reads the notes line `Loads (kg|lb): Name 100 (3/3) · ...`, which is appended to the log notes when a workout finishes.
-- **Sim timer:** `openTimer` handles laps for runs and stations, and saves to the log.
+  - `parseLoads` reads the notes line `Loads (kg|lb): Name 100 (3/3) · ...` (optional ` · RIR 0|1|2|3+` inside the brackets, returned as `rir`), which is appended to the log notes when a workout finishes.
+  - RIR rule in `suggestLoad`: 0 = repeat, 1 to 2 = +1 increment, 3+ = +2 increments, missed sets = repeat, no RIR = old rule. Deloads unchanged.
+- **Sim timer (legacy):** `openTimer` modal; new sims start in workout mode.
 - **History:** `renderHistory`, `renderCalendar` (month grid).
 - **Progress:**
   - Coach card and weekly report: `renderCoach`, `renderReport`.
