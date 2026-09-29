@@ -57,7 +57,8 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
   - Saturday sims run inside workout mode (`simSegments` + sim card + pinned Next). The old `openTimer` modal only resumes timers started before v35.
   - Timed items (`timedKind`): run reps with a distance (Tue intervals) and single run or station items get Start/Stop.
   - Minimize (`minimizeWorkout`) keeps timers running; `#woPill` reopens. The SW never reloads while `woState()` exists.
-  - `setUnit` converts typed loads on kg/lb switch (workout unit label or Settings).
+  - Units: Settings sets the main unit (`setUnit`); tapping a unit label in workout mode switches only that exercise (`setExUnit`, stored in `k('eunit')`, read by `unitFor(ek)`). Loads lines are always written in the main unit (`toMain`), so the coach format never mixes units.
+  - `wtInfo` strips plan weights from workout titles; the plan number becomes the first suggestion ("Plan weight") and `RACE_WT` shows the HYROX Open race weight as a reference.
   - Finish writes notes: `Workout …`, `Sim week N · total …`, `Runs: …`, `Loads (u): Name 100 (3/3 · RIR 2)`, `Note: …`, `Exercise: …`; station splits go to the stations field (exact seconds kept by `collectStations`).
 - **Weights:**
   - `LOADABLE` holds each exercise's weight increment. `suggestLoad` checks the coach override first, then applies progression rules and the 80% deload.
