@@ -32,7 +32,7 @@ check('Add button now points at Fri',await p.locator('#addSession').innerText(),
 await p.click('#addSession');await p.clock.runFor(300);
 check('log form prefilled with the date and that weekday\'s session',await p.evaluate(()=>[document.querySelector('.view.active').id,date.value,session.value]),['log','2026-10-09','Fri: Upper + erg + arms B']);
 await p.click('#logForm button[type=submit]');await p.clock.runFor(500);
-check('Save returns to Plan on that week and the Fri card shows the result',await p.evaluate(()=>[document.querySelector('.view.active').id,document.querySelector('.week-title').textContent.startsWith('Week 2:'),!!document.querySelector('.day-card[data-day=Fri] .day-res')]),['plan',true,true]);
+check('Save returns to Plan on that week and the Fri card shows the result',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('weekJump').value==='2',!!document.querySelector('.day-card[data-day=Fri] .day-res')]),['plan',true,true]);
 check('log count 5',await logs(p),5);
 // delete
 await card(p,'Fri').locator('.day-head').click();await p.clock.runFor(200);
