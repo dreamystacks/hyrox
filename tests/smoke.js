@@ -5,7 +5,7 @@ const URL='file://'+path.resolve(__dirname,'../index.html');
 await p.clock.install({time:new Date('2026-09-28T16:00:00')});
 await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(5000);
 const plan=await p.evaluate(()=>[1,9,22].map(n=>{const w=PLAN[n-1];return n+' MON '+sessionItems('Mon',w.mon,w).map(x=>x.title).join(' | ')+' // FRI '+sessionItems('Fri',w.fri,w).map(x=>x.title).join(' | ')}).join('\n'));console.log(plan);
-for(const v of ['plan','history','bench','guides','today'])await p.evaluate(v=>showView(v),v);
+for(const v of ['plan','bench','guides','today'])await p.evaluate(v=>showView(v),v);
 await p.evaluate(()=>startWorkout(1,0,'2026-09-28'));await p.clock.runFor(500);
 console.log('workout items:',await p.locator('#workout .wo-item').count());
 await p.screenshot({path:path.resolve(__dirname,'smoke.png')});

@@ -9,7 +9,7 @@ const open=async(tz,when='2026-10-07T10:00:00')=>{const ctx=await b.newContext({
  await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1')});await p.clock.install({time:new Date(when)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('America/Toronto');
 const tabs=await p.evaluate(()=>[...document.querySelectorAll('.bottombar .tab')].map(t=>t.dataset.view+':'+(t.textContent.trim()||'(today)')));
-check('bar: Plan, History, Today (raised, active), Coach; no Guides or Progress',tabs,['plan:Plan','history:History','today:(today)','bench:Coach']);
+check('bar: Plan, Today (raised, active), Coach; no History, Guides or Progress',tabs,['plan:Plan','today:(today)','bench:Coach']);
 check('app opens on Today',await p.evaluate(()=>document.querySelector('.view.active').id),'today');
 check('Settings has no Guides row',await p.locator('#settingsModal #guidesBtn').count(),0);
 await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
