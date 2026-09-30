@@ -383,26 +383,19 @@ html,body{overscroll-behavior-y:none}
 .td-rest .tp{margin-bottom:6px}
 
 /* season grid + week strip states */
-.sg-card{padding:0;overflow:hidden}
-.sg-head{display:flex;align-items:center;gap:8px;width:100%;padding:14px;background:none;border:0;color:inherit;font:inherit;text-align:left;touch-action:manipulation;cursor:pointer}
-.sg-head{flex-wrap:wrap;row-gap:2px}.sg-count{order:3;flex-basis:100%}.sg-head .td-label{margin:0}.sg-head .chev{margin-left:auto;transition:transform .2s}.sg-card.shut .sg-head .chev{transform:rotate(-90deg)}
-.sg-count{font-size:.78rem;color:var(--muted)}.sg-count b{color:var(--text);font-family:var(--font-num);font-weight:500;font-size:.95rem}
-.sg-body{padding:0 14px 14px}.sg-card.shut .sg-body{display:none}
-.sg2{display:grid;gap:6px;justify-content:center}
-.sg2-row{display:grid;grid-template-columns:34px repeat(7,minmax(0,30px));gap:6px;align-items:center;padding:0;border:0;border-radius:8px;background:none;touch-action:manipulation;cursor:pointer}
-.sg2-row.sel{background:color-mix(in srgb,var(--lime) 10%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 10%,transparent)}
-.sg2-lab{font-family:var(--font-num);font-size:.78rem;color:var(--muted);text-align:center;border-radius:6px;padding:1px 0}
-.sg2-lab.dl{background:color-mix(in srgb,var(--amber) 22%,transparent);color:var(--amber);font-weight:600}
-.sg2-row i{display:grid;place-items:center;aspect-ratio:1;border-radius:6px;font-style:normal;font-size:.8rem;font-weight:700;color:var(--on-accent)}
+.sgm-wrap{margin:0 0 14px}
+.sgm-count{font-size:.74rem;color:var(--muted);margin:0 0 8px}.sgm-count b{color:var(--text);font-family:var(--font-num);font-weight:500;font-size:.85rem}
+.sgm{display:grid;grid-template-columns:repeat(27,minmax(0,1fr));gap:3px}
+.sgm-col{display:grid;gap:3px;padding:0;border:0;border-radius:3px;background:none;touch-action:manipulation;cursor:pointer}
+.sgm-col.dl{background:color-mix(in srgb,var(--amber) 22%,transparent);outline:2px solid color-mix(in srgb,var(--amber) 22%,transparent)}
+.sgm-col.sel{outline:1.5px solid var(--text);outline-offset:1px}
+.sgm-col i{display:block;aspect-ratio:1;border-radius:2px}
 .b-trained{background:var(--lime)}
 .b-rest{background:color-mix(in srgb,var(--lime) 34%,transparent)}
 .b-missed{background:color-mix(in srgb,var(--muted) 45%,var(--bg))}
-.b-future{background:transparent;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--muted) 45%,transparent)}
+.b-future{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--muted) 45%,transparent)}
 .b-today{background:var(--amber)}
-i.race{outline:2px solid #f5c542;outline-offset:1px}
-.sg-key{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:.7rem;color:var(--muted)}
-.sg-key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.sg-key .k-dl{padding:1px 7px;border-radius:4px;background:color-mix(in srgb,var(--amber) 22%,transparent);color:var(--amber)}
+i.race{outline:1.5px solid #f5c542;outline-offset:0}
 .add-wide{width:100%;margin-top:14px}
 .wk-tot{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin:6px 0 8px}.wk-tot b{color:var(--text);font-family:var(--font-num);font-weight:500;font-size:.95rem}
 .day-mid{display:grid;gap:2px;min-width:0}
@@ -603,9 +596,8 @@ function didHTML(x,mine){const act=mine?`<div class="did-act"><button class="sec
  const runs=((String(x.notes||'').match(/Runs: ([^\n]+)/)||[])[1]||''),L=parseLoads(x),st=String(x.stations||'').split(' · ').filter(Boolean),nl=String(x.notes||'').split('\n').map(t=>t.trim().replace(/^Note: /,'')).filter(t=>t&&!/^(Workout \d|Loads \(|Runs: |Sim week |Stations: )/.test(t)),
   c=[x.duration?x.duration+' min':'',x.rpe?'RPE '+x.rpe:'',x.knee?'Knee '+x.knee+'/10':'',x.distance?x.distance+' km':'',x.pace?x.pace+' /km':''].filter(Boolean);
  return`<div class="did"><div class="did-h">${when} · ${esc(sessionLabel(x.session))}</div>${c.length?`<div class="td-chips">${c.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}${st.length?`<div class="td-dsub">Stations</div><div class="td-chips">${st.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}${runs?`<div class="td-dsub">Runs</div><div class="td-chips">${runs.split(' / ').map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}${L.length?`<div class="td-dsub">Weights</div><ul class="td-lifts">${L.map(l=>`<li><span>${esc(l.name)} ${numTxt(l.kg)} ${esc(l.u||'kg')}${l.st&&/\//.test(l.st)?` <small>(${esc(l.st)}${l.rir?' · RIR '+esc(l.rir):''})</small>`:''}</span></li>`).join('')}</ul>`:''}${nl.length?`<div class="td-dsub">Notes</div><div class="td-dnotes">${nl.map(t=>`<p>${esc(t)}</p>`).join('')}</div>`:''}${act}</div>`}
-function renderSeasonGrid(who){const el=$('gridWrap');if(!el)return;const S=seasonStates(who),pn=planPos(new Date()),N=Math.max(0,Math.min(189,pn.diff+1)),trained=S.reduce((a,d)=>a+d.filter(x=>x.st==='trained').length,0);let open=true;try{open=localStorage.getItem('hrx_grid_open')!=='0'}catch{}
- el.innerHTML=`<div class="card sg-card${open?'':' shut'}"><button class="sg-head" id="sgToggle" type="button" aria-expanded="${open}"><span class="td-label">Season</span><span class="sg-count">${pn.diff<0?'Starts Sep 28':`Day <b>${N}</b> / 189`} · <b>${trained}</b> trained · <b>${189-N}</b> days left</span><span class="chev" aria-hidden="true">⌄</span></button><div class="sg-body"><div class="sg2">${S.map((days,wi)=>{const wk=wi+1;return`<button class="sg2-row${wk===currentWeek?' sel':''}" type="button" data-wk="${wk}" aria-label="Week ${wk}"><span class="sg2-lab${[4,8,12,16,20].includes(wk)?' dl':''}">${wk}</span>${days.map((d,i)=>`<i class="b-${d.today?'today':d.st}${wk===27&&i>=5?' race':''}">${d.today&&d.st==='trained'?'✓':''}</i>`).join('')}</button>`}).join('')}</div><div class="sg-key"><span><i class="b-trained"></i>Trained</span><span><i class="b-rest"></i>Rest</span><span><i class="b-missed"></i>Missed</span><span><i class="b-future"></i>Ahead</span><span><i class="b-today"></i>Today</span><span><i class="b-future race"></i>Race days</span><span class="k-dl">Deload week</span></div></div></div>`;
- $('sgToggle').onclick=()=>{const c=el.querySelector('.sg-card'),o=c.classList.toggle('shut');$('sgToggle').setAttribute('aria-expanded',String(!o));try{localStorage.setItem('hrx_grid_open',o?'0':'1')}catch{}};
+function renderSeasonGrid(who){const el=$('gridWrap');if(!el)return;const S=seasonStates(who),pn=planPos(new Date()),N=Math.max(0,Math.min(189,pn.diff+1)),trained=S.reduce((a,d)=>a+d.filter(x=>x.st==='trained').length,0);
+ el.innerHTML=`<div class="sgm-wrap"><div class="sgm-count">${pn.diff<0?'Starts Sep 28':`Day <b>${N}</b> / 189`} · <b>${trained}</b> trained</div><div class="sgm">${S.map((days,wi)=>{const wk=wi+1;return`<button class="sgm-col${[4,8,12,16,20].includes(wk)?' dl':''}${wk===currentWeek?' sel':''}" type="button" data-wk="${wk}" aria-label="Week ${wk}">${days.map((d,i)=>`<i class="b-${d.today?'today':d.st}${wk===27&&i>=5?' race':''}"></i>`).join('')}</button>`}).join('')}</div></div>`;
  el.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>{currentWeek=+b.dataset.wk;planSelDate=null;renderPlan();const t=document.querySelector('#plan .week-nav');if(t)window.scrollTo({top:Math.max(0,t.getBoundingClientRect().top+scrollY-12),behavior:'smooth'})})}
 function renderPlan(){renderSeg($('planSeg'),renderPlan);const who=viewing(),mine=who===athlete,w=PLAN[currentWeek-1],todayIso=isoLocal(new Date()),start=new Date(w.date+'T12:00:00'),end=dateAt(w.date,6),bench=[8,16,20].includes(w.week),deload=[4,8,12,16,20].includes(w.week);
  const L=getLogs(who).filter(x=>weekOf(x.date)===w.week);if(planSelDate&&weekOf(planSelDate)!==w.week)planSelDate=null;weekJump.value=w.week;renderSeasonGrid(who);
