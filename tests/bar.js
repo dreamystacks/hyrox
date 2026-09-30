@@ -23,5 +23,10 @@ await p.evaluate(()=>document.activeElement.blur());await shrink(34);await p.wai
 check('keyboard closed: bar back at the bottom',await bar(),'translateY(34px)');
 await p.selectOption('#session','Other');await p.waitForTimeout(1200);
 check('after picking an option the select is released and the bar stays correct',await p.evaluate(()=>[document.activeElement===document.getElementById('session'),document.querySelector('.bottombar').style.transform]),[false,'translateY(34px)']);
+// no event fires (short pages such as Today): the periodic realign still catches the gap
+await p.evaluate(()=>{showView('today');visualViewport.height=innerHeight+41});await p.waitForTimeout(700);
+check('Today, viewport changed without any event: bar corrected within 700 ms',await bar(),'translateY(41px)');
+await p.evaluate(()=>{visualViewport.height=innerHeight});await p.waitForTimeout(700);
+check('viewport back to normal: transform cleared',await bar(),'');
 check('no page errors',errs.join('|'),'');
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();
