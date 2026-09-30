@@ -27,6 +27,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 | `plan/HYROX_Brisbane_2027_Plan.xlsx` | Fred's source plan. Keep in sync with `PLAN`. |
 | `tests/smoke.js` | Playwright smoke test. |
 | `tests/swap.js` | Playwright check for a swapped week (Plan "Logged" tags, Today default, Done card, Up next). |
+| `tests/nav.js` | Playwright check for the bar, the Coach view order, the Next report line (Toronto and Brisbane viewers), the Guides button and Back, and the info buttons. |
 | `tests/grid.js` | Playwright check for the season grid and the week strip (states, counters, tap to jump, no overflow at 390 and 360). |
 
 ### Data and sync
@@ -52,7 +53,9 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - `guideKeys()` goes through `MATCHERS` to reach `GUIDES` keys. `EXPHOTO` maps muscles, `VIDQ` holds YouTube search queries, and `RETIRED_GUIDES` hides guides.
 
 ### Navigation (v42)
-- Bottom bar: Plan · History · **Today** (raised centre button, app opens here) · Progress · Guides. There is no Log tab. Settings has no Guides row.
+- Bottom bar: Plan · History · **Today** (raised centre button, app opens here) · Coach. There is no Log tab, no Progress tab and no Guides tab; the bar shares its width between however many tabs exist (`grid-auto-flow:column`). Settings has no Guides row.
+- **Coach tab** (label Coach, spark icon; the internal view id is still `bench`, so `showView('bench')`, `renderBench`, `[data-view=bench]`): one athlete switch, coach card, weekly report, an always visible "Next report: Sat 6:52 PM" line (`nextReportAt`/`nextReportText`: the coach runs Saturdays 18:52 Toronto time, shown in the viewer's own time zone), then the section "What the coach reads": finish ladder, curves, body weight, benchmarks, station table.
+- **Guides** are not a tab: the book button in the Today header (`[data-guides]`) opens the Guides view, and its Back button (`#guidesBack`) returns to Today. While Guides is open the Today tab stays highlighted. The ⓘ buttons open the guide modal over whatever view you are on and close back to it.
 - Main loop: Today → Start → workout guides you (auto scrolls to the next exercise after the last set, RIR or EMOM) → Finish → finish sheet (RPE 1 to 10 + knee 0 to 10, one Save) → Today shows the Done card.
 - `openFinish(payload)` is the only way a workout, hockey or legacy sim timer gets saved. The workout state is cleared only on Save (`after` callback); Back returns to the workout untouched; "More details" opens the full log form prefilled.
 - The log form (`#log`) is only reached from History: "+ Add session" (`#addSession`) or the edit button. Cancel returns to History. Do not add other entry points.
@@ -79,14 +82,14 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
   - RIR rule in `suggestLoad`: 0 = repeat, 1 to 2 = +1 increment, 3+ = +2 increments, missed sets = repeat, no RIR = old rule. Deloads unchanged.
 - **Sim timer (legacy):** `openTimer` modal; new sims start in workout mode.
 - **History:** `renderHistory`, `renderCalendar` (month grid).
-- **Progress:**
-  - **Season grid** (first card on Progress, `renderSeasonGrid(who)` into `#gridWrap`): 27 columns (plan weeks) x 7 rows (Mon to Sun) = 189 boxes, built from `seasonStates(who)` and `dayStatesFor(W,L,todayIso)`. State per day, in priority order: `trained` (lime: a non Rest day log on that date, or that day's session logged by stored name anywhere in that plan week, the same matching as the Plan tags) > `rest` (dim lime: Wed, Sun without the optional run, Thu from week 26, or a logged Rest day, once the date has passed or is today) > `missed` (past, dark) > `future` (dark, low opacity). Today gets a ring. Deload weeks (4, 8, 12, 16, 20) get an amber tinted column (`.sg-in.dl`, `--amber`). Tapping a column opens Plan on that week. Header: "Day N / 189 · X workouts" (X counts non Rest day logs). Boxes size themselves from the card width (`repeat(27,1fr)`, about 9px with a 3px gap), so nothing overflows at 360 or 390. Not shown on Today on purpose (Today answers one question).
+- **Coach tab** (view id `bench`):
+  - **Season grid** (last card of the Coach view for now, `renderSeasonGrid(who)` into `#gridWrap`): 27 columns (plan weeks) x 7 rows (Mon to Sun) = 189 boxes, built from `seasonStates(who)` and `dayStatesFor(W,L,todayIso)`. State per day, in priority order: `trained` (lime: a non Rest day log on that date, or that day's session logged by stored name anywhere in that plan week, the same matching as the Plan tags) > `rest` (dim lime: Wed, Sun without the optional run, Thu from week 26, or a logged Rest day, once the date has passed or is today) > `missed` (past, dark) > `future` (dark, low opacity). Today gets a ring. Deload weeks (4, 8, 12, 16, 20) get an amber tinted column (`.sg-in.dl`, `--amber`). Tapping a column opens Plan on that week. Header: "Day N / 189 · X workouts" (X counts non Rest day logs). Boxes size themselves from the card width (`repeat(27,1fr)`, about 9px with a 3px gap), so nothing overflows at 360 or 390. Not shown on Today on purpose (Today answers one question).
   - The Plan week header strip (`td-strip`) uses the same `dayStatesFor` colours and shows "x / 7 days" next to "Run this week" (trained plus passed rest days). The 27 tick season bar above it is unchanged.
   - Coach card and weekly report: `renderCoach`, `renderReport`.
   - Levels and standards: `renderStanding` (finish ladder), `renderCurves`, `renderStdTable` (constants `STD`, `FINISH`, `RUNPACE`).
   - **Levels rule:** `STD`/`FINISH` levels are in race (fatigued) times. Only logged sim data meets them: station splits from full volume sims (`stationSeries`) and full sim totals (`latestFullSim`). Fresh benchmarks (`BENCH`) are only compared to their own target ("X s to target" / "Target hit ✓").
   - Body weight: `renderBW`, plotted as a weekly average line with a dot per weigh-in.
-- **Settings sheet:** athlete switch, theme, sync, weight unit, check for updates, guides.
+- **Settings sheet:** athlete switch, theme, sync, weight unit, check for updates.
 - **Themes:** 5 accents (`ACCENTS`) × Dark, Light or Auto, set through `data-theme="{accent}-{mode}"` on `<html>`. Use the CSS variables `--g1/--g2` (gradient), `--lime` (accent), `--bg`, `--card`, `--text` and `--muted`. Fonts are SF Pro (system) for text and Barlow Condensed (`--font-num`) for numbers.
 
 ### AI coach (weekly scheduled task)
@@ -105,7 +108,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - **Viewport:** `maximum-scale=1, user-scalable=no` stops double tap zoom, which Fred asked for.
 
 ## Test and deploy
-1. Run `node tests/smoke.js` (plus `node tests/swap.js` for anything touching Plan, Today or Up next, and `node tests/grid.js` for the season grid or week strip). They need `playwright`, and Chromium sits at `/opt/pw-browsers/chromium` in Claude's cloud sandbox. Add targeted Playwright checks for what you changed, and look at screenshots at 390x844.
+1. Run `node tests/smoke.js` (plus `node tests/swap.js` for anything touching Plan, Today or Up next, `node tests/grid.js` for the season grid or week strip, and `node tests/nav.js` for the bar, the Coach view or the Guides button). They need `playwright`, and Chromium sits at `/opt/pw-browsers/chromium` in Claude's cloud sandbox. Add targeted Playwright checks for what you changed, and look at screenshots at 390x844.
 2. Use `p.clock.install()` to pin dates, because the app depends on the current plan week. Wait about 4 s after picking an athlete so the splash clears.
 3. Bump `VERSION` in `sw.js`, commit, and push to `main`.
 4. Never run `pkill -f` with a broad pattern in the sandbox; it kills the shell. Start servers with `setsid`.

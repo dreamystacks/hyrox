@@ -26,6 +26,7 @@ check('Sat done on its own date has no weekday',t.Sat,'✓ Logged');
 check('day chips filled when that session was done any day this week',await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.day-card')].map(c=>[c.dataset.day,c.querySelector('.day-chip').classList.contains('done')]))),{Mon:true,Tue:true,Wed:false,Thu:true,Fri:false,Sat:true,Sun:false});
 check('Plan rows have no tick circles',await p.locator('#days .ex-st').count(),0);
 check('today keeps a ring, not a fill (Sat chip is filled only because the sim is done)',await p.evaluate(()=>{const c=document.querySelector('.day-head.today .day-chip'),cs=getComputedStyle(c);return [cs.outlineStyle,c.classList.contains('done')]}),['solid',true]);
+check('Start only on cards whose session is not logged this week (Fri missed; Mon, Tue, Thu, Sat done)',await p.evaluate(()=>[...document.querySelectorAll('.day-card')].filter(c=>c.querySelector('[data-start],[data-hockey]')).map(c=>c.dataset.day)),['Fri']);
 check('yellow chip still marks today (Sat)',await p.evaluate(()=>document.querySelector('.day-head.today').closest('.day-card').dataset.day),'Sat');
 await p.click('#nextWeek');await p.clock.runFor(400);check('next week has no tags',Object.values(await tags(p)).join(''),'');
 await p.close();

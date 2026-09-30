@@ -13,7 +13,7 @@ const open=async(w=390)=>{const p=await b.newPage({viewport:{width:w,height:844}
  await p.clock.install({time:new Date('2026-10-10T18:00:00')});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);return p};
 const col=(p,wk)=>p.evaluate(wk=>[...document.querySelectorAll(`.sg-col[data-wk="${wk}"] i`)].map(i=>i.className.replace('s-','').replace(' now','*')),wk);
 let p=await open();
-check('grid is the first card under the athlete switch',await p.evaluate(()=>document.querySelector('#bench > #gridWrap')&&document.querySelector('#gridWrap').previousElementSibling.id),'benchSeg');
+check('grid card lives in the Coach view',await p.evaluate(()=>!!document.querySelector('#bench > #gridWrap .sg-card')),true);
 check('27 columns x 7 rows = 189 boxes',await p.evaluate(()=>[document.querySelectorAll('.sg-col').length,document.querySelectorAll('.sg i').length]),[27,189]);
 check('header counter',await p.locator('.sg-count').innerText(),'Day 13 / 189 · 4 workouts');
 check('week 1: no logs, Rest day log on Tue, Wed and Sun are rest',await col(p,1),['missed','rest','rest','missed','missed','missed','rest']);
