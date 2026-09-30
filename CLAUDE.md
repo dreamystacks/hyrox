@@ -32,6 +32,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 | `tests/header.js` | Playwright check for the Plan header: dots and circles share states, today dot, frame follows column taps and arrows, circles scroll to and open the day card, stats line, 390 and 360 layout, first card position. |
 | `tests/coach.js` | Playwright check for the Coach tab: empty state on week 1, seeded splits, runs and benchmarks (estimate, levers order, diverging bars with signs, clamp, target hit, trend tiles and skeletons, tap to expand, timeline, standards collapse), measured full sim, coach.json card, viewing another athlete, light theme, 390 and 360. |
 | `tests/sled.js` | Playwright check for the sled suggestions: Monday EMOM progression (20+, 10-20, missed, deload, no history), Saturday sim percent of race weight, contexts never mixing, coach override Monday only, Use button, logged total, missing empty sled weight, race weight cap. |
+| `tests/bar.js` | Playwright check for the bottom bar realign with a faked visualViewport: select and date focus still push the bar down, a text field with the keyboard up does not. |
 | `tests/plan.js` | Playwright check for the Plan tab as history: inline results on a swapped week, expand, Edit, Delete, Add session (prefill, returns to Plan), Settings backup rows. |
 
 ### Data and sync
@@ -108,6 +109,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 ## iOS gotchas we already hit
 - **No `position:fixed` pseudo-elements inside the fixed, scrolling `#workout` overlay.** iOS painted them over the content and the screen went blank except the sticky rest bar. Put gradients directly on the element's background instead.
 - **Bottom tab bar:** iOS standalone can leave the layout viewport short after the keyboard closes. The small script before `</body>` realigns the bar using `visualViewport`. Don't use `screen.height` for this, because it overshoots and cuts the bar off.
+- **Bar realign and selects:** the realign script treats only text like inputs and textareas as "keyboard up" (`typing`). A focused select or date input (the Log form) is not a keyboard, and iOS keeps focus on it after the picker closes, which used to leave the bar floating above the bottom. The script also blurs selects and date inputs on change and realigns again. Covered by `tests/bar.js`.
 - **Keep settings rows that toggle in place** (like the kg/lb unit) out of the "any `.set-row` click closes the sheet" rule, or the screen jumps.
 - **Cache:** the SW is network first and auto reloads on update, except during a workout. Users have "Check for updates" in Settings. If Fred reports old behaviour, first check that his screenshot shows the current version.
 - **Viewport:** `maximum-scale=1, user-scalable=no` stops double tap zoom, which Fred asked for.
