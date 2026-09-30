@@ -11,7 +11,7 @@ let fails=0;const check=(name,got,want)=>{const g=JSON.stringify(got),w=JSON.str
 const open=async(w=390)=>{const p=await b.newPage({viewport:{width:w,height:844}});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>d.accept());
  await p.addInitScript(lg=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(lg))},LOGS);
  await p.clock.install({time:new Date('2026-10-10T18:00:00')});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(500);return p};
-const col=(p,wk)=>p.evaluate(wk=>[...document.querySelectorAll(`.sgm-col[data-wk="${wk}"] i`)].map(i=>i.className.replace(/^b-/,'').replace(' race','#')),wk);
+const col=(p,wk)=>p.evaluate(wk=>[...document.querySelectorAll(`.sgm-col[data-wk="${wk}"] i`)].map(i=>i.className.replace(/^b-/,'')),wk);
 let p=await open();
 check('Plan order: seg, grid, week nav, header, days, add button',await p.evaluate(()=>[...document.querySelectorAll('#plan > *')].map(e=>e.id||e.className.split(' ')[0])),['section-title','planSeg','gridWrap','week-nav','weekHero','days','addSession']);
 check('27 columns x 7 = 189 dots',await p.evaluate(()=>[document.querySelectorAll('.sgm-col').length,document.querySelectorAll('.sgm-col i').length]),[27,189]);
@@ -19,14 +19,11 @@ check('one line counter',(await p.locator('.sgm-count').innerText()).replace(/\s
 check('week 1: Rest day log Tue, Wed and Sun rest, rest missed',await col(p,1),['missed','rest','rest','missed','missed','missed','rest']);
 check('week 2 (swapped)',await col(p,2),['trained','trained','rest','trained','trained','today','future']);
 check('week 3 all ahead',await col(p,3),Array(7).fill('future'));
-check('race days: Sat and Sun of week 27',await col(p,27),['future','future','future','future','future','future#','future#']);
-check('deload columns tinted (4, 8, 12, 16, 20)',await p.evaluate(()=>[...document.querySelectorAll('.sgm-col.dl')].map(x=>+x.dataset.wk)),[4,8,12,16,20]);
-check('week 2 column is selected',await p.evaluate(()=>document.querySelector('.sgm-col.sel').dataset.wk),'2');
 const g=await p.evaluate(()=>{const w=document.querySelector('.sgm-wrap').getBoundingClientRect(),i=document.querySelector('.sgm-col i').getBoundingClientRect();return{h:Math.round(w.height),dot:Math.round(i.width),noScroll:document.documentElement.scrollWidth<=innerWidth,fixed:[...document.querySelectorAll('.sgm-wrap *')].some(e=>getComputedStyle(e).position==='fixed')}});
 check('390: compact (under 130px tall), dots 8 to 10px, no scroll, nothing fixed',[g.h<130,g.dot>=8&&g.dot<=10,g.noScroll,g.fixed],[true,true,true,false]);
 check('another athlete has their own grid',await p.evaluate(()=>{renderSeasonGrid('will');const t=document.querySelector('.sgm-count').textContent.replace(/\s+/g,' ')+' | '+document.querySelectorAll('.sgm i.b-trained').length;renderSeasonGrid('fred');return t}),'Day 13 / 189 · 0 trained | 0');
 await p.click('.sgm-col[data-wk="4"]');await p.clock.runFor(800);
-check('tap week 4 selects it in Plan',await p.evaluate(()=>[document.querySelector('.view.active').id,document.querySelector('.week-title').textContent.startsWith('Week 4:'),document.querySelector('.sgm-col.sel').dataset.wk]),['plan',true,'4']);
+check('tap week 4 selects it in Plan',await p.evaluate(()=>[document.querySelector('.view.active').id,document.querySelector('.week-title').textContent.startsWith('Week 4:')]),['plan',true]);
 // week header
 await p.evaluate(()=>{currentWeek=2;renderPlan()});
 check('week 2 strip states',await p.evaluate(()=>[...document.querySelectorAll('.td-strip .td-day')].map(d=>d.className.replace('td-day st-','').replace(' now','*'))),['trained','trained','rest','trained','trained','trained*','future']);
