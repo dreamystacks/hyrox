@@ -26,6 +26,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 | `apps-script/Code.gs` | Google Apps Script backend (key redacted; the real key is in the deployed script only). |
 | `plan/HYROX_Brisbane_2027_Plan.xlsx` | Fred's source plan. Keep in sync with `PLAN`. |
 | `tests/smoke.js` | Playwright smoke test. |
+| `tests/swap.js` | Playwright check for a swapped week (Plan "Logged" tags, Today default, Done card, Up next). |
 
 ### Data and sync
 - **Athletes:** `ATHLETES={fred,will,grady}` is the single source. Every per athlete loop (picker, `merge`, `markAllDirty`, segment controls) uses `Object.keys(ATHLETES)`, so adding someone is one line plus the coach prompt.
@@ -55,6 +56,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - `openFinish(payload)` is the only way a workout, hockey or legacy sim timer gets saved. The workout state is cleared only on Save (`after` callback); Back returns to the workout untouched; "More details" opens the full log form prefilled.
 - The log form (`#log`) is only reached from History: "+ Add session" (`#addSession`) or the edit button. Cancel returns to History. Do not add other entry points.
 - Plan cards show "Start" only for today or missed days of the current week (logged with today's date); "Log hockey" on Thursdays. Future and past weeks show nothing.
+- **Sessions are matched by stored session name, never by date.** `weekSessions(week)` maps session name to the logs of that plan week (`Rest day` ignored). Plan cards use it (`loggedTag`): "✓ Logged" when done on the card's own date, "✓ Logged Tue" when the session was done on another weekday (swapped days). The yellow chip on a card still marks today's date. Today's default session, `upNext` and the Start eligibility use the same map: a session already done this week is skipped, and when a day was displaced by a swap, Up next shows "Up next · Mon's session". Plain missed days are not nagged in Up next (Today's hint covers them). Covered by `tests/swap.js`.
 - Today holds: header, one compact week line, weigh-in row when due, one session card (the title is the session picker: a styled row with a chevron over an invisible native `select#sessionPick`; Start right under it, rest day link at the bottom), Up next. Season ticks, day strip and run km bar live in the Plan week header.
 
 ### Features map (search these function names)
@@ -100,7 +102,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 - **Viewport:** `maximum-scale=1, user-scalable=no` stops double tap zoom, which Fred asked for.
 
 ## Test and deploy
-1. Run `node tests/smoke.js`. It needs `playwright`, and Chromium sits at `/opt/pw-browsers/chromium` in Claude's cloud sandbox. Add targeted Playwright checks for what you changed, and look at screenshots at 390x844.
+1. Run `node tests/smoke.js` (and `node tests/swap.js` for anything touching Plan, Today or Up next). They need `playwright`, and Chromium sits at `/opt/pw-browsers/chromium` in Claude's cloud sandbox. Add targeted Playwright checks for what you changed, and look at screenshots at 390x844.
 2. Use `p.clock.install()` to pin dates, because the app depends on the current plan week. Wait about 4 s after picking an athlete so the splash clears.
 3. Bump `VERSION` in `sw.js`, commit, and push to `main`.
 4. Never run `pkill -f` with a broad pattern in the sandbox; it kills the shell. Start servers with `setsid`.
