@@ -13,7 +13,7 @@ check('bar: Plan, Today (raised, active), Coach; no History, Guides or Progress'
 check('app opens on Today',await p.evaluate(()=>document.querySelector('.view.active').id),'today');
 check('Settings has no Guides row',await p.locator('#settingsModal #guidesBtn').count(),0);
 await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
-check('Coach view order',await p.evaluate(()=>[...document.querySelectorAll('#bench > *')].map(e=>e.id||e.tagName.toLowerCase()).slice(0,9)),['h2','benchSeg','coachWrap','reportWrap','nextReport','readsH','p','standWrap','curveWrap']);
+check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#bench > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,7)),['section-title','benchSeg','standWrap','leverWrap','card','splitWrap','testWrap']);
 check('Coach title',await p.locator('#bench h2').innerText(),'Coach');
 check('no athlete toggle in the Coach or Plan header',await p.evaluate(()=>[document.querySelectorAll('#bench .seg').length,document.querySelectorAll('#plan .seg').length]),[0,0]);
 await p.evaluate(()=>{syncCfg=()=>({url:'x',key:'y'});setSegRender();settingsModal.classList.add('show')});
@@ -24,7 +24,7 @@ await p.evaluate(()=>{settingsModal.classList.remove('show')});await p.click('#b
 check('Back to me clears it',await p.evaluate(()=>[viewing(),document.getElementById('benchSeg').textContent]),['fred','']);
 await p.evaluate(()=>{syncCfg=()=>null;});
 check('Next report (Toronto viewer, Wed)',await p.locator('#nextReport').innerText(),'Next report: Sat 6:52 PM');
-check('the line is there even with no report at all',await p.evaluate(()=>[!!document.querySelector('#coachWrap .coach.empty'),$('nextReport').offsetHeight>0]),[true,true]);
+check('the line is there even with no report at all',await p.evaluate(()=>[document.querySelector('#coachWrap .cc-head').textContent==='Baseline week',$('nextReport').offsetHeight>0]),[true,true]);
 await p.evaluate(()=>{});await p.context().close();
 p=await open('Australia/Brisbane');await p.click('.bottombar [data-view=bench]');await p.clock.runFor(400);
 check('Next report shown in the viewer\'s own time zone (Brisbane)',await p.locator('#nextReport').innerText(),'Next report: Sun 8:52 AM');await p.context().close();
