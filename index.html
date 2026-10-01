@@ -496,6 +496,8 @@ html,body{overscroll-behavior-y:none}
 .sl-sug{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0 2px;padding:8px 10px;border-radius:12px;background:var(--accent-soft);font-size:.82rem}.sl-sug b{font-family:var(--font-num);font-weight:500;font-size:1rem}
 .sl-sug button{flex:none;min-height:34px;padding:0 14px;border:0;border-radius:10px;background:linear-gradient(115deg,var(--g1),var(--g2));color:var(--on-grad);font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}.sl-sug em{font-style:normal;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .sl-sp{flex:1;min-width:0;line-height:1.35}.sl-sug .nw{white-space:nowrap}.sl-sug b{display:inline!important}.sl-sug .sl-sp,.sl-sug .nw{flex:none}.sl-sug .sl-sp{flex:1}.sl-why{display:block;color:var(--muted);font-size:.72rem;margin:0 0 6px}.sl-need{margin:8px 0 4px;padding:8px 10px;border-radius:12px;background:var(--chip);color:var(--text2);font-size:.8rem}.sim-sled .sled-box{margin-top:6px}
+/* short pages (Today, Log) must still fill the screen: on iOS a document shorter than the viewport lets the fixed bar float above the bottom */
+html{min-height:100%}body{min-height:100vh;min-height:100dvh}
 </style></head><body>
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-volt-dark-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
 <div id="workout" aria-live="polite"></div>

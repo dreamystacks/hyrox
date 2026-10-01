@@ -23,6 +23,8 @@ await p.evaluate(()=>document.activeElement.blur());await shrink(34);await p.wai
 check('keyboard closed: bar back at the bottom',await bar(),'translateY(34px)');
 await p.selectOption('#session','Other');await p.waitForTimeout(1200);
 check('after picking an option the select is released and the bar stays correct',await p.evaluate(()=>[document.activeElement===document.getElementById('session'),document.querySelector('.bottombar').style.transform]),[false,'translateY(34px)']);
+// short pages fill the screen
+for(const v of ['today','log','guides']){await p.evaluate(v=>showView(v),v);await p.waitForTimeout(150);check('document is at least as tall as the screen on '+v+', no scrollbar for it',await p.evaluate(()=>[document.documentElement.scrollHeight>=innerHeight,document.documentElement.scrollHeight-innerHeight<=2||document.documentElement.scrollHeight>innerHeight]),[true,true])}
 // no event fires (short pages such as Today): the periodic realign still catches the gap
 await p.evaluate(()=>{showView('today');visualViewport.height=innerHeight+41});await p.waitForTimeout(700);
 check('Today, viewport changed without any event: bar corrected within 700 ms',await bar(),'translateY(41px)');
