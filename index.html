@@ -1094,7 +1094,7 @@ function emomState(){if(!emomRun)return null;const el=Date.now()-emomRun.start;r
 function beepOnce(f){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime;o.frequency.value=f||988;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(.3,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.start(t);o.stop(t+.27)}catch{}try{navigator.vibrate&&navigator.vibrate(120)}catch{}}
 // ---------- loads & suggestions ----------
 const LOADABLE={trap:5,hack:5,rdl:5,squat:5,bench:2.5,dbbench:2,ohp:2.5,pullup:2.5,sledpush:10,sledpull:5,carry:2,lunge:0,wallball:0,lateral:1,inclinecurl:1,hammercurl:1,tricepoh:2.5,pushdown:2.5,reardelt:1,crunch:2.5};
-function unit(){return load(k('unit'),'kg')}
+function unit(){return load(k('unit'),'lb')}
 // sled loader: empty sled weight + plate counts, remembered per exercise (push and pull sleds can differ)
 const PLATES_LB=[45,25,10],LBK=2.2046,RACE_LB={sledpush:335,sledpull:227};
 function isSledK(ek){return ek==='sledpush'||ek==='sledpull'}
@@ -1247,5 +1247,8 @@ if(athlete){const wx=woState();if(wx){if(wx.min){woRestore();woRun()}else openWo
 </script><script>(function(){const vv=window.visualViewport;let raf=0;function fix(){raf=0;const bar=document.querySelector('.bottombar');if(!bar)return;const ae=document.activeElement,typing=ae&&(ae.tagName==='TEXTAREA'||(ae.tagName==='INPUT'&&/^(text|search|tel|url|email|number|password|)$/i.test(ae.type||'')));const maxY=document.documentElement.scrollHeight-innerHeight;if(scrollY<0||scrollY>maxY+1)return;if(!bar.offsetHeight)return;let off=0;if(!typing&&vv){const m=/translateY\((-?[\d.]+)px\)/.exec(bar.style.transform),cur=m?+m[1]:0,nat=bar.getBoundingClientRect().bottom-cur;off=vv.height+vv.offsetTop-nat}off=Math.round(off);const v=off>1?`translateY(${off}px)`:'';if(bar.style.transform!==v)bar.style.transform=v}
 function q(){if(!raf)raf=requestAnimationFrame(fix)}if(vv){vv.addEventListener('resize',q);vv.addEventListener('scroll',q)}addEventListener('scroll',q,{passive:true});addEventListener('resize',q);addEventListener('orientationchange',()=>setTimeout(q,300));
 document.addEventListener('change',e=>{const t=e.target;if(t&&(t.tagName==='SELECT'||t.type==='date')){setTimeout(()=>{try{t.blur()}catch{}q()},50);[300,900].forEach(d=>setTimeout(q,d))}});
-document.addEventListener('focusout',()=>setTimeout(()=>{scrollTo(scrollX,scrollY);q()},300));document.addEventListener('visibilitychange',q);addEventListener('pageshow',q);window.realignBar=q;setInterval(()=>{if(!document.hidden)q()},500);q()})();</script>
+document.addEventListener('focusout',()=>setTimeout(()=>{scrollTo(scrollX,scrollY);q()},300));document.addEventListener('visibilitychange',q);addEventListener('pageshow',q);window.realignBar=q;
+// First open: iOS standalone can paint the fixed bar against a stale layout viewport until something forces a relayout (a tab switch fixed it). Do the same work a tab switch does, a few times while the app settles.
+function kick(){const bar=document.querySelector('.bottombar');if(!bar||document.body.classList.contains('focus'))return;const y=scrollY;bar.style.display='none';void bar.offsetHeight;bar.style.display='';scrollTo(scrollX,y+1);scrollTo(scrollX,y);q()}
+window.kickBar=kick;[0,300,900,1900,3000].forEach(d=>setTimeout(kick,d));addEventListener('pageshow',()=>[0,300,900].forEach(d=>setTimeout(kick,d)));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')[100,600].forEach(d=>setTimeout(kick,d))});setInterval(()=>{if(!document.hidden)q()},500);q()})();</script>
 </body></html>
