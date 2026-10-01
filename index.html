@@ -700,7 +700,7 @@ function migrateChecks(a){if(!a)return;const key=nsKey(a,'checks'),s=load(key,nu
   o[`w${wk}-${m[2]}-${nj}${m[4]}`]=s[kk]});
  store(key,o);const t=new Date().toISOString();store(nsKey(a,'checksT'),t);markDirty('state',a,'',t)}
 function checkKey(){return k('checks')}function restoreChecks(){let s={};s=load(checkKey(),{});document.querySelectorAll('[data-done]').forEach(e=>e.classList.toggle('on',!!s[e.dataset.done]));document.querySelectorAll('[data-check]').forEach(c=>{c.checked=!!s[c.dataset.check];c.onchange=()=>{s=load(checkKey(),{});s[c.dataset.check]=c.checked;store(checkKey(),s);const t=new Date().toISOString();store(k('checksT'),t);markDirty('state',athlete,'',t);scheduleSync()}})}
-function showView(id){if(id==='today')renderToday();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===(id==='log'?'plan':id==='guides'?'today':id)));if(id==='plan')renderPlan();if(id==='guides')renderGuides();if(id==='bench')renderBench();scrollTo(0,0);if(window.realignBar)[0,120,500].forEach(d=>setTimeout(window.realignBar,d))}
+function showView(id){if(id==='today')renderToday();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===(id==='log'?'plan':id==='guides'?'today':id)));if(id==='plan')renderPlan();if(id==='guides')renderGuides();if(id==='bench')renderBench();scrollTo(0,0);if(window.realignBar)[0,120,500].forEach(d=>setTimeout(window.realignBar,d));if(window.kickBar)setTimeout(window.kickBar,60)}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>showView(t.dataset.view));
 PLAN.forEach(w=>weekJump.add(new Option(`Week ${w.week} · ${w.phase} · ${new Date(w.date+'T12:00:00').toLocaleDateString('en',{month:'short',day:'numeric'})}`,w.week)));weekJump.onchange=()=>{currentWeek=+weekJump.value;renderPlan()};prevWeek.onclick=()=>{currentWeek=Math.max(1,currentWeek-1);renderPlan()};nextWeek.onclick=()=>{currentWeek=Math.min(27,currentWeek+1);renderPlan()};
 function openGuide(k){modalBody.innerHTML=guideHTML(k);modal.classList.add('show')}closeModal.onclick=()=>modal.classList.remove('show');modal.onclick=e=>{if(e.target===modal)modal.classList.remove('show')};
@@ -1096,6 +1096,8 @@ function beepOnce(f){try{audioCtx=audioCtx||new (window.AudioContext||window.web
 // ---------- loads & suggestions ----------
 const LOADABLE={trap:5,hack:5,rdl:5,squat:5,bench:2.5,dbbench:2,ohp:2.5,pullup:2.5,sledpush:10,sledpull:5,carry:2,lunge:0,wallball:0,lateral:1,inclinecurl:1,hammercurl:1,tricepoh:2.5,pushdown:2.5,reardelt:1,facepull:2.5,crunch:2.5};
 function unit(){return load(k('unit'),'lb')}
+// one time switch to lb for every athlete on this phone (Fred asked for lb by default; a kg stored earlier kept winning). Settings can still set kg afterwards.
+try{if(!localStorage.getItem('hrx_unit_lb_v1')){Object.keys(localStorage).filter(x=>/^hrx_[a-z]+_unit_v2$/.test(x)).forEach(x=>localStorage.setItem(x,JSON.stringify('lb')));localStorage.setItem('hrx_unit_lb_v1','1')}}catch{}
 // sled loader: empty sled weight + plate counts, remembered per exercise (push and pull sleds can differ)
 const PLATES_LB=[45,25,10],LBK=2.2046,RACE_LB={sledpush:335,sledpull:227};
 function isSledK(ek){return ek==='sledpush'||ek==='sledpull'}
@@ -1250,6 +1252,8 @@ function q(){if(!raf)raf=requestAnimationFrame(fix)}if(vv){vv.addEventListener('
 document.addEventListener('change',e=>{const t=e.target;if(t&&(t.tagName==='SELECT'||t.type==='date')){setTimeout(()=>{try{t.blur()}catch{}q()},50);[300,900].forEach(d=>setTimeout(q,d))}});
 document.addEventListener('focusout',()=>setTimeout(()=>{scrollTo(scrollX,scrollY);q()},300));document.addEventListener('visibilitychange',q);addEventListener('pageshow',q);window.realignBar=q;
 // First open: iOS standalone can paint the fixed bar against a stale layout viewport until something forces a relayout (a tab switch fixed it). Do the same work a tab switch does, a few times while the app settles.
-function kick(){const bar=document.querySelector('.bottombar');if(!bar||document.body.classList.contains('focus'))return;const y=scrollY;bar.style.display='none';void bar.offsetHeight;bar.style.display='';scrollTo(scrollX,y+1);scrollTo(scrollX,y);q()}
+function kick(){const bar=document.querySelector('.bottombar');if(!bar||document.body.classList.contains('focus'))return;const de=document.documentElement,y=scrollY,short=de.scrollHeight<=innerHeight+1;
+ // A tab switch fixes the bar because the document becomes taller than the screen and scrolls. Do the same on short pages: grow by 2px, scroll 1px, scroll back, shrink.
+ if(short)de.style.minHeight='calc(100vh + 2px)';bar.style.display='none';void bar.offsetHeight;bar.style.display='';scrollTo(scrollX,y+1);requestAnimationFrame(()=>{scrollTo(scrollX,y);if(short)requestAnimationFrame(()=>{de.style.minHeight='';q()});else q()})}
 window.kickBar=kick;[0,300,900,1900,3000].forEach(d=>setTimeout(kick,d));addEventListener('pageshow',()=>[0,300,900].forEach(d=>setTimeout(kick,d)));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')[100,600].forEach(d=>setTimeout(kick,d))});setInterval(()=>{if(!document.hidden)q()},500);q()})();</script>
 </body></html>
