@@ -331,7 +331,8 @@ textarea.wo-note{min-height:110px!important}#woNote{min-height:170px!important}t
 .td-lifts b{font-family:var(--font-num);font-weight:500;color:var(--muted)}
 .td-lifts b.up{color:var(--lime)}
 .td-dnotes p{margin:0 0 4px;font-size:.88rem;line-height:1.4}
-html,body{overscroll-behavior-y:none}
+/* iOS rubber band bounce at the top and bottom of pages is on (Fred asked for it). Sheets and workout keep their scroll contained so the page behind does not move. */
+.sheet,.fin-card,#workout{overscroll-behavior:contain}
 .sled-box{display:block;margin-top:8px;padding:10px;border-radius:12px;background:color-mix(in srgb,var(--text) 5%,transparent)}.sl-row{display:flex;align-items:center;gap:8px}.sl-l{font-size:.78rem;font-weight:650;color:var(--muted);flex:1}.sl-in{width:74px}.sl-plates{display:grid;gap:6px;margin-top:8px}.sl-p{display:flex;align-items:center;gap:10px}.sl-p span{flex:1;text-align:center;font-size:.9rem;color:var(--text);white-space:nowrap}.sl-tot{white-space:nowrap}.sl-p b{font-family:var(--font-num);font-size:1.25rem;font-weight:500}.sl-p button{width:44px;height:40px;border:0;border-radius:10px;background:var(--chip);color:var(--text);font-size:1.3rem;font-weight:600;touch-action:manipulation}.sl-tot{margin-top:10px;font-size:.84rem;color:var(--muted)}.sl-tot b{font-family:var(--font-num);font-size:1.3rem;font-weight:500;color:var(--text);margin-left:6px}.sl-s{display:block;margin-top:6px;font-size:.7rem;color:var(--muted);line-height:1.4}.em-moves .sled-box{width:100%}
 
 /* declutter: chips, info buttons, hidden details */
