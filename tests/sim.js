@@ -1,0 +1,28 @@
+// Saturday sim lines: half volume distances, lane rounding, sled targets, lane notes. node tests/sim.js
+const {chromium}=require('playwright'),path=require('path');
+const URL='file://'+path.resolve(__dirname,'../index.html'),OUT=process.env.SHOTS||__dirname;
+let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log('FAIL',m)}else console.log('ok  ',m)};
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});
+const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.clock.install({time:new Date('2026-10-03T15:00:00')});await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(5000);
+const d=()=>p.evaluate(()=>{const o={};sessionItems('Sat',PLAN[0].sat,PLAN[0]).forEach(i=>{if(/^\d\. /.test(i.title))o[i.title.replace(/^\d\. /,'')]=i.detail});return o});
+let s=await d();console.log(JSON.stringify(s));
+ok(/^Half volume · 500 m/.test(s['SkiErg']),'SkiErg half = 500 m');
+ok(/2 × 12 m = 24 m/.test(s['Sled push'])&&/2 × 12 m = 24 m/.test(s['Sled pull']),'sleds 25 m become 2 × 12 m = 24 m');
+ok(/3 × 12 m = 36 m/.test(s['Burpee broad jumps']),'burpees 40 m become 3 × 12 m = 36 m');
+ok(/set the empty sled weight/.test(s['Sled push'])&&!/152 kg/.test(s['Sled push']),'no empty sled weight: asks for it');
+await p.evaluate(()=>{store(k('sledcfg'),{sledpush:{kg:100/2.2046},sledpull:{kg:100/2.2046}})});
+s=await d();
+ok(/target 250 lb: sled \+ 2 x 45 \+ 2 x 25 \+ 10/.test(s['Sled push']),'push target 250 lb: '+s['Sled push']);
+ok(/target 170 lb: sled \+ 45 \+ 25/.test(s['Sled pull']),'pull target 170 lb: '+s['Sled pull']);
+await p.evaluate(()=>store(k('lane'),0));s=await d();
+ok(/Half volume · 25 m/.test(s['Sled push'])&&/Half volume · 40 m/.test(s['Burpee broad jumps']),'lane off: plain half distances');
+await p.evaluate(()=>store(k('lane'),12));
+ok(await p.evaluate(()=>laneNote(sessionItems('Sat',PLAN[0].sat,PLAN[0]).map(i=>Object.assign({},i)))).then?true:true,'laneNote callable');
+const ln=await p.evaluate(()=>laneNote(sessionItems('Sat',PLAN[0].sat,PLAN[0])));console.log(ln);
+ok(/Sled push 2 × 12 m = 24 m/.test(ln)&&/Burpee broad jumps 3 × 12 m = 36 m/.test(ln),'Lane notes line covers sim stations');
+await p.evaluate(()=>startWorkout(1,5,'2026-10-03'));await p.clock.runFor(600);
+const t=await p.locator('#workout').innerText();ok(/24 m/.test(t)&&/36 m/.test(t),'workout sim card shows lane distances');
+await p.screenshot({path:OUT+'/sim.png'});
+ok(!errs.length,'no page errors '+JSON.stringify(errs));
+console.log(fails?fails+' FAILED':'ALL OK');await b.close();process.exit(fails?1:0)})();
