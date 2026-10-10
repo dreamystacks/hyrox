@@ -1297,6 +1297,8 @@ function unit(){return load(k('unit'),'lb')}
 // one time switch to lb for every athlete on this phone (Fred asked for lb by default; a kg stored earlier kept winning). Settings can still set kg afterwards.
 // one time: Fred's gym mat is 12 m (his note on Mon Sep 29); other athletes start with the lane off
 try{if(!localStorage.getItem('hrx_lane_seed_v2')){const c=localStorage.getItem('hrx_fred_lane_v2');if(c===null||c==='12'){localStorage.setItem('hrx_fred_lane_v2','16');localStorage.setItem('hrx_fred_lane2_v2','12')}localStorage.setItem('hrx_lane_seed_v1','1');localStorage.setItem('hrx_lane_seed_v2','1')}}catch{}
+// Will trains at the same gym as Fred: same mat lines (seeded once, only if he never set his own)
+try{if(!localStorage.getItem('hrx_lane_seed_v3')){if(localStorage.getItem('hrx_will_lane_v2')===null&&localStorage.getItem('hrx_will_lane2_v2')===null){localStorage.setItem('hrx_will_lane_v2','16');localStorage.setItem('hrx_will_lane2_v2','12')}localStorage.setItem('hrx_lane_seed_v3','1')}}catch{}
 try{if(!localStorage.getItem('hrx_unit_lb_v1')){Object.keys(localStorage).filter(x=>/^hrx_[a-z]+_unit_v2$/.test(x)).forEach(x=>localStorage.setItem(x,JSON.stringify('lb')));localStorage.setItem('hrx_unit_lb_v1','1')}}catch{}
 // sled loader: empty sled weight + plate counts, remembered per exercise (push and pull sleds can differ)
 const PLATES_LB=[45,25,10],LBK=2.2046,RACE_LB={sledpush:335,sledpull:227};

@@ -9,6 +9,7 @@ await p.addInitScript(()=>{const l={};window.__vv={offsetTop:0,height:innerHeigh
 await p.clock.install({time:new Date('2026-09-28T16:00:00')});await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(5000);
 // lane seeded for Fred: Plan text rounds 20 m to 2 x 12 m
 ok(await p.evaluate(()=>laneM()===16&&laneS()===12),'Fred starts with a 16 m long line and a 12 m short line');
+ok(await p.evaluate(()=>localStorage.getItem('hrx_will_lane_v2')==='16'&&localStorage.getItem('hrx_will_lane2_v2')==='12'&&localStorage.getItem('hrx_grady_lane_v2')===null),'Will gets the same 16 and 12 m lines, Grady stays off');
 const monTxt=await p.evaluate(()=>sessionItems('Mon',PLAN[0].mon,PLAN[0]).map(i=>i.detail).join(' '));
 ok(/Sled push 2×12 m/.test(monTxt)&&!/20 m/.test(monTxt),'Monday EMOM shows Sled push 2×12 m: '+monTxt.slice(0,120));
 ok(await p.evaluate(()=>laneFix('sled pull 12.5 m')==='sled pull 1×12 m'&&laneFix('sled push 25 m race weight')==='sled push 2×12 m race weight'&&laneFix('sled push 50 m')==='sled push 3×16 m'&&laneFix('burpee broad jumps 40 m')==='burpee broad jumps 1×16 + 2×12 m'),'rounding: 12.5 to 1 × 12, 25 to 2 × 12, 50 to 3 × 16, 40 to 16 + 2 × 12');
