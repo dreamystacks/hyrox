@@ -22,3 +22,5 @@ Single source of truth for app work. Fred writes app feedback in his training no
 - [x] Screen wake lock with video fallback, lock screen and Dynamic Island Next control via Now Playing, Settings toggle (v68)
 - [x] Last time line (load, sets, RIR, note) and official HYROX distance on every exercise, EMOM totals (v68)
 - [x] Assisted pull-up toggle (v68)
+- [x] Race standards in metric and imperial everywhere in workout mode (v69)
+- [x] Two mat lines (16 m long, 12 m short): every mat distance shows lengths and back and forth count (v70)

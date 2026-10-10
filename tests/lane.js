@@ -8,19 +8,19 @@ const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('p
 await p.addInitScript(()=>{const l={};window.__vv={offsetTop:0,height:innerHeight,addEventListener:(t,f)=>{(l[t]=l[t]||[]).push(f)},fire:t=>(l[t]||[]).forEach(f=>f())};Object.defineProperty(window,'visualViewport',{value:window.__vv,configurable:true})});
 await p.clock.install({time:new Date('2026-09-28T16:00:00')});await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(5000);
 // lane seeded for Fred: Plan text rounds 20 m to 2 x 12 m
-ok(await p.evaluate(()=>laneM())===12,'Fred starts with a 12 m lane');
+ok(await p.evaluate(()=>laneM()===16&&laneS()===12),'Fred starts with a 16 m long line and a 12 m short line');
 const monTxt=await p.evaluate(()=>sessionItems('Mon',PLAN[0].mon,PLAN[0]).map(i=>i.detail).join(' '));
 ok(/Sled push 2×12 m/.test(monTxt)&&!/20 m/.test(monTxt),'Monday EMOM shows Sled push 2×12 m: '+monTxt.slice(0,120));
-ok(await p.evaluate(()=>laneFix('sled pull 12.5 m')==='sled pull 12 m'&&laneFix('sled push 25 m race weight')==='sled push 2×12 m race weight'&&laneFix('sled push 50 m')==='sled push 4×12 m'),'rounding: 12.5 to 1 length, 25 to 2, 50 to 4');
-ok(await p.evaluate(()=>laneFix('farmers carry 20 m')==='farmers carry 20 m'),'only sled moves are rounded');
+ok(await p.evaluate(()=>laneFix('sled pull 12.5 m')==='sled pull 1×12 m'&&laneFix('sled push 25 m race weight')==='sled push 2×12 m race weight'&&laneFix('sled push 50 m')==='sled push 3×16 m'&&laneFix('burpee broad jumps 40 m')==='burpee broad jumps 1×16 + 2×12 m'),'rounding: 12.5 to 1 × 12, 25 to 2 × 12, 50 to 3 × 16, 40 to 16 + 2 × 12');
+ok(await p.evaluate(()=>laneFix('farmers carry 20 m')==='farmers carry 2×12 m'&&laneFix('skierg 500 m')==='skierg 500 m'),'carries are rounded, ergs are not');
 // Settings row
 await p.click('#avatarBtn').catch(()=>p.evaluate(()=>avatarBtn.click()));
-ok(await p.locator('#laneIn').inputValue()==='12','Settings shows 12');
-await p.fill('#laneIn','0');await p.locator('#laneIn').dispatchEvent('change');
-ok(await p.evaluate(()=>laneM())===0,'lane 0 turns it off');
+ok(await p.locator('#laneIn').inputValue()==='16'&&await p.locator('#laneIn2').inputValue()==='12','Settings shows 16 and 12');
+await p.fill('#laneIn','0');await p.locator('#laneIn').dispatchEvent('change');await p.fill('#laneIn2','0');await p.locator('#laneIn2').dispatchEvent('change');
+ok(await p.evaluate(()=>!laneOn()),'both lines 0 turns it off');
 ok(await p.evaluate(()=>/20 m/.test(sessionItems('Mon',PLAN[0].mon,PLAN[0]).map(i=>i.detail).join(' '))),'off: plan distance back to 20 m');
 ok(await p.locator('#settingsModal.show').count()===1,'settings sheet stays open while editing the lane');
-await p.fill('#laneIn','12');await p.locator('#laneIn').dispatchEvent('change');await p.evaluate(()=>closeSettings.click());
+await p.fill('#laneIn','16');await p.locator('#laneIn').dispatchEvent('change');await p.fill('#laneIn2','12');await p.locator('#laneIn2').dispatchEvent('change');await p.evaluate(()=>closeSettings.click());
 // workout: bar weight
 await p.evaluate(()=>startWorkout(1,0,'2026-09-28'));await p.clock.runFor(600);
 ok((await p.locator('#workout').innerText()).includes('2×12 m'),'workout screen shows 2×12 m');
@@ -40,7 +40,7 @@ await p.evaluate(()=>{document.activeElement.blur()});await p.clock.runFor(900);
 ok(await p.evaluate(()=>workout.style.top===''&&workout.style.height===''),'blur releases the pin');
 // notes line
 await p.evaluate(()=>finishWorkout());await p.clock.runFor(200);
-const nt=await p.evaluate(()=>finPayload.notes);ok(/Lane: 12 m · Sled push 2 × 12 m = 24 m/.test(nt),'finish notes carry the Lane line: '+nt.split('\n').filter(x=>/Lane/.test(x)).join('|'));
+const nt=await p.evaluate(()=>finPayload.notes);ok(/Lane: 16 m and 12 m · Sled push 2 × 12 m = 24 m/.test(nt),'finish notes carry the Lane line: '+nt.split('\n').filter(x=>/Lane/.test(x)).join('|'));
 ok(/Loads \(lb\): Trap bar[^\n]*145/.test(nt)||/145/.test(nt),'loads line holds the 145 total');
 ok(!errs.length,'no page errors '+JSON.stringify(errs));
 console.log(fails?fails+' FAILED':'ALL OK');await b.close();process.exit(fails?1:0)})();
