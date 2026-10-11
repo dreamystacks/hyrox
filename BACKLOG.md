@@ -27,3 +27,4 @@ Single source of truth for app work. Fred writes app feedback in his training no
 - [x] Plan: "Did Fri's session" on the day a swapped session was done (v72); Rest day logs no longer hide the real result on a card (v73)
 - [x] Workout: compact top strip, no jump when a notes box gets focus, no Plan content showing through with the keyboard up (v73)
 - [x] Plan: Friday EMOM erg targets in metres instead of calories, DB bench 3 x 8 instead of 3 x 5 (Fred, Oct 11)
+- [x] Plan week as a diary: each card shows what was done that date, planned session as a grey line, one colour rule for chips, circles and dots (v74)

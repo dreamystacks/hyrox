@@ -1,6 +1,6 @@
 // Swapped week check: node tests/swap.js  (needs playwright; Chromium at /opt/pw-browsers/chromium in Claude's cloud sandbox)
 // Week 2 (Mon Oct 5 to Sun Oct 11, 2026). Mon was used for Tue's session and Tue for Mon's session.
-// Checks the Plan "Logged" tags (matched by stored session name, weekday shown when done on another day),
+// Checks the Plan diary cards (v74: each card is a date and shows what was done that day, the planned session is a grey line),
 // and that Today's default session, Done card and Up next follow the swap. Display only, no data changes.
 const {chromium}=require('playwright'),path=require('path');
 const URL='file://'+path.resolve(__dirname,'../index.html');
@@ -17,19 +17,20 @@ const next=p=>p.locator('.td-next').innerText().then(x=>x.replace(/\n+/g,' | ').
 // Plan tags
 let p=await open('2026-10-10T18:00:00',WEEK);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(600);
 const t=await tags(p);
-check('Mon card (its session was done on Tue)',t.Mon,'✓ Logged Tue');
-check('Tue card (its own session was done on Mon)',t.Tue,'✓ Logged Mon');
-check('Wed (Rest day log ignored)',t.Wed,'');
-check('Thu hockey done on Fri',t.Thu,'✓ Logged Fri');
-check('Fri card: its own session not logged, but Thu hockey was done that day',t.Fri,"✓ Did Thu's session");
-check('swap tags on the day a session was actually done',await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.day-card')].map(c=>[c.dataset.day,((c.querySelector('.day-logged.swap')||{}).textContent||'').trim()]))),{Mon:"✓ Did Tue's session",Tue:"✓ Did Mon's session",Wed:'',Thu:'',Fri:"✓ Did Thu's session",Sat:'',Sun:''});
-check('Sat done on its own date has no weekday',t.Sat,'✓ Logged');
-check('day chips filled when that session was done any day this week',await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.day-card')].map(c=>[c.dataset.day,c.querySelector('.day-chip').classList.contains('done')]))),{Mon:true,Tue:true,Wed:false,Thu:true,Fri:false,Sat:true,Sun:false});
+const cards=await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.day-card')].map(c=>[c.dataset.day,c.querySelector('.day-name').textContent.trim()+' | '+c.querySelector('.day-raw').textContent.trim()])));
+check('Mon card shows what was done on Mon (Tue session) and its plan moved to Tue',cards.Mon,'Run + Arms | Planned: Legs lift + EMOM · moved to Tue');
+check('Tue card shows Mon session done on Tue',cards.Tue,'Legs lift + EMOM | Planned: Run + Arms · moved to Mon');
+check('Wed logged rest day',cards.Wed,'Rest day | Planned: Rest');
+check('Thu: hockey moved to Fri',cards.Thu,'Hockey | Moved to Fri');
+check('Fri card shows the hockey done that day',cards.Fri,'Hockey | Planned: Upper + EMOM');
+check('Sat sim done on its own day',cards.Sat.split(' | ')[0],'Sim');
+check('no lime tag pills any more',await p.locator('#days .day-logged').count(),0);
+check('day chips follow the date: lime trained, dim rest, plain future',await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.day-card')].map(c=>[c.dataset.day,c.querySelector('.day-chip').className.replace('day-chip st-','')]))),{Mon:'trained',Tue:'trained',Wed:'rest',Thu:'rest',Fri:'trained',Sat:'trained',Sun:'future'});
 check('Plan rows have no tick circles',await p.locator('#days .ex-st').count(),0);
-check('today keeps a ring, not a fill (Sat chip is filled only because the sim is done)',await p.evaluate(()=>{const c=document.querySelector('.day-head.today .day-chip'),cs=getComputedStyle(c);return [cs.outlineStyle,c.classList.contains('done')]}),['solid',true]);
+check('today keeps a ring plus the lime fill because the sim was done today',await p.evaluate(()=>{const c=document.querySelector('.day-head.today .day-chip'),cs=getComputedStyle(c);return [cs.outlineStyle,c.classList.contains('st-trained')]}),['solid',true]);
 check('Start only on cards whose session is not logged this week (Fri missed; Mon, Tue, Thu, Sat done)',await p.evaluate(()=>[...document.querySelectorAll('.day-card')].filter(c=>c.querySelector('[data-start],[data-hockey]')).map(c=>c.dataset.day)),['Fri']);
 check('yellow chip still marks today (Sat)',await p.evaluate(()=>document.querySelector('.day-head.today').closest('.day-card').dataset.day),'Sat');
-await p.click('#nextWeek');await p.clock.runFor(400);check('next week has no tags',Object.values(await tags(p)).join(''),'');
+await p.click('#nextWeek');await p.clock.runFor(400);check('next week: plan titles, no results',await p.locator('#days .day-res').count(),0);
 await p.close();
 // Today, Monday evening: only Tue's session logged on Monday
 p=await open('2026-10-05T20:00:00',[SWAP_MON]);

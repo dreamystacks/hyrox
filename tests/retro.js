@@ -16,7 +16,7 @@ await p.mouse.click(195,30);await p.clock.runFor(300);
 check('tapping above the sheet closes it',await p.evaluate(()=>$('finish').hidden),true);
 await thu.locator('[data-hockey]').click();await p.clock.runFor(300);
 await p.click('#finRpe [data-fr="6"]');await p.click('#finSave');await p.clock.runFor(500);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(400);
-check('saved on Thursday, Thu card now Logged',await p.evaluate(()=>[getLogs().map(x=>x.date+' '+x.session),document.querySelector('.day-card[data-day=Thu] .day-logged')?.textContent.trim()]),[['2026-10-01 Thu: Hockey'],'✓ Logged']);
+check('saved on Thursday, Thu card now shows the hockey result with a lime chip',await p.evaluate(()=>[getLogs().map(x=>x.date+' '+x.session),document.querySelector('.day-card[data-day=Thu] .day-chip').classList.contains('st-trained'),!!document.querySelector('.day-card[data-day=Thu] .day-res')]),[['2026-10-01 Thu: Hockey'],true,true]);
 // Mon and Tue missed: Start plus "log it for Mon"
 const mon=p.locator('.day-card[data-day=Mon]');await mon.locator('.day-head').click();
 check('Mon card: Start and a retro link',[await mon.locator('[data-start]').count(),await mon.locator('[data-retro]').innerText()],[1,'Already done it? Log it for Mon']);

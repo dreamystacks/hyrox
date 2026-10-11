@@ -11,9 +11,10 @@ await p.clock.install({time:new Date('2026-10-11T15:40:00')});await p.goto(URL);
 await p.click('.bottombar [data-view=plan]');await p.clock.runFor(600);
 const card=d=>p.locator(`.day-card[data-day=${d}] .day-mid`).innerText();
 const tue=await card('Tue'),fri=await card('Fri');
-ok(!/Rest day logged/.test(tue)&&/55 min|45 min/.test(tue),'Tue card shows the Run + Arms result, not "Rest day logged": '+tue.replace(/\n/g,' | '));
-ok(!/Rest day logged/.test(fri)&&/55 min/.test(fri),'Fri card shows the Upper + EMOM result: '+fri.replace(/\n/g,' | '));
-ok(/Did Fri's session/i.test(await card('Sun')),'Sun card says Did Fri\'s session');
+ok(/^Rest day\nPlanned: Run \+ Arms · moved to Wed$/.test(tue),'Tue card (diary): Rest day, planned Run + Arms moved to Wed: '+tue.replace(/\n/g,' | '));
+ok(/^Rest day\nPlanned: Upper \+ EMOM · moved to Sun$/.test(fri),'Fri card (diary): Rest day, Upper + EMOM moved to Sun: '+fri.replace(/\n/g,' | '));
+const wed=await card('Wed');ok(/^Run \+ Arms\nPlanned: Rest/.test(wed)&&/3.2 km/.test(wed),'Wed card shows the Run + Arms done that day: '+wed.replace(/\n/g,' | '));
+ok(/^Upper \+ EMOM\nPlanned: Recovery/.test(await card('Sun')),'Sun card shows Upper + EMOM, planned Recovery');
 await p.screenshot({path:OUT+'/ui-plan.png',fullPage:true});
 // plan text: no calories, DB bench 3x8
 ok(await p.evaluate(()=>PLAN.every(w=>!/\d+ cal\b/.test(w.fri||''))),'no calorie targets left in the plan');

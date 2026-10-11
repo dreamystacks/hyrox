@@ -1,5 +1,5 @@
 // Plan tab as the history: node tests/plan.js  (needs playwright; Chromium at /opt/pw-browsers/chromium in Claude's cloud sandbox)
-// Clock pinned to Sat Oct 10 2026 (week 2, swapped: Mon holds Tue's session, Tue holds Mon's).
+// Clock pinned to Sat Oct 10 2026 (week 2, swapped: Mon holds Tue's session, Tue holds Mon's). Cards are dates (diary, v74).
 // Checks inline results on day cards, expand with Edit/Delete, Add session (prefilled, returns to Plan), Settings backup rows.
 const {chromium}=require('playwright'),path=require('path');
 const URL='file://'+path.resolve(__dirname,'../index.html');
@@ -14,13 +14,13 @@ const card=(p,d)=>p.locator(`.day-card[data-day=${d}]`);
 const logs=p=>p.evaluate(()=>getLogs().length);
 let p=await open();
 check('no History anywhere: no section, no tab, no calendar',await p.evaluate(()=>[!!document.getElementById('history'),!!document.querySelector('[data-view=history]'),!!document.getElementById('calWrap')]),[false,false,false]);
-check('Mon card shows the result of the session done on Tue',(await card(p,'Mon').locator('.day-res').innerText()).replace(/\s+/g,' '),'55 min RPE 8 Sled push 120 · Back squat 100 “Felt strong”');
-check('Tue card shows the run',(await card(p,'Tue').locator('.day-res').innerText()).replace(/\s+/g,' '),'60 min RPE 6 6 km @ 5:30');
-check('Wed card shows Rest day logged',(await card(p,'Wed').locator('.day-res').innerText()).trim(),'Rest day logged');
+check('Mon card (diary) shows the run done on Mon',(await card(p,'Mon').locator('.day-res').innerText()).replace(/\s+/g,' '),'60 min RPE 6 6 km @ 5:30');
+check('Tue card (diary) shows the legs session done on Tue',(await card(p,'Tue').locator('.day-res').innerText()).replace(/\s+/g,' '),'55 min RPE 8 Sled push 120 · Back squat 100 “Felt strong”');
+check('Wed card (diary) is titled Rest day',(await card(p,'Wed').locator('.day-name').innerText()).trim(),'Rest day');
 check('Fri card (nothing logged) has no result line',await card(p,'Fri').locator('.day-res').count(),0);
 // expand Mon
 await card(p,'Mon').locator('.day-head').click();await p.clock.runFor(300);
-check('expanded Mon shows details, notes, Edit and Delete',await p.evaluate(()=>{const c=document.querySelector('.day-card[data-day=Mon]'),t=c.querySelector('.did').innerText;return[/Sled push 120/.test(t),/Felt strong/.test(t),!!c.querySelector('[data-edit]'),!!c.querySelector('[data-delete]')]}),[true,true,true,true]);
+check('expanded Mon shows the run done that day, Edit and Delete, then the plan',await p.evaluate(()=>{const c=document.querySelector('.day-card[data-day=Mon]'),t=c.querySelector('.did').innerText;return[/6 km/.test(t),/5:30/.test(t),!!c.querySelector('[data-edit]'),!!c.querySelector('[data-delete]'),/Planned: Legs lift \+ EMOM/.test(c.querySelector('.plan-h').textContent)]}),[true,true,true,true,true]);
 // edit and cancel
 await card(p,'Mon').locator('[data-edit]').click();await p.clock.runFor(300);
 check('Edit opens the log form',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('logTitle').textContent]),['log','Edit session']);
