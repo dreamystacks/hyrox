@@ -24,3 +24,6 @@ Single source of truth for app work. Fred writes app feedback in his training no
 - [x] Assisted pull-up toggle (v68)
 - [x] Race standards in metric and imperial everywhere in workout mode (v69)
 - [x] Two mat lines (16 m long, 12 m short): every mat distance shows lengths and back and forth count (v70)
+- [x] Plan: "Did Fri's session" on the day a swapped session was done (v72); Rest day logs no longer hide the real result on a card (v73)
+- [x] Workout: compact top strip, no jump when a notes box gets focus, no Plan content showing through with the keyboard up (v73)
+- [x] Plan: Friday EMOM erg targets in metres instead of calories, DB bench 3 x 8 instead of 3 x 5 (Fred, Oct 11)
