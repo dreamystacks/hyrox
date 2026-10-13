@@ -297,7 +297,9 @@ body::before{top:-14%!important;height:84vh!important}
 .sim-undo{display:block;margin:4px auto 0;padding:6px 10px}
 .sim-card .tm-list{margin-top:10px}
 .sim-up{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
-.wo-dock{position:sticky;bottom:0;z-index:7;margin:18px -18px calc(-20px - env(safe-area-inset-bottom));padding:10px 14px calc(12px + env(safe-area-inset-bottom));background:var(--bg);box-shadow:0 -14px 22px -12px var(--bg)}
+/* fixed to the real screen bottom: as a sticky child iOS stopped it short of the edge and content showed under it (Fred, Oct 13) */
+.wo-dock{position:fixed;left:0;right:0;bottom:0;z-index:72;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:var(--bg);box-shadow:0 -14px 22px -12px var(--bg)}
+#workout.show{padding-bottom:calc(140px + env(safe-area-inset-bottom))}
 .dk-b{width:100%;min-height:84px;display:flex;align-items:center;gap:12px;text-align:left;border:0;border-radius:22px;padding:14px 20px;background:linear-gradient(120deg,var(--g1),var(--g2));color:#0a0a0a;font:inherit;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .dk-b span{flex:1;min-width:0}.dk-b b{display:block;font-size:1.25rem;font-weight:800;line-height:1.15}.dk-b small{display:block;font-size:.8rem;opacity:.75;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dk-b strong{font-family:var(--font-num);font-size:2.4rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}

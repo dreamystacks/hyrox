@@ -13,6 +13,8 @@ let t=await dockTxt(p);ok(/Set 1 of 3 done/.test(t)&&/Trap/.test(t),'dock starts
 const wl=await p.locator('#workout .wo-last').first().innerText();ok(/Last time Mon, Oct 5: 205 lb · 3\/3 sets · RIR 2/.test(wl)&&/95 last set/.test(wl),'last time line with sets, RIR and note: '+wl);
 const em=await p.locator('#workout .em-moves').innerText();ok(/Today \d+ × 24 m = \d+ m \/ \d+ ft/.test(em)&&/HYROX race: 50 m \/ 164 ft · 152 kg \/ 335 lb/.test(em),'EMOM sled push shows today total and race distance: '+em.replace(/\n/g,' | ').slice(0,400));
 await p.screenshot({path:OUT+'/dock-mon.png'});
+const db=await p.evaluate(()=>{const r=document.querySelector('.wo-dock').getBoundingClientRect();return [Math.round(r.bottom),innerHeight]});ok(db[0]===db[1],'dock touches the bottom of the screen ('+db[0]+' vs '+db[1]+')');
+await p.evaluate(()=>{const W=document.getElementById('workout');W.scrollTop=W.scrollHeight});await p.clock.runFor(200);const fin=await p.evaluate(()=>{const f=document.getElementById('woFinish').getBoundingClientRect(),d=document.querySelector('.wo-dock').getBoundingClientRect();return f.bottom<=d.top});ok(fin,'scrolled to the end, Finish workout sits above the dock, not under it');
 await p.click('.dk-b');await p.clock.runFor(300);t=await dockTxt(p);ok(/Skip rest/.test(t),'after a set the dock offers Skip rest');
 await p.click('.dk-b');await p.clock.runFor(300);ok(/Skip rest/.test(await dockTxt(p)),'second tap inside 1.2 s is ignored');
 await p.clock.runFor(1300);await p.click('.dk-b');await p.clock.runFor(300);t=await dockTxt(p);ok(/Set 2 of 3 done/.test(t),'tap after the lock skips rest, dock moves to set 2');
