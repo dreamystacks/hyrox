@@ -32,5 +32,10 @@ const after=await W.evaluate(e=>[e.scrollTop,e.scrollHeight]);
 ok(before[1]===after[1],'focusing a notes box does not change the page height ('+before[1]+' → '+after[1]+')');
 ok(await p.evaluate(()=>getComputedStyle(document.querySelector('.wo-dock')).visibility==='hidden'),'dock invisible while typing');
 const em=await p.locator('#workout .em-moves').innerText();ok(/SkiErg 150 m/i.test(em)&&!/cal/.test(em),'EMOM shows SkiErg 150 m, no calories');
+// Today card shows the suggested load before Start (Fred, Oct 13)
+await p.evaluate(()=>{closeWorkout&&closeWorkout();localStorage.removeItem(k('workout'));const L=getLogs();L.push({id:'h',date:'2026-10-12',week:3,session:'Other',duration:40,notes:'',savedAt:'2026-10-12T20:00:00Z',updatedAt:'2026-10-12T20:00:00Z'});store(k('logs'),L)});
+await p.clock.setSystemTime(new Date('2026-10-13T19:00:00'));await p.evaluate(()=>{const L=getLogs();L.push({id:'i',date:'2026-10-05',week:2,session:'Mon: Lower + sled',duration:45,notes:'Loads (lb): Trap-bar deadlift 205 (3/3 · RIR 2)',savedAt:'2026-10-05T20:00:00Z',updatedAt:'2026-10-05T20:00:00Z'});store(k('logs'),L);showView('today')});await p.clock.runFor(400);
+await p.evaluate(()=>{document.body.classList.remove('focus');const s=document.getElementById('sessionPick');s.value='Mon: Lower + sled';s.dispatchEvent(new Event('change',{bubbles:true}))});await p.clock.runFor(400);
+const tr=await p.locator('.td-session .exercise').first().innerText();ok(/215 lb · 85\/side/.test(tr),'Today trap bar row shows 215 lb · 85/side before Start: '+tr.replace(/\n/g,' | '));
 ok(!errs.length,'no page errors '+errs.join('|'));
 console.log(fails?fails+' FAILED':'ALL OK');await b.close();process.exit(fails?1:0)})();
