@@ -54,7 +54,7 @@ await p.evaluate(()=>finishWorkout());await p.clock.runFor(300);ok(/Assisted pul
 await p.evaluate(()=>{store(k('assist'),{})});ok(await p.evaluate(()=>{const s=suggestLoad('pullup',3,null);return !s||s.why==='plan'||s.kg!==undefined}),'toggle off: assisted history not used as added weight');
 // lock screen setting
 await p.evaluate(()=>{const f=document.getElementById('finish');if(f)f.classList.remove('show')});
-await p.evaluate(()=>avatarBtn.click());await p.clock.runFor(200);ok(/On/.test(await p.locator('#lockVal').innerText()),'Lock screen controls default On');
-await p.evaluate(()=>lockRow.click());await p.clock.runFor(100);ok(/Off/.test(await p.locator('#lockVal').innerText())&&await p.locator('#settingsModal.show').count()===1,'toggle Off, sheet stays open');
+await p.evaluate(()=>avatarBtn.click());await p.clock.runFor(200);ok(/Off/.test(await p.locator('#lockVal').innerText()),'Lock screen controls default Off (music keeps playing)');
+await p.evaluate(()=>lockRow.click());await p.clock.runFor(100);ok(/On/.test(await p.locator('#lockVal').innerText())&&await p.locator('#settingsModal.show').count()===1,'toggle On, sheet stays open');
 ok(!p.errs.length,'no page errors (Fri) '+p.errs.join('|'));await p.close();
 console.log(fails?fails+' FAILED':'ALL OK');await b.close();process.exit(fails?1:0)})();
