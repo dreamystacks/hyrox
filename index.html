@@ -1286,7 +1286,7 @@ function woElapsed(x){return (x.pausedAt||Date.now())-x.start-x.paused}
 function startWorkout(week,idx,ds){const cur=woState();if(cur&&cur.week===week&&cur.idx===idx)return openWorkout();if(cur&&!confirm('A workout is already running. Replace it?'))return openWorkout();emomRun=null;emomSave();restEnd=0;workPhase=null;woSave({week,idx,date:ds,start:Date.now(),paused:0,pausedAt:null});openWorkout()}
 function woItems(x){const w=PLAN[x.week-1],[day,label,key]=dayDefs[x.idx],raw=rawFor(w,key,day);return{w,day,label,items:sessionItems(day,raw,w)}}
 function setCheck(key,val){const s2=load(checkKey(),{});s2[key]=val;store(checkKey(),s2);const t=new Date().toISOString();store(k('checksT'),t);markDirty('state',athlete,'',t);scheduleSync()}
-function woRestore(){const x=woState();if(!x)return;emomLoad();lastEmMin=emomRun?emomState().minute:-1;const r=x.rest;workPhase=x.work||null;if(r&&(r.end>Date.now()||workPhase)){restEnd=r.end;restLen=r.len;restLabel=r.label||'Rest'}else restEnd=0}
+function woRestore(){const x=woState();if(!x)return;emomLoad();lastEmMin=emomRun?emomState().minute:-1;const r=x.rest;workPhase=x.work||null;if(r&&(r.end>Date.now()||workPhase)){restEnd=r.end;restLen=r.len;restLabel=r.label||'Rest'}else{restEnd=0;if(r&&x.autoNext&&autoRepGo(r.end))woPatch(z=>{z.rest=null})}}
 function saveRest(){woPatch(x=>{x.rest=restEnd?{end:restEnd,len:restLen,label:restLabel}:null;x.work=workPhase})}
 function woRun(){clearInterval(woTick);woTick=setInterval(woTickFn,250);woPillUpd()}
 function openWorkout(){const x=woPatch(y=>{y.min=false});if(!x)return;woRestore();document.body.classList.add('focus');$('workout').classList.add('show');renderWorkout();woRun();keepAwake();mediaStart();emfSync()}
@@ -1302,7 +1302,7 @@ function woTickFn(){const x=woState();if(!x){woPillUpd();return}const dkt=$('doc
  const el=woElapsed(x);if(!x.pausedAt)document.querySelectorAll('#workout .wo-clk').forEach(c=>c.textContent=fmt(el));
  const rt=$('woRepT');if(rt&&x.rep)rt.textContent=fmt(el-x.rep.t0);
  if(x.sim&&x.sim.t0!=null){const m=x.sim.marks,a=$('woSimT'),b=$('woSimTot');if(a)a.textContent=fmt(el-(m.length?m[m.length-1]:x.sim.t0));if(b)b.textContent=fmt(el-x.sim.t0)}
- if(restEnd){const rb=$('woRest'),left=restEnd-Date.now();if(left<=0){restEnd=0;if(workPhase){const wp=workPhase;workPhase=null;beep();completeSet(wp.key,wp.parent,wp.total,wp.rest,+wp.key.split('-s').pop());return}saveRest();beep();if(rb){rb.querySelector('strong').textContent='Go';rb.querySelector('small').textContent='Rest done';rb.querySelector('.fill').style.width='100%';rb.classList.add('doneflash')}setTimeout(()=>{if(!restEnd&&!woTyping())renderWorkout()},2600)}
+ if(restEnd){const rb=$('woRest'),left=restEnd-Date.now();if(left<=0){const _re=restEnd;restEnd=0;if(!workPhase&&autoRepGo(_re)){saveRest();renderWorkout();return}if(workPhase){const wp=workPhase;workPhase=null;beep();completeSet(wp.key,wp.parent,wp.total,wp.rest,+wp.key.split('-s').pop());return}saveRest();beep();if(rb){rb.querySelector('strong').textContent='Go';rb.querySelector('small').textContent='Rest done';rb.querySelector('.fill').style.width='100%';rb.classList.add('doneflash')}setTimeout(()=>{if(!restEnd&&!woTyping())renderWorkout()},2600)}
   else if(rb){rb.querySelector('strong').textContent=fmt(left+999);rb.querySelector('.fill').style.width=(100-left/restLen*100)+'%'}}
  if(!shown)woPillUpd()}
 const REST_BY_KEY={trap:120,hack:120,rdl:120,squat:150,split:90,sledpush:120,sledpull:120,lunge:90,pullup:120,bench:120,dbbench:120,ohp:120,rowlift:90,carry:60,skierg:60,rowerg:90,run:90,lateral:60,inclinecurl:60,hammercurl:60,tricepoh:60,pushdown:60,reardelt:60,facepull:60,hanging:60,crunch:60};
@@ -1337,7 +1337,7 @@ function dockModel(){const x=woState();if(!x)return null;const {w,day,items}=woI
  if(sim&&sim.t0!=null&&sim.marks.length<segs.length){const i=sim.marks.length,cur=segs[i],nx=segs[i+1];return{kind:'sim',label:nx?'Next → '+nx.name:'Finish sim',sub:`Now ${i+1}/${segs.length} · ${cur.name}${cur.kind==='run'?' '+cur.km+' km':''}`,title:cur.name,t:'sim'}}
  if(x.rep){const it=items[+x.rep.parent.split('-').pop()]||{};return{kind:'rep',label:x.rep.total>1?`Stop rep ${x.rep.n} of ${x.rep.total}`:'Stop timer',sub:it.title?nmOf(it):'',title:x.rep.total>1?`Rep ${x.rep.n} of ${x.rep.total}`:'Timer',t:'rep'}}
  if(emomRun){const st=emomState(),n=emomRun.moves.length,mi=Math.min(st.minute,emomRun.mins-1);return{kind:'emom',info:true,label:moveShort(emomRun.moves[mi%n]),sub:`Minute ${mi+1} of ${emomRun.mins} · next ${moveShort(emomRun.moves[(mi+1)%n])}`,title:moveShort(emomRun.moves[mi%n]),t:'emom'}}
- if(restEnd)return workPhase?{kind:'rest',info:true,label:restLabel,sub:'Hold, the set ticks itself',title:'Hold',t:'rest'}:{kind:'rest',label:'Skip rest',sub:restLabel,title:'Rest',t:'rest',sel:'#woRest'};
+ if(restEnd)return workPhase?{kind:'rest',info:true,label:restLabel,sub:'Hold, the set ticks itself',title:'Hold',t:'rest'}:{kind:'rest',label:'Skip rest',sub:(()=>{const an=(woState()||{}).autoNext;return an?`Rep ${an.n} of ${an.total} starts by itself`:restLabel})(),title:'Rest',t:'rest',sel:'#woRest'};
  for(let i=0;i<items.length;i++){const it=items[i],key=K(i);
   if(it.emom&&c[key]&&!(x.feel||{})[key]&&!(x.feelskip||{})[key])return{kind:'feel',label:'EMOM done. Rest left each minute?',title:'EMOM done',choices:[['20+','20+ s'],['10-20','10 to 20 s'],['missed','Missed']].map(([v,l])=>({l,sel:`[data-feel="${key}|${v}"]`})).concat([{l:'Skip',fn:()=>{woPatch(y=>{(y.feelskip=y.feelskip||{})[key]=1});renderWorkout();woNext(i)}}])};
   const ps=parseSets(it),ek=loadKey(it);
@@ -1354,7 +1354,10 @@ function dockHTML(){const d=dockModel();if(!d)return'';const lk=Date.now()<dockL
 function dockAct(){const now=Date.now();if(now<dockLock)return;const d=dockModel();if(!d||d.info||d.choices)return;dockLock=now+1200;unlockAudio();if(d.kind==='sim')return simNextAct();if(d.kind==='rep')return stopRepAct();const W=$('workout');if(!W.querySelector('.wo-list'))renderWorkout();const el=W.querySelector(d.sel);if(el)el.click()}
 // sim lap: a tap within 4 s of the start or the previous lap is a double tap (it logged 0:02 and 0:00 laps on Oct 10)
 function simNextAct(){const y=woState();if(!y||!y.sim||y.sim.t0==null)return;if(y.pausedAt){toastMsg('Resume the workout first');return}const {w,day,items}=woItems(y),segs=simSegments(w),now=woElapsed(y),m=y.sim.marks;if(m.length>=segs.length)return;if(now-(m.length?m[m.length-1]:y.sim.t0)<4000){toastMsg('Double tap ignored');return}m.push(now);woSave(y);simMarkChecks(y,segs,items,w,day);if(m.length>=segs.length){beep();toastMsg('Sim done');renderWorkout();woNext(items.length);return}beepOnce(1320);renderWorkout();mediaLast='';mediaUpd()}
-function stopRepAct(){const y=woState();if(!y||!y.rep)return;const r=y.rep,ms=woElapsed(y)-r.t0;if(ms<3000){toastMsg('Double tap ignored');return}y.times=y.times||{};const a=y.times[r.parent]=y.times[r.parent]||[];a[r.n-1]=ms;y.rep=null;woSave(y);beepOnce(1320);if(r.total>1)completeSet(r.sk,r.parent,r.total,r.rest,r.n);else{setCheck(r.parent,true);renderWorkout();woNext(ixOf(r.parent))}mediaLast='';mediaUpd()}
+
+// v82: interval reps start by themselves when the rest ends (or Skip rest), so nobody forgets to restart the clock. at = timestamp the rep really started.
+function autoRepGo(at){const y=woState();if(!y||!y.autoNext||y.rep)return false;const a=y.autoNext,c=load(checkKey(),{});y.autoNext=null;if(c[a.parent+'-s'+a.n]){woSave(y);return false}const late=Math.max(0,Date.now()-(at||Date.now()));y.rep={sk:a.parent+'-s'+a.n,parent:a.parent,n:a.n,total:a.total,rest:a.rest,t0:woElapsed(y)-late};woSave(y);beepOnce(1320);toastMsg('Rep '+a.n+' of '+a.total+' started');mediaLast='';return true}
+function stopRepAct(){const y=woState();if(!y||!y.rep)return;const r=y.rep,ms=woElapsed(y)-r.t0;if(ms<3000){toastMsg('Double tap ignored');return}y.times=y.times||{};const a=y.times[r.parent]=y.times[r.parent]||[];a[r.n-1]=ms;y.rep=null;y.autoNext=r.total>1&&r.n<r.total?{parent:r.parent,n:r.n+1,total:r.total,rest:r.rest}:null;woSave(y);beepOnce(1320);if(r.total>1)completeSet(r.sk,r.parent,r.total,r.rest,r.n);else{setCheck(r.parent,true);renderWorkout();woNext(ixOf(r.parent))}mediaLast='';mediaUpd()}
 function woNext(from){const x=woState();if(!x)return;const W=$('workout');if(!W.classList.contains('show'))return;const {items,day,w}=woItems(x),c=load(checkKey(),{}),segs=day==='Sat'?simSegments(w):[];let n=-1;for(let j=from+1;j<items.length;j++){const it=items[j];if(segs.length&&(it.title==='Running'||/^\d\. /.test(it.title)))continue;if(!c[`w${w.week}-${day}-${j}`]){n=j;break}}
  setTimeout(()=>{const stk=W.querySelector('.wo-sticky'),el=n>=0?W.querySelector(`[data-ix="${n}"]`):$('woFinish');if(!el)return;const top=el.getBoundingClientRect().top-W.getBoundingClientRect().top+W.scrollTop-(stk?stk.offsetHeight:0)-12;W.scrollTo({top:Math.max(0,top),behavior:'smooth'})},80)}
 function ixOf(key){return +String(key).split('-').pop()}
@@ -1534,7 +1537,7 @@ function renderWorkout(){const x=woState();if(!x){closeWorkout();return}const W=
  W.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>{unlockAudio();const [key,n,total,rest,hold,timed]=b.dataset.set.split('|'),sk=key+'-s'+n,c=load(checkKey(),{}),y=woState();
   if(+timed&&y.rep){if(y.rep.sk===sk)return stopRep();toastMsg('Stop the running rep first');return}
   if(c[sk]){setCheck(sk,false);if(c[key])setCheck(key,false);if(y.times&&y.times[key]){y.times[key][+n-1]=null;woSave(y)}workPhase=null;renderWorkout();return}
-  if(+timed){restEnd=0;workPhase=null;y.rep={sk,parent:key,n:+n,total:+total,rest:+rest,t0:woElapsed(y)};woSave(y);beepOnce(1320);renderWorkout();return}
+  if(+timed){restEnd=0;workPhase=null;y.autoNext=null;y.rep={sk,parent:key,n:+n,total:+total,rest:+rest,t0:woElapsed(y)};woSave(y);beepOnce(1320);renderWorkout();return}
   if(+hold){workPhase={key:sk,parent:key,total:+total,rest:+rest};startRest(+hold/1000,'Set '+n+' · hold');return}
   completeSet(sk,key,+total,+rest,+n)});
  const sg=$('simGo');if(sg)sg.onclick=()=>{unlockAudio();restEnd=0;workPhase=null;woPatch(y=>{y.sim={t0:woElapsed(y),marks:[]}});beepOnce(1320);renderWorkout();W.scrollTop=0};
@@ -1542,7 +1545,7 @@ function renderWorkout(){const x=woState();if(!x){closeWorkout();return}const W=
  W.querySelectorAll('[data-dk]').forEach(b=>b.onclick=()=>{if(Date.now()<dockLock)return;const d=dockModel(),c=d&&d.choices&&d.choices[+b.dataset.dk];if(!c)return;dockLock=Date.now()+700;if(c.fn)c.fn();else{const e=W.querySelector(c.sel);if(e)e.click()}});
  if(Date.now()<dockLock)setTimeout(()=>W.querySelectorAll('.wo-dock .lock').forEach(e=>e.classList.remove('lock')),dockLock-Date.now()+20);
  const su=$('simUndo');if(su)su.onclick=()=>{woPatch(y=>{y.sim.marks.pop()});renderWorkout()};
- const rb=$('woRest');if(rb)rb.onclick=()=>{restEnd=0;renderWorkout()};
+ const rb=$('woRest');if(rb)rb.onclick=()=>{restEnd=0;if(autoRepGo())saveRest();renderWorkout()};
  $('woPause').onclick=()=>{const y=woState();if(y.pausedAt){y.paused+=Date.now()-y.pausedAt;y.pausedAt=null}else y.pausedAt=Date.now();woSave(y);renderWorkout()};
  $('woDiscard').onclick=()=>{if(!confirm('Discard this workout? Nothing will be logged.'))return;emomRun=null;emomSave();localStorage.removeItem(k('workout'));noteOpen=new Set();closeWorkout();renderToday()};
  $('woFinish').onclick=finishWorkout}
