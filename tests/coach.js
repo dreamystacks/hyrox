@@ -79,4 +79,8 @@ p=await open({t:'2026-12-27T12:00:00',logs:SIMS,bench:BENCHV,mode:'light',w:360}
 check('light 360: behind colour is the darker orange, no scroll',await p.evaluate(()=>[getComputedStyle(document.documentElement).getPropertyValue('--behind').trim(),document.documentElement.scrollWidth<=innerWidth]),['#b4540a',true]);
 await p.close();
 check('no page errors',errs.join('|'),'');
+// Nashville tracker (v79): second goal line and flag before Dec 10, gone after
+p=await open({t:'2026-10-13T22:00:00',logs:[],bench:{}});
+check('Nashville line and flag on the hero before the race',await p.evaluate(()=>[!!document.querySelector('.hs-nsh'),/Nashville 1:40:00/.test(document.querySelector('.hs-nsh').textContent),!!document.querySelector('.hl-g2')]),[true,true,true]);
+await p.close();
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();
