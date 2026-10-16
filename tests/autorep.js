@@ -9,13 +9,13 @@ const dock=()=>p.locator('.wo-dock').innerText();
 ok(/Start rep 1 of 5/.test(await dock()),'first rep is still a manual start');
 await p.click('.dk-b');await p.clock.runFor(150000);
 await p.click('.dk-b');await p.clock.runFor(500);
-ok(/Skip rest/.test(await dock())&&/Rep 2 of 5 starts by itself/.test(await dock()),'after stopping rep 1 the rest says rep 2 starts by itself: '+(await dock()).replace(/\n/g,' | '));
+const rc=await p.locator('#woRest').innerText();ok(/Rep 2 of 5 starts by itself/.test(rc),'after stopping rep 1 the top rest card says rep 2 starts by itself: '+rc.replace(/\n/g,' | '));
 await p.clock.runFor(95000);
 const st=await p.evaluate(()=>woState());ok(st.rep&&st.rep.n===2,'rep 2 started when the rest ended');
 ok(/Stop|rep 2/i.test(await dock()),'dock now stops rep 2: '+(await dock()).replace(/\n/g,' | '));
 await p.clock.runFor(150000);await p.click('.dk-b');await p.clock.runFor(1500);
 ok(await p.evaluate(()=>woState().autoNext&&woState().autoNext.n===3),'rep 3 queued');
-await p.click('.dk-b');await p.clock.runFor(500);
+await p.click('#woRestSkip');await p.clock.runFor(500);
 ok(await p.evaluate(()=>woState().rep&&woState().rep.n===3),'Skip rest starts rep 3 right away');
 const t=await p.evaluate(()=>woState().times);const a=Object.values(t)[0];ok(a[0]>=149000&&a[1]>=149000,'rep times logged: '+a.map(v=>Math.round(v/1000)).join(','));
 // close app mid rest, reopen after rest end

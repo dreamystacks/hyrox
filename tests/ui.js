@@ -22,11 +22,11 @@ ok(await p.evaluate(()=>/SkiErg 150 m/.test(PLAN[1].fri)&&/row 150 m/.test(PLAN[
 // workout: compact rest strip, no page bleed, dock keeps its space while typing
 await p.evaluate(()=>startWorkout(3,4,'2026-10-16'));await p.clock.runFor(600);
 await p.evaluate(()=>startRest(150,'Rest after set 1'));await p.clock.runFor(300);
-const rh=await p.locator('#woRest').evaluate(e=>e.getBoundingClientRect().height);ok(rh<70,'rest strip is compact ('+Math.round(rh)+' px, was about 240)');
-const sh=await p.locator('.wo-sticky').evaluate(e=>e.getBoundingClientRect().height);ok(sh<140,'whole top bar under 140 px ('+Math.round(sh)+')');
+const rh=await p.locator('#woRest').evaluate(e=>e.getBoundingClientRect().height);ok(rh<135,'rest card stays compact ('+Math.round(rh)+' px, was about 240 before v73)');
+const sh=await p.locator('.wo-sticky').evaluate(e=>e.getBoundingClientRect().height);ok(sh<200,'whole top bar under 200 px with the v83 rest card ('+Math.round(sh)+')');
 ok(await p.evaluate(()=>getComputedStyle(document.querySelector('main.shell')).visibility==='hidden'),'page behind the workout is hidden');
 await p.screenshot({path:OUT+'/ui-rest.png'});
-const W=p.locator('#workout');await W.evaluate(e=>e.scrollTop=e.scrollHeight);await p.clock.runFor(200);
+await p.evaluate(()=>{restEnd=0;renderWorkout()});await p.clock.runFor(200);const W=p.locator('#workout');await W.evaluate(e=>e.scrollTop=e.scrollHeight);await p.clock.runFor(200);
 const before=await W.evaluate(e=>[e.scrollTop,e.scrollHeight]);await p.focus('#woNote');await p.clock.runFor(300);
 const after=await W.evaluate(e=>[e.scrollTop,e.scrollHeight]);
 ok(before[1]===after[1],'focusing a notes box does not change the page height ('+before[1]+' → '+after[1]+')');

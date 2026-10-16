@@ -15,10 +15,11 @@ const em=await p.locator('#workout .em-moves').innerText();ok(/Today \d+ × 24 m
 await p.screenshot({path:OUT+'/dock-mon.png'});
 const db=await p.evaluate(()=>{const r=document.querySelector('.wo-dock').getBoundingClientRect();return [Math.round(r.bottom),innerHeight]});ok(db[0]===db[1],'dock touches the bottom of the screen ('+db[0]+' vs '+db[1]+')');
 await p.evaluate(()=>{const W=document.getElementById('workout');W.scrollTop=W.scrollHeight});await p.clock.runFor(200);const fin=await p.evaluate(()=>{const f=document.getElementById('woFinish').getBoundingClientRect(),d=document.querySelector('.wo-dock').getBoundingClientRect();return f.bottom<=d.top});ok(fin,'scrolled to the end, Finish workout sits above the dock, not under it');
-await p.click('.dk-b');await p.clock.runFor(300);t=await dockTxt(p);ok(/Skip rest/.test(t),'after a set the dock offers Skip rest');
-await p.click('.dk-b');await p.clock.runFor(300);ok(/Skip rest/.test(await dockTxt(p)),'second tap inside 1.2 s is ignored');
-await p.clock.runFor(1300);await p.click('.dk-b');await p.clock.runFor(300);t=await dockTxt(p);ok(/Set 2 of 3 done/.test(t),'tap after the lock skips rest, dock moves to set 2');
-for(let i=0;i<2;i++){await p.clock.runFor(1300);await p.click('.dk-b');await p.clock.runFor(1300);if(/Skip rest/.test(await dockTxt(p)))await p.click('.dk-b')}
+await p.click('.dk-b');await p.clock.runFor(300);ok(await p.locator('.wo-dock').count()===0&&await p.locator('#woRestSkip').count()===1,'after a set the dock hides and the top rest card has Skip');
+const rc=await p.locator('#woRest').innerText();ok(/rest/i.test(rc)&&/Next: Set 2 of 3 done/.test(rc),'rest card says what comes next: '+rc.replace(/\n/g,' | '));
+await p.click('#rsPlus');await p.clock.runFor(200);ok(await p.evaluate(()=>restEnd-Date.now()>190000),'+15 adds 15 s to the rest');
+await p.click('#woRestSkip');await p.clock.runFor(300);t=await dockTxt(p);ok(/Set 2 of 3 done/.test(t),'Skip ends the rest, dock moves to set 2');
+for(let i=0;i<2;i++){await p.clock.runFor(1300);await p.click('.dk-b');await p.clock.runFor(1300);if(await p.locator('#woRestSkip').count())await p.click('#woRestSkip')}
 await p.clock.runFor(1300);t=await dockTxt(p);ok(/Reps left in the tank/.test(t)&&await p.locator('.dk-c').count()===5,'after the last set the dock asks RIR with 5 buttons');
 await p.locator('.dk-c').nth(2).click();await p.clock.runFor(300);ok(await p.evaluate(()=>Object.values(woState().rir||{}).includes('2')),'RIR 2 saved from the dock');
 t=await dockTxt(p);ok(/Set 1 of 3 done/.test(t)&&/Hack/.test(t),'dock moves on to the hack squat');
@@ -30,7 +31,7 @@ t=await dockTxt(p);ok(/Start sim/.test(t),'Saturday dock starts the sim: '+t.rep
 await p.click('.dk-b');await p.clock.runFor(100);await p.click('.dk-b');await p.clock.runFor(100);
 ok(await p.evaluate(()=>woState().sim&&woState().sim.marks.length===0),'double tap on Start sim logs no lap');
 await p.clock.runFor(1500);await p.click('.dk-b');await p.clock.runFor(200);ok(await p.evaluate(()=>woState().sim.marks.length===0),'Next 1.6 s after start is ignored');
-t=await dockTxt(p);ok(/Next → RowErg/.test(t)&&/\d:\d\d/.test(t),'dock shows Next → RowErg with the lap timer');
+t=await dockTxt(p);ok(/Next → RowErg/.test(t)&&!/\d:\d\d/.test(t)&&/\d:\d\d/.test(await p.locator('#woSimT').innerText()),'dock shows Next → RowErg, the lap timer lives only at the top');
 await p.screenshot({path:OUT+'/dock-sim.png'});
 await p.clock.runFor(170000);await p.click('.dk-b');await p.clock.runFor(200);ok(await p.evaluate(()=>woState().sim.marks.length===1),'real lap after 2:50 is logged');
 ok(await p.locator('#workout .sim-strip #simNext').count()===0&&await p.locator('.wo-dock #simNext').count()===1,'Next button lives only in the dock');
