@@ -15,7 +15,7 @@ const logs=p=>p.evaluate(()=>getLogs().length);
 let p=await open();
 check('no History anywhere: no section, no tab, no calendar',await p.evaluate(()=>[!!document.getElementById('history'),!!document.querySelector('[data-view=history]'),!!document.getElementById('calWrap')]),[false,false,false]);
 check('Mon card (diary) shows the run done on Mon',(await card(p,'Mon').locator('.day-res').innerText()).replace(/\s+/g,' '),'60 min RPE 6 6 km @ 5:30');
-check('Tue card (diary) shows the legs session done on Tue',(await card(p,'Tue').locator('.day-res').innerText()).replace(/\s+/g,' '),'55 min RPE 8 Sled push 120 · Back squat 100 “Felt strong”');
+check('Tue card (diary) shows the legs session done on Tue (time and RPE only, loads stay in the open card)',(await card(p,'Tue').locator('.day-res').innerText()).replace(/\s+/g,' '),'55 min RPE 8');
 check('Wed card (diary) is titled Rest day',(await card(p,'Wed').locator('.day-name').innerText()).trim(),'Rest day');
 check('Fri card (nothing logged) has no result line',await card(p,'Fri').locator('.day-res').count(),0);
 // expand Mon
