@@ -17,7 +17,7 @@ const next=p=>p.locator('.td-next').innerText().then(x=>x.replace(/\n+/g,' | ').
 // Plan tags
 let p=await open('2026-10-10T18:00:00',WEEK);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(600);
 const t=await tags(p);
-const cards=await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.day-card')].map(c=>[c.dataset.day,c.querySelector('.day-name').textContent.trim()+' | '+c.querySelector('.day-raw').textContent.trim()])));
+const cards=await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.day-card')].map(c=>[c.dataset.day,c.querySelector('.day-name').textContent.trim()+' | '+(c.querySelector('.day-raw')||c.querySelector('.plan-h')).textContent.trim()])));
 check('Mon card shows what was done on Mon (Tue session) and its plan moved to Tue',cards.Mon,'Run + Arms | Planned: Legs lift + EMOM · moved to Tue');
 check('Tue card shows Mon session done on Tue',cards.Tue,'Legs lift + EMOM | Planned: Run + Arms · moved to Mon');
 check('Wed logged rest day',cards.Wed,'Rest day | Planned: Rest');

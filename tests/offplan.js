@@ -11,7 +11,7 @@ await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(5000);
 const L=await p.evaluate(()=>getLogs('fred'));ok(L.find(x=>x.id==='m1').session==='Other','Oct 12 push day moved to Other');ok(L.find(x=>x.id==='t1').session==='Mon: Lower + sled','Tuesday legs log untouched');
 ok(await p.evaluate(()=>Object.keys(load(DIRTY,{})).some(k=>k==='logs|fred|m1')),'fix is queued for sync');
 await p.evaluate(()=>showView('plan'));await p.clock.runFor(800);
-const cards=await p.evaluate(()=>[...document.querySelectorAll('.day-card')].slice(0,2).map(c=>c.querySelector('.day-head').innerText.replace(/\s+/g,' ')));
+const cards=await p.evaluate(()=>[...document.querySelectorAll('.day-card')].slice(0,2).map(c=>(c.querySelector('.day-head').innerText+' '+(c.querySelector('.plan-h')?.textContent||'')).replace(/\s+/g,' ')));
 ok(/Extra workout/.test(cards[0])&&/Planned: Legs lift \+ EMOM/.test(cards[0])&&/moved to Tue/.test(cards[0]),'Monday card: Extra workout, Planned: Legs lift + EMOM · moved to Tue: '+cards[0]);
 ok(/Legs lift \+ EMOM/.test(cards[1])&&/Planned: Run \+ Arms/.test(cards[1]),'Tuesday card: Legs lift + EMOM, Planned: Run + Arms: '+cards[1]);
 const opt=await p.evaluate(()=>[...document.querySelectorAll('#session option')].map(o=>o.text));ok(opt.includes('Extra workout (not in the plan)')&&opt.includes('Mon plan: Legs lift + EMOM'),'log form options use plan names and offer Extra workout');

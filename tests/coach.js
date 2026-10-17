@@ -22,7 +22,7 @@ const geo=(p,w)=>p.evaluate(()=>({noScroll:document.documentElement.scrollWidth<
 let p=await open({t:'2026-09-29T18:00:00'});
 check('view order: hero, levers (hidden), coach, splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#bench > *')].map(e=>e.id||e.className.split(' ')[0])).then(a=>a.slice(0,7)),['benchSeg','standWrap','leverWrap','card','splitWrap','testWrap','benchTable']);
 check('empty hero: no estimate, unlock week from PLAN, stations measured',[await txt(p,'.hero-big'),await txt(p,'.hero .pill'),await txt(p,'.hero-sub')],['-:--:--','UNLOCKS WEEK 9','Goal 1:25:00 · 0 of 8 stations measured']);
-check('empty hero: dashed you marker, no gap bar',await p.evaluate(()=>[!!document.querySelector('.hl-you.dashed'),!!document.querySelector('.gb')]),[true,false]);
+check('empty hero: no you marker until an estimate exists, no gap bar',await p.evaluate(()=>[!!document.querySelector('.hl-you'),!!document.querySelector('.gb')]),[false,false]);
 check('ladder ticks B I A E and a lime goal marker',await p.evaluate(()=>[[...document.querySelectorAll('.hl-tick')].map(t=>t.textContent.replace(/\s+/g,'')),document.querySelector('.hl-goal').textContent.trim()]),[['1:47B','1:34I','1:21A','1:13E'],'Goal 1:25']);
 check('no levers while there is no data',await p.locator('#leverWrap').innerHTML(),'');
 check('coach baseline copy and next report line',[await txt(p,'.cc-head'),(await txt(p,'#nextReport')).startsWith('Next report:')],['Baseline week',true]);

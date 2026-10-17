@@ -9,7 +9,7 @@ const logs=[L('a','2026-10-05','Mon: Lower + sled'),L('b','2026-10-06','Rest day
 await p.addInitScript(lg=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(lg))},logs);
 await p.clock.install({time:new Date('2026-10-11T15:40:00')});await p.goto(URL);await p.clock.runFor(5000);
 await p.click('.bottombar [data-view=plan]');await p.clock.runFor(600);
-const card=d=>p.locator(`.day-card[data-day=${d}] .day-mid`).innerText();
+const card=d=>p.evaluate(d=>{const c=document.querySelector('.day-card[data-day='+d+']'),h=c.querySelector('.plan-h'),m=c.querySelector('.day-mid');const t=m.querySelector('.day-name').innerText+'\n'+(c.querySelector('.day-raw')?c.querySelector('.day-raw').innerText:h?h.textContent:'')+(c.querySelector('.day-res')?'\n'+c.querySelector('.day-res').innerText:'');return t.trim()},d);
 const tue=await card('Tue'),fri=await card('Fri');
 ok(/^Rest day\nPlanned: Run \+ Arms · moved to Wed$/.test(tue),'Tue card (diary): Rest day, planned Run + Arms moved to Wed: '+tue.replace(/\n/g,' | '));
 ok(/^Rest day\nPlanned: Upper \+ EMOM · moved to Sun$/.test(fri),'Fri card (diary): Rest day, Upper + EMOM moved to Sun: '+fri.replace(/\n/g,' | '));
