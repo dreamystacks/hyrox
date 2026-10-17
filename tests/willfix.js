@@ -6,7 +6,7 @@ await p.addInitScript(()=>{if(localStorage.getItem('seed'))return;localStorage.s
 await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(4000);
 const r=await p.evaluate(()=>{const x=getLogs('will')[0];return{st:x.stations,n:x.notes,dirty:Object.keys(load('hrx_dirty_v1',{})).includes('logs|will|1792264428356')}});
 ok(r.st==='SkiErg 2:21 · Sled push 1:13 · Sled pull 1:52 · Burpee broad jumps 2:36','stations rewritten pro rata');
-ok(/Sim week 3 · total 35:22/.test(r.n)&&/Runs: 6:30 \/ 6:48 \/ 6:54 \/ 7:06/.test(r.n)&&/Times estimated/.test(r.n)&&/Sled pull 195/.test(r.n),'total 35:22, runs, note added, his loads kept');
+ok(/Sim week 3 · total 35:22/.test(r.n)&&/Runs: 6:30 \/ 6:48 \/ 6:54 \/ 7:06/.test(r.n)&&/Times estimated/.test(r.n)&&/Sled pull 170 \(1\/1\)/.test(r.n)&&/Sled push 250/.test(r.n),'total 35:22, runs, note added, same sled loads as Fred (250 / 170)');
 ok(r.dirty,'queued for sync');
 await p.reload();await p.clock.runFor(3000);ok(await p.evaluate(()=>(getLogs('will')[0].notes.match(/Times estimated/g)||[]).length)===1,'applies only once');
 await b.close();console.log(f?f+' failed':'all passed');process.exit(f?1:0)})();
