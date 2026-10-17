@@ -25,6 +25,9 @@ check('next minute: card advances, note box is empty for the new move',await p.e
 // keyboard: shrink the viewport to what iOS leaves above the keyboard
 await p.setViewportSize({width:390,height:420});await p.clock.runFor(1200);await p.focus('#emfNote');
 check('keyboard sized viewport (390x420): still fits, clock and card visible',await fits(p),{noScroll:true,inside:true});
+check('typing a note locks the page behind (no scroll jump) and the top stays pinned',await p.evaluate(()=>[document.body.style.position,document.getElementById('emFocus').style.top,scrollY]),['fixed','0px',0]);
+await p.evaluate(()=>document.getElementById('emfNote').blur());await p.clock.runFor(1000);
+check('leaving the note unlocks the page',await p.evaluate(()=>[document.body.style.position,!document.body.dataset.emfLock]),['',true]);
 await p.setViewportSize({width:390,height:844});await p.clock.runFor(1200);
 // run to the end
 await p.clock.runFor(15*60000);
