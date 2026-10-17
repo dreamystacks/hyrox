@@ -677,6 +677,34 @@ body.emf{overflow:hidden}body.emf .toast,body.emf #woPill,body.emf .wo-dock,body
 .nd-go{color:var(--muted);font-size:1.1rem}
 .nd-bw .wt{width:72px;flex:none}
 .nd-bw button{flex:none;border:0;border-radius:999px;padding:9px 14px;background:var(--lime);color:var(--on-accent);font-weight:700;font:inherit;font-weight:700}
+
+/* v85 Coach: gap waterfall, delta pill, insight card */
+.wf{padding:18px}
+.wf-h{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}.wf-h b{font-size:1.05rem}.wf-h small{color:var(--muted);font-size:.8rem}
+.wf-row{display:flex;flex-direction:column;gap:5px;padding:6px 0}
+.wf-top{display:flex;justify-content:space-between;font-size:.88rem}
+.wf-v{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.wf-v.wf-loss{color:var(--behind)}.wf-v.wf-gain{color:var(--g2)}
+.wf-bar{height:12px;border-radius:3px}
+.wf-goal{background:repeating-linear-gradient(135deg,var(--line2) 0 2px,transparent 2px 6px)}
+.wf-bar.wf-loss{background:repeating-linear-gradient(135deg,var(--behind) 0 3px,color-mix(in srgb,var(--behind) 30%,transparent) 3px 6px)}
+.wf-bar.wf-gain{background:repeating-linear-gradient(135deg,var(--g2) 0 3px,color-mix(in srgb,var(--g2) 30%,transparent) 3px 6px)}
+.wf-proj{background:linear-gradient(90deg,var(--g1),var(--g2))}
+.wf-ax{display:flex;justify-content:space-between;font-size:.66rem;color:var(--muted);border-top:1px dashed var(--line2);padding-top:6px;margin-top:4px;font-family:var(--font-num)}
+.dpill-row{display:flex;align-items:center;gap:8px;margin:2px 0 6px}
+.dpill{font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line2)}
+.dpill.up{color:#1a7f4b}.dpill.down{color:var(--behind)}
+[data-theme$=dark] .dpill.up{color:var(--g2)}
+.dpill-l{font-size:.78rem;color:var(--muted)}
+[data-theme^=studio] .card.cc{color:#fff;border:0;background:radial-gradient(140% 120% at 100% 100%,#ffb27a 0%,#f2c7a4 22%,#8fa8e8 52%,#1d3b8f 82%)}
+[data-theme^=studio] .card.cc .td-label,[data-theme^=studio] .card.cc .muted,[data-theme^=studio] .card.cc .next-rep,[data-theme^=studio] .card.cc .cc-sum{color:#eef2ff!important}
+[data-theme^=studio] .card.cc .cc-head{color:#fff;font-weight:600;font-size:1.3rem;letter-spacing:-.01em}
+[data-theme^=studio] .card.cc .cc-day{background:#ffffff2b;color:#fff}
+[data-theme^=studio] .card.cc .cc-tw{border-color:#ffffff33;color:#fff}
+[data-theme^=studio] .card.cc .cc-more{align-self:flex-start;background:#fff;color:#121212;border-radius:999px;padding:10px 16px;font-weight:600;text-decoration:none}
+[data-theme^=studio] .card.cc #coachFull{color:#fff}
+[data-theme^=studio] .card.cc .next-rep{background:#ffffff26!important;color:#fff!important;border:0}
+[data-theme^=studio] .card.cc .next-rep *{color:#fff!important}
 </style></head><body>
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-volt-dark-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
 <div id="workout" aria-live="polite"></div>
@@ -1169,7 +1197,7 @@ function firstFullVolWeek(){const w=PLAN.find(w=>/sim/i.test(w.sat)&&qualSat(w.s
 // 1. Hero: projected finish
 function renderStanding(who){const wrap=$('standWrap');if(!wrap)return;const m=coachModel(who),sim=m.sim,lo=65*60,hi=112*60,pos=sec=>Math.max(0,Math.min(100,(hi-sec)/(hi-lo)*100)),tot=sim?sim.sec:m.est,has=tot!=null,pg=pos(GOAL_TOTAL);
  const pill=has?(sim?`Measured · full sim ${shortDate(sim.date)}`:'Estimate · half sims'):`Unlocks week ${firstFullVolWeek()}`,nsh=upcomingRaces().find(r=>!r.main);
- const d=has?tot-GOAL_TOTAL:0,gap=has?(d>0?`<b class=\"behind\">+${fmtSec(d)}</b> to find`:`<b class=\"ahead\">-${fmtSec(-d)}</b> ahead`):`<b>${m.nSt}</b> of 8 stations measured`;
+ const prev=(!sim&&has)?(()=>{try{const cw=planPos(new Date()).week;return coachModel(who,cw-1).est}catch{return null}})():null,dl=prev!=null&&Math.abs(prev-tot)>=1?`<span class="dpill ${tot<prev?'up':'down'}">${tot<prev?'▼':'▲'} ${fmtSec(Math.abs(prev-tot))}</span><span class="dpill-l">vs last week</span>`:'',d=has?tot-GOAL_TOTAL:0,gap=has?(d>0?`<b class=\"behind\">+${fmtSec(d)}</b> to find`:`<b class=\"ahead\">-${fmtSec(-d)}</b> ahead`):`<b>${m.nSt}</b> of 8 stations measured`;
  const marks=FINISH.map(([nm,t])=>`<div class=\"hl-tick\" style=\"left:${pos(toSec(t))}%\"><i></i><b>${t.replace(/:00$/,'')}</b><small>${nm[0]}</small></div>`).join('');
  const py=has?pos(tot):22,close=Math.abs(py-pg)<17||(nsh&&Math.abs(py-pos(nsh.goal))<17);
  const you=`<div class=\"hl-you${has?'':' dashed'}${close?' hi':''}\" style=\"left:${py}%\"><span>You</span></div>`;
@@ -1177,14 +1205,26 @@ function renderStanding(who){const wrap=$('standWrap');if(!wrap)return;const m=c
  let bar='';if(has){const runsG=m.runs.length?8*(m.ra-m.gr):null,stG=m.all?m.S-m.Sg:null,trG=sim&&runsG!=null&&stG!=null?(sim.sec-m.S-8*m.ra)-m.gt:0,parts=[['Runs',runsG],['Stations',stG],['Transitions',trG]].filter(p=>p[1]!=null&&p[1]>0.5);
   if(parts.length){const sum=parts.reduce((a,p)=>a+p[1],0);bar=`<div class=\"gb\">${parts.map((p,i)=>`<i style=\"flex:${p[1]/sum};opacity:${[1,.68,.42][i]}\"></i>`).join('')}</div><div class=\"gb-l\">${parts.map((p,i)=>`<span><i style=\"opacity:${[1,.68,.42][i]}\"></i>${p[0]} <b>+${fmtSec(p[1])}</b></span>`).join('')}</div>`}}
  wrap.innerHTML=`<div class=\"card hero\"><div class=\"hero-top\"><span class=\"td-label\" style=\"margin:0\">Projected finish</span><span class=\"pill\">${pill}</span></div>
- <div class=\"hero-big\">${has?fmtSec(tot):'-:--:--'}</div><div class=\"hero-sub\">Goal <b>1:25:00</b> · ${gap}</div>${nsh?`<div class=\"hs-nsh\"><i></i>Nashville <b>${fmtSec(nsh.goal)}</b> · ${has?(tot-nsh.goal>0?`<b class=\"behind\">+${fmtSec(tot-nsh.goal)}</b> to find`:`<b class=\"ahead\">-${fmtSec(nsh.goal-tot)}</b> ahead`):nsh.when} · ${raceDays(nsh)} d</div>`:''}${sim&&m.est!=null?`<div class=\"hero-sm\">Estimate from splits ${fmtSec(m.est)}</div>`:''}
+ <div class=\"hero-big\">${has?fmtSec(tot):'-:--:--'}</div>${dl?`<div class=\"dpill-row\">${dl}</div>`:''}<div class=\"hero-sub\">Goal <b>1:25:00</b> · ${gap}</div>${nsh?`<div class=\"hs-nsh\"><i></i>Nashville <b>${fmtSec(nsh.goal)}</b> · ${has?(tot-nsh.goal>0?`<b class=\"behind\">+${fmtSec(tot-nsh.goal)}</b> to find`:`<b class=\"ahead\">-${fmtSec(nsh.goal-tot)}</b> ahead`):nsh.when} · ${raceDays(nsh)} d</div>`:''}${sim&&m.est!=null?`<div class=\"hero-sm\">Estimate from splits ${fmtSec(m.est)}</div>`:''}
  <div class=\"hl\"><div class=\"hl-track\"></div>${fill}${marks}<div class=\"hl-goal\" style=\"left:${pg}%\"><span>Goal 1:25</span></div>${nsh?`<div class=\"hl-goal hl-g2\" style=\"left:${pos(nsh.goal)}%\"><span>Nashville ${fmtSec(nsh.goal).replace(/:00$/,'')}</span></div>`:''}${you}</div>${bar}</div>`}
 // 2. Biggest levers: items behind goal, ranked by seconds lost
+
+// v85: from the 1:25:00 goal to the projected time, one step per loss (canvas design, Fred Oct 16). Gains elsewhere come off as one green step.
+function gapWaterfallHTML(m,items){const over=m.est-GOAL_TOTAL,lost=items.reduce((a,t)=>a+t.lost,0),gain=Math.max(0,lost-over),span=Math.max(over,lost),rows=[];let acc=0;
+ const pc=v=>(v/span*100).toFixed(1)+'%';
+ items.forEach(t=>{rows.push({n:t.n,v:'+'+fmtSec(t.lost),cls:'wf-loss',l:pc(acc),w:pc(t.lost),line:t.line});acc+=t.lost});
+ if(gain>0.5)rows.push({n:'Ahead elsewhere',v:'-'+fmtSec(gain),cls:'wf-gain',l:pc(acc-gain),w:pc(gain),line:'Stations or runs already faster than goal'});
+ const ax=[0,.25,.5,.75,1].map(f=>fmtSec(GOAL_TOTAL+f*span).replace(/:\d\d$/,''));
+ return`<div class="card wf"><div class="wf-h"><b>Why you're over goal</b><small>From ${fmtSec(GOAL_TOTAL)} to ${fmtSec(m.est)}, biggest first</small></div>
+ <div class="wf-row"><div class="wf-top"><span>Goal</span><span class="wf-v">${fmtSec(GOAL_TOTAL)}</span></div><div class="wf-bar wf-goal" style="width:100%"></div></div>
+ ${rows.map(r=>`<div class="wf-row"><div class="wf-top"><span>${esc(r.n)}</span><span class="wf-v ${r.cls}">${r.v}</span></div><div class="wf-bar ${r.cls}" style="margin-left:${r.l};width:${r.w}" title="${esc(r.line)}"></div></div>`).join('')}
+ <div class="wf-row"><div class="wf-top"><span><b>Projected</b></span><span class="wf-v"><b>${fmtSec(m.est)}</b></span></div><div class="wf-bar wf-proj" style="width:100%"></div></div>
+ <div class="wf-ax">${ax.map(a=>`<span>${a}</span>`).join('')}</div></div>`}
 function renderLevers(who){const el=$('leverWrap');if(!el)return;const m=coachModel(who),items=[];
  m.st.forEach(s=>{if(s.last!=null&&s.last-s.g>0.5)items.push({n:s.n,lost:s.last-s.g,line:`${fmtSec(s.last)} vs ${fmtSec(s.g)} goal`})});
  if(m.runs.length&&m.ra>m.gr)items.push({n:'Runs',lost:8*(m.ra-m.gr),line:`${fmtSec(m.ra)} /km vs ${fmtSec(m.gr)} goal · 8 runs`});
  if(!m.nSt&&!m.runs.length){el.innerHTML='';return}
- items.sort((a,b)=>b.lost-a.lost);const top=items.slice(0,3),mx=top.length?top[0].lost:1;
+ items.sort((a,b)=>b.lost-a.lost);if(m.enough&&m.est>GOAL_TOTAL+1){el.innerHTML=gapWaterfallHTML(m,items);return}const top=items.slice(0,3),mx=top.length?top[0].lost:1;
  el.innerHTML=`<div class=\"card lv\"><div class=\"td-label\">Biggest levers</div>${top.length?top.map(t=>`<div class=\"lv-row\"><div class=\"lv-top\"><b>${esc(t.n)}</b><span class=\"lv-v\">+${fmtSec(t.lost)}</span></div><div class=\"lv-line\">${t.line}</div><div class=\"lv-bar\"><i style=\"width:${Math.max(4,t.lost/mx*100)}%\"></i></div></div>`).join(''):'<div class=\"lv-ok\">On pace for 1:25</div>'}</div>`}
 // 3. Coach: headline, first sentence, up to 2 tweaks. The full report sits behind a toggle.
 function firstSentence(s){s=String(s||'').trim();const m=s.match(/^.*?[.!?](?=\s|$)/);return m?m[0]:s}
