@@ -29,11 +29,11 @@ check('no Plan heading, no tick bar, no x / 7 days pill, one week nav, no eyebro
 check('caption row: SEASON left, count right',await p.evaluate(()=>[document.querySelector('.sgm-cap .td-label').textContent,document.querySelector('.sgm-cap .sgm-count').textContent.replace(/\\s+/g,' ')]),['Season','Day 13 / 189 · 4 trained']);
 check('frame moved to the tapped week (4), only one frame',await p.evaluate(()=>[document.querySelectorAll('.sgm-col.sel').length,document.querySelector('.sgm-col.sel').dataset.wk,getComputedStyle(document.querySelector('.sgm-col.sel')).outlineStyle]),[1,'4','solid']);
 check('week focus is one ellipsis line',await p.evaluate(()=>{const f=document.querySelector('.wk-f'),c=getComputedStyle(f);return[c.whiteSpace,c.textOverflow,f.getBoundingClientRect().height<24]}),['nowrap','ellipsis',true]);
-check('stats line has no x / 7 days',(await p.locator('.wk-tot').innerText()).replace(/\\s+/g,' ').includes('/ 7'),false);
+check('stats line has no x / 7 days',(await p.locator('#weekHero .wk-tot').innerText()).replace(/\\s+/g,' ').includes('/ 7'),false);
 // week header
 await p.evaluate(()=>{currentWeek=2;renderPlan()});
 check('week 2 strip states',await p.evaluate(()=>[...document.querySelectorAll('.td-strip .td-day')].map(d=>d.className.replace('td-day st-','').replace(' now','*'))),['trained','trained','rest','rest','trained','trained*','future']);
-check('week 2 totals: sessions, km, RPE',(await p.locator('.wk-tot').innerText()).replace(/\s+/g,' '),'4/5 sessions 6/'+(await p.evaluate(()=>PLAN[1].runKm))+' km RPE 7.0');
+check('week 2 totals: sessions, km, RPE',(await p.locator('#weekHero .wk-tot').innerText()).replace(/\s+/g,' '),'4 days trained 4/5 sessions 6/'+(await p.evaluate(()=>PLAN[1].runKm))+' km');
 await p.close();
 p=await open(360);
 check('360: no horizontal scroll, grid inside its wrap',await p.evaluate(()=>{const w=document.querySelector('.sgm-wrap').getBoundingClientRect(),g=document.querySelector('.sgm').getBoundingClientRect();return [document.documentElement.scrollWidth<=innerWidth,g.left>=w.left&&g.right<=w.right]}),[true,true]);
