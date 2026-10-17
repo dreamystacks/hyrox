@@ -77,7 +77,7 @@ check('viewing Will: banner, empty hero, disabled entry',await p.evaluate(()=>[d
 await p.close();
 // ---------- light theme and 360 ----------
 p=await open({t:'2026-12-27T12:00:00',logs:SIMS,bench:BENCHV,mode:'light',w:360});
-check('light 360: behind colour is the Studio light pink (Fred defaults to Studio since v85), no scroll',await p.evaluate(()=>[getComputedStyle(document.documentElement).getPropertyValue('--behind').trim(),document.documentElement.scrollWidth<=innerWidth]),['#c8235f',true]);
+check('light 360: behind colour is the Studio light orange (v87, the warm side of the theme pair), no scroll',await p.evaluate(()=>[getComputedStyle(document.documentElement).getPropertyValue('--behind').trim(),document.documentElement.scrollWidth<=innerWidth]),['#c2531c',true]);
 await p.close();
 check('no page errors',errs.join('|'),'');
 // Nashville tracker (v79): second goal line and flag before Dec 10, gone after
