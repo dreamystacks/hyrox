@@ -9,7 +9,7 @@ await p.addInitScript(()=>{if(sessionStorage.getItem('s'))return;sessionStorage.
 await p.clock.install({time:new Date('2026-10-02T09:00:00')});await p.goto(URL);await p.clock.runFor(5000);
 await p.click('.bottombar [data-view=plan]');await p.clock.runFor(500);
 const thu=p.locator('.day-card[data-day=Thu]');await thu.locator('.day-head').click();
-check('Thu card offers Log hockey for Thu',await thu.locator('[data-hockey]').innerText(),'LOG HOCKEY · THU');
+check('Thu card offers Log hockey for Thu',await thu.locator('[data-hockey]').innerText(),'Log hockey · Thu');
 await thu.locator('[data-hockey]').click();await p.clock.runFor(300);
 check('finish sheet opens with Thursday as the date',await p.evaluate(()=>[!$('finish').hidden,finPayload.date,finPayload.session]),[true,'2026-10-01','Thu: Hockey']);
 await p.mouse.click(195,30);await p.clock.runFor(300);

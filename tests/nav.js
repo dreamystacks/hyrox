@@ -13,8 +13,8 @@ check('bar: Plan, Today (raised, active), Coach; no History, Guides or Progress'
 check('app opens on Today',await p.evaluate(()=>document.querySelector('.view.active').id),'today');
 check('Settings has no Guides row',await p.locator('#settingsModal #guidesBtn').count(),0);
 await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
-check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#bench > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,7)),['section-title','benchSeg','standWrap','leverWrap','card','splitWrap','testWrap']);
-check('Coach title',await p.locator('#bench h2').innerText(),'Coach');
+check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#bench > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,7)),['benchSeg','standWrap','leverWrap','card','splitWrap','testWrap','benchTable']);
+check('Coach title in the top bar',await p.locator('#pgTitle').innerText(),'Coach');
 check('no athlete toggle in the Coach or Plan header',await p.evaluate(()=>[document.querySelectorAll('#bench .seg').length,document.querySelectorAll('#plan .seg').length]),[0,0]);
 await p.evaluate(()=>{syncCfg=()=>({url:'x',key:'y'});setSegRender();settingsModal.classList.add('show')});
 check('Settings has the viewing switch without (you)',await p.locator('#setSeg button').allInnerTexts(),['Fred','Will','Grady']);
@@ -33,8 +33,8 @@ check('Saturday after 6:52 PM rolls to next Saturday',await p.locator('#nextRepo
 check('...and it is really 6 to 7 days away (Sat 20:00 to next Sat 18:52)',await p.evaluate(()=>{const d=(nextReportAt()-Date.now())/864e5;return d>6.9&&d<7}),true);await p.context().close();
 // Guides from Today (Tuesday: a training day, so the card has exercises)
 p=await open('America/Toronto','2026-10-06T10:00:00');
-check('Today header has the guides button',await p.locator('#today .td-book').count(),1);
-await p.click('#today .td-book');await p.clock.runFor(400);
+check('Top bar has the guides button on Today',await p.locator('#tbBook').isVisible(),true);
+await p.click('#tbBook');await p.clock.runFor(400);
 check('Guides opens; Today tab stays highlighted; no tab of its own',await p.evaluate(()=>[document.querySelector('.view.active').id,document.querySelector('.tab.active').dataset.view,document.querySelectorAll('.bottombar [data-view=guides]').length]),['guides','today',0]);
 check('Guides list rendered',await p.evaluate(()=>document.querySelectorAll('#guideGrid .guide-card').length>5),true);
 await p.click('#guidesBack');await p.clock.runFor(300);

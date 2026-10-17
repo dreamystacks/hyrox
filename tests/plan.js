@@ -26,9 +26,9 @@ await card(p,'Mon').locator('[data-edit]').click();await p.clock.runFor(300);
 check('Edit opens the log form',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('logTitle').textContent]),['log','Edit session']);
 await p.click('#cancelEdit');await p.clock.runFor(300);check('Cancel returns to Plan',await p.evaluate(()=>document.querySelector('.view.active').id),'plan');
 // add session (last opened card is Mon Oct 5)
-check('Add button follows the last opened card',await p.locator('#addSession').innerText(),'+ ADD SESSION · MON, OCT 5');
+check('Add button follows the last opened card',await p.locator('#addSession').innerText(),'+ Add session · Mon, Oct 5');
 await card(p,'Fri').locator('.day-head').click();await p.clock.runFor(200);
-check('Add button now points at Fri',await p.locator('#addSession').innerText(),'+ ADD SESSION · FRI, OCT 9');
+check('Add button now points at Fri',await p.locator('#addSession').innerText(),'+ Add session · Fri, Oct 9');
 await p.click('#addSession');await p.clock.runFor(300);
 check('log form prefilled with the date and that weekday\'s session',await p.evaluate(()=>[document.querySelector('.view.active').id,date.value,session.value]),['log','2026-10-09','Fri: Upper + erg + arms B']);
 await p.click('#logForm button[type=submit]');await p.clock.runFor(500);
