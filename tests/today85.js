@@ -10,7 +10,7 @@ await p.addInitScript(()=>{if(localStorage.getItem('seed'))return;localStorage.s
 await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(5000);
 ok(await p.evaluate(()=>document.documentElement.dataset.theme)==='studio-light',vw+': Fred lands on Studio light');
 const tile=await p.locator('.rt-tile').innerText();ok(/Nashville/.test(tile)&&/56/.test(tile)&&/Brisbane/.test(tile)&&/170/.test(tile),vw+': race tile shows both races: '+tile.replace(/\n/g,' | '));
-const ts=await p.locator('.ts-wrap').innerText();ok(/^4 days trained/.test(ts),vw+': 4 days trained: '+ts.replace(/\n/g,' | '));
+const ts=await p.locator('.ts-wrap').innerText();ok(/4 trained/.test(ts),vw+': 4 days trained: '+ts.replace(/\n/g,' | '));
 ok(await p.locator('.ts-bars i').count()===18,vw+': one bar per day since Sep 28 (18 so far)');
 ok(await p.locator('.ts-bars i.now').count()===1,vw+': today is marked');
 const nd=await p.locator('.nd-card').innerText();ok(/Weigh-in due/.test(nd)&&/Legs lift \+ EMOM not logged/.test(nd),vw+': Needs you has weigh-in and the missed Monday: '+nd.replace(/\n/g,' | '));

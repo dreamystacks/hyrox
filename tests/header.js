@@ -15,7 +15,7 @@ for(const w of [390,360]){
  const p=await open(w);
  check(w+': week 1 dots = circles (one state source)',await p.evaluate(()=>{const d=[...document.querySelectorAll('.sgm-col[data-wk="1"] i')].map(i=>i.className.replace(/^b-/,'').replace(' now','')),c=[...document.querySelectorAll('.td-strip .td-day')].map(x=>x.className.replace(/.*st-(\w+).*/,'$1'));return JSON.stringify(d)===JSON.stringify(c.map(s=>s))}),true);
  check(w+': Mon and Tue trained, Tue is today with the ring and lime fill',await p.evaluate(()=>[...document.querySelectorAll('.sgm-col[data-wk="1"] i')].slice(0,3).map(i=>i.className)),['b-trained','b-trained now','b-future']);
- check(w+': stats line',(await p.locator('#weekHero .wk-tot').innerText()).replace(/\s+/g,' '),'2 days trained 2/5 sessions 2.4/8 km');
+ check(w+': stats line',(await p.locator('#weekTrack .wk-tot').innerText()).replace(/\s+/g,' '),'2 days trained 2/5 sessions 2.4/8 km');
  check(w+': frame on week 1, one only',await p.evaluate(()=>[...document.querySelectorAll('.sgm-col.sel')].map(x=>x.dataset.wk)),['1']);
  check(w+': no horizontal scroll, dots inside the screen',await p.evaluate(()=>[document.documentElement.scrollWidth<=innerWidth,document.querySelector('.sgm').getBoundingClientRect().right<=innerWidth]),[true,true]);
  check(w+': first session card starts within the first screen',await p.evaluate(()=>document.querySelector('.day-card').getBoundingClientRect().top<560),true);
