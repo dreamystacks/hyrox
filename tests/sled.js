@@ -1,5 +1,5 @@
 // Sled suggestions check: node tests/sled.js  (needs playwright; Chromium at /opt/pw-browsers/chromium in Claude's cloud sandbox)
-// Two contexts: Monday EMOM (progression from the last EMOM load, feel 20+ / 10-20 / missed, deload 80%, coach override) and
+// Two contexts: Monday EMOM (progression from the last EMOM load, feel 20+ / 10-20 / missed, deload holds the load (v107), coach override) and
 // Saturday sim (percent of race weight from the plan text). Builds use an empty sled of 100 lb plus 45, 25 and 10 lb plates.
 const {chromium}=require('playwright'),path=require('path');
 const URL='file://'+path.resolve(__dirname,'../index.html');
@@ -30,7 +30,7 @@ check('10 to 20 s left holds the load',await chip(p,'.emom'),{sug:'Suggested 190
 p=await open({t:'2026-10-05T07:00:00',logs:[MON('missed')]});await start(p,2,0,'2026-10-05');
 check('missed minutes go one increment down (165 lb)',await chip(p,'.emom'),{sug:'Suggested 165 lb total plates 65 lb: 45 + 2 x 10',why:'last EMOM: missed minutes'});await p.close();
 p=await open({t:'2026-10-19T07:00:00',logs:[MON('20+')]});await start(p,4,0,'2026-10-19');
-check('deload week: 80% of the last EMOM load, closest without going over',await chip(p,'.emom'),{sug:'Suggested 150 lb total plates 50 lb: 2 x 25',why:'deload week: 80% of last EMOM load'});await p.close();
+check('deload week (v107): holds the last EMOM load, fewer rounds',await chip(p,'.emom'),{sug:'Suggested 190 lb total plates 90 lb: 2 x 45',why:'deload week: same as last EMOM load, fewer rounds'});await p.close();
 p=await open({t:'2026-10-05T07:00:00',logs:[]});await start(p,2,0,'2026-10-05');
 check('no EMOM history: sled + 2 x 45',await chip(p,'.emom'),{sug:'Suggested 190 lb total plates 90 lb: 2 x 45',why:'first time: sled + 2 x 45'});await p.close();
 // ---------- Saturday sim ----------
