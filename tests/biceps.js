@@ -17,7 +17,7 @@ ok(pl.filter(x=>x[0]>=25).every(x=>!x[2]),'taper weeks 25 to 27 unchanged');
 const td=await p.locator('#today').innerText();ok(/Bayesian cable curls\s*3×10-12/.test(td)&&/Hammer curls\s*3×10-12/.test(td),'Today Friday rows show both curls');
 // Plan card
 await p.evaluate(()=>{currentWeek=4;showView('plan')});await p.clock.runFor(400);
-const fr=await p.locator('.day-card[data-day=Fri]').innerText();ok(/6 lifts \+ EMOM 12′/.test(fr),'Plan Friday structure line: 6 lifts + EMOM 12′');
+const fr=await p.locator('.day-card[data-day=Fri]').evaluate(c=>c.textContent);ok(/6 lifts \+ EMOM 12′/.test(fr),'Plan Friday sheet structure line: 6 lifts + EMOM 12′');
 await p.locator('.day-card[data-day=Fri] .day-head').click();await p.clock.runFor(300);ok(/Bayesian cable curls/i.test(await p.locator('.day-card[data-day=Fri]').textContent()),'Plan open Friday card lists the Bayesian curl');
 // guide
 await p.evaluate(()=>showView('today'));await p.clock.runFor(300);
