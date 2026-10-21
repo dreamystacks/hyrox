@@ -1636,8 +1636,8 @@ function woRestore(){const x=woState();if(!x)return;emomLoad();lastEmMin=emomRun
 function saveRest(){woPatch(x=>{x.rest=restEnd?{end:restEnd,len:restLen,label:restLabel}:null;x.work=workPhase})}
 function woRun(){clearInterval(woTick);woTick=setInterval(woTickFn,250);woPillUpd()}
 function openWorkout(){const x=woPatch(y=>{y.min=false});if(!x)return;woRestore();document.body.classList.add('focus');$('workout').classList.add('show');renderWorkout();woRun();keepAwake();mediaStart();emfSync()}
-function minimizeWorkout(){emfHide();woPatch(y=>{y.min=true});$('workout').classList.remove('show');document.body.classList.remove('focus');woPillUpd();refreshViews()}
-function closeWorkout(){emfHide();$('workout').classList.remove('show');document.body.classList.remove('focus');clearInterval(woTick);restEnd=0;workPhase=null;woPillUpd();mediaStop();wakeOff()}
+function minimizeWorkout(){if(window.woUnlock)window.woUnlock();emfHide();woPatch(y=>{y.min=true});$('workout').classList.remove('show');document.body.classList.remove('focus');woPillUpd();refreshViews()}
+function closeWorkout(){emfHide();if(window.woUnlock)window.woUnlock();$('workout').classList.remove('show');document.body.classList.remove('focus');clearInterval(woTick);restEnd=0;workPhase=null;woPillUpd();mediaStop();wakeOff()}
 function woPillUpd(){const p=$('woPill');if(!p)return;const x=woState(),show=!!x&&!$('workout').classList.contains('show');p.hidden=!show;if(show)p.innerHTML=`Workout · ${fmt(woElapsed(x))}${x.pausedAt?' · paused':''} <b>›</b>`}
 function woTyping(){const a=document.activeElement;return!!(a&&$('workout').contains(a)&&/^(TEXTAREA|INPUT)$/.test(a.tagName))}
 function beep(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();[0,.22,.44].forEach(t=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=880;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.001,audioCtx.currentTime+t);g.gain.exponentialRampToValueAtTime(.3,audioCtx.currentTime+t+.02);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+t+.18);o.start(audioCtx.currentTime+t);o.stop(audioCtx.currentTime+t+.2)})}catch{}try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch{}}
@@ -1959,7 +1959,15 @@ function fit(){raf=0;const ae=document.activeElement,typing=W.classList.contains
  if(typing){W.style.bottom='auto';W.style.top=Math.max(0,Math.round(vv.offsetTop))+'px';W.style.height=Math.round(vv.height)+'px';return}
  if(W.style.height||W.style.top||W.style.bottom){W.style.top='';W.style.height='';W.style.bottom=''}}
 function q(){if(!raf)raf=requestAnimationFrame(fit)}
-vv.addEventListener('resize',q);vv.addEventListener('scroll',q);document.addEventListener('focusin',()=>{q();[150,400,800].forEach(d=>setTimeout(q,d))});document.addEventListener('focusout',()=>[0,200,500].forEach(d=>setTimeout(q,d)));window.pinWorkout=q})();
+// v109: Fred (Oct 20) still saw the whole workout screen scroll up when a box got focus. The window behind the overlay could still scroll, and the fit only ran a few times. While a field in #workout has focus: lock the body at its scroll (like emfLock), refit every 60 ms, keep window.scrollY at 0, and scroll #workout itself so the field sits above the keyboard.
+const B=document.body;function inW(){const ae=document.activeElement;return W.classList.contains('show')&&ae&&W.contains(ae)&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&!(document.getElementById('emFocus')||{}).contains?.(ae)}
+function show(){const ae=document.activeElement;if(!inW())return;const r=ae.getBoundingClientRect(),st=W.querySelector('.wo-sticky'),topY=Math.round(vv.offsetTop)+(st?st.getBoundingClientRect().height:0)+8,botY=Math.round(vv.offsetTop+vv.height)-16;if(r.bottom>botY)W.scrollTop+=r.bottom-botY;else if(r.top<topY)W.scrollTop-=topY-r.top}
+function lock(){if(B.dataset.woLock||B.dataset.emfLock)return;const y=scrollY;B.dataset.woLock=String(y);B.style.position='fixed';B.style.top=-y+'px';B.style.left='0';B.style.right='0';B.style.width='100%';clearInterval(window._woIv);window._woIv=setInterval(()=>{if(!B.dataset.woLock){clearInterval(window._woIv);return}fit();if(window.scrollY)window.scrollTo(0,0)},60)}
+function unlock(){if(!B.dataset.woLock)return;const y=+B.dataset.woLock||0;delete B.dataset.woLock;clearInterval(window._woIv);B.style.position=B.style.top=B.style.left=B.style.right=B.style.width='';window.scrollTo(0,y);[0,200,500,900].forEach(d=>setTimeout(()=>{fit();if(window.realignBar)window.realignBar()},d))}
+vv.addEventListener('resize',()=>{q();setTimeout(show,60)});vv.addEventListener('scroll',q);
+document.addEventListener('focusin',()=>{if(inW())lock();q();[150,400,800].forEach(d=>setTimeout(q,d));[120,350,700].forEach(d=>setTimeout(show,d))});
+document.addEventListener('focusout',()=>{setTimeout(()=>{if(!inW())unlock()},80);[0,200,500].forEach(d=>setTimeout(q,d))});
+window.pinWorkout=q;window.woUnlock=unlock})();
 </script>
 <script>document.addEventListener('focusin',e=>{const W=document.getElementById('workout');if(W&&W.contains(e.target)&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName))W.classList.add('kb')});document.addEventListener('focusout',()=>{const W=document.getElementById('workout');if(W)setTimeout(()=>{const a=document.activeElement;if(!(a&&W.contains(a)&&/^(INPUT|TEXTAREA)$/.test(a.tagName)))W.classList.remove('kb')},50)});</script>
 </body></html>
