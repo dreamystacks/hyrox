@@ -1,4 +1,4 @@
-// Plan header check: node tests/header.js  (needs playwright; Chromium at /opt/pw-browsers/chromium in Claude's cloud sandbox)
+// Plan header check (v111: day rows, day sheet, dots on Coach): node tests/header.js  (needs playwright; Chromium at /opt/pw-browsers/chromium in Claude's cloud sandbox)
 // Clock pinned to Tue Sep 29 2026 18:00 (week 1, day 2): Mon and Tue trained, today is Tue.
 // Checks dots vs circles share one state source, today dot (trained keeps lime plus ring, untrained is amber),
 // the column frame follows taps and the arrows, circles scroll to and open the right day card, stats line, and 390/360 layout.
@@ -13,30 +13,35 @@ const open=async(w,logs=LOGS,t='2026-09-29T18:00:00')=>{const p=await b.newPage(
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(600);return p};
 for(const w of [390,360]){
  const p=await open(w);
- check(w+': week 1 dots = circles (one state source)',await p.evaluate(()=>{const d=[...document.querySelectorAll('.sgm-col[data-wk="1"] i')].map(i=>i.className.replace(/^b-/,'').replace(' now','')),c=[...document.querySelectorAll('.td-strip .td-day')].map(x=>x.className.replace(/.*st-(\w+).*/,'$1'));return JSON.stringify(d)===JSON.stringify(c.map(s=>s))}),true);
+ check(w+': week 1 dots (Coach) = circles (Plan), one state source',await p.evaluate(()=>{renderSeasonGrid('fred');const d=[...document.querySelectorAll('.sgm-col[data-wk="1"] i')].map(i=>i.className.replace(/^b-/,'').replace(' now','').replace(' race','')),c=[...document.querySelectorAll('.td-strip .td-day')].map(x=>x.className.replace(/.*st-(\w+).*/,'$1'));return JSON.stringify(d)===JSON.stringify(c)}),true);
  check(w+': Mon and Tue trained, Tue is today with the ring and lime fill',await p.evaluate(()=>[...document.querySelectorAll('.sgm-col[data-wk="1"] i')].slice(0,3).map(i=>i.className)),['b-trained','b-trained now','b-future']);
  check(w+': stats line',(await p.locator('#weekTrack .wk-tot').innerText()).replace(/\s+/g,' '),'2 days trained 2/5 sessions 2.4/8 km');
- check(w+': frame on week 1, one only',await p.evaluate(()=>[...document.querySelectorAll('.sgm-col.sel')].map(x=>x.dataset.wk)),['1']);
- check(w+': no horizontal scroll, dots inside the screen',await p.evaluate(()=>[document.documentElement.scrollWidth<=innerWidth,document.querySelector('.sgm').getBoundingClientRect().right<=innerWidth]),[true,true]);
- check(w+': first session card starts within the first screen',await p.evaluate(()=>document.querySelector('.day-card').getBoundingClientRect().top<560),true);
- // tap a column far away: frame moves, week card follows
- await p.click('.sgm-col[data-wk="9"]');await p.clock.runFor(500);
- check(w+': tapping week 9 moves the frame and the week select',await p.evaluate(()=>[document.querySelector('.sgm-col.sel').dataset.wk,document.getElementById('weekJump').value]),['9','9']);
- check(w+': column hit area is the full column height',await p.evaluate(()=>{const c=document.querySelector('.sgm-col[data-wk="9"]').getBoundingClientRect();return c.height>=60}),true);
+ check(w+': no season dots on Plan any more',await p.evaluate(()=>!!document.querySelector('#plan .sgm')),false);
+ check(w+': all 7 day rows fit on screen below the week card (rows about 64 px)',await p.evaluate(()=>{const r=[...document.querySelectorAll('#days .day-card')].map(c=>Math.round(c.getBoundingClientRect().height));return[r.length,r.every(h=>h>=56&&h<=80)]}),[7,true]);
+ check(w+': no horizontal scroll',await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ // tap a circle: that day's sheet opens at the bottom of the screen
+ await p.click('.td-strip [data-jump=Fri]');await p.clock.runFor(300);
+ const r=await p.evaluate(()=>{const c=document.querySelector('.day-card[data-day=Fri]'),bd=c.querySelector('.day-body').getBoundingClientRect();return{open:c.classList.contains('open'),bottom:Math.round(bd.bottom),dim:getComputedStyle(document.getElementById('planDim')).display,title:c.querySelector('.ds-h b').textContent}});
+ check(w+': tapping the Fri circle opens the Fri sheet at the bottom with a dim backdrop',[r.open,Math.abs(r.bottom-844)<=2,r.dim,r.title],[true,true,'block','Upper + EMOM']);
+ await p.click('.day-card[data-day=Fri] [data-dclose]');await p.clock.runFor(200);
+ check(w+': X closes it',await p.evaluate(()=>[document.querySelectorAll('.day-card.open').length,document.body.classList.contains('psheet')]),[0,false]);
+ await p.click('.day-card[data-day=Mon] .day-head');await p.clock.runFor(200);
+ await p.mouse.click(195,60);await p.clock.runFor(200);
+ check(w+': tapping the dim area closes the sheet',await p.locator('.day-card.open').count(),0);
+ // arrows and swipe change week
  await p.click('#nextWeek');await p.clock.runFor(300);
- check(w+': arrows move the frame too',await p.evaluate(()=>document.querySelector('.sgm-col.sel').dataset.wk),'10');
- // circle tap scrolls to and opens the right card
- await p.evaluate(()=>{currentWeek=1;renderPlan();window.scrollTo(0,0)});await p.clock.runFor(300);
- await p.click('.td-strip [data-jump=Fri]');await p.waitForTimeout(300);
- const r=await p.evaluate(()=>{const c=document.querySelector('.day-card[data-day=Fri]'),t=c.getBoundingClientRect().top;return{open:c.classList.contains('open'),top:Math.round(t),atEnd:scrollY>=document.documentElement.scrollHeight-innerHeight-2}});
- check(w+': tapping the Fri circle opens Fri and puts it at the top (or as high as the page allows) '+JSON.stringify(r),[r.open,(r.top>=0&&r.top<=40)||(r.atEnd&&r.top>=0&&r.top<600)],[true,true]);
- await p.evaluate(()=>window.scrollTo(0,0));await p.clock.runFor(800);
- await p.click('.td-strip [data-jump=Mon]');await p.waitForTimeout(300);
- check(w+': tapping Mon opens Mon',await p.evaluate(()=>document.querySelector('.day-card[data-day=Mon]').classList.contains('open')),true);
+ check(w+': arrow moves to week 2',await p.evaluate(()=>document.getElementById('weekJump').value),'2');
+ await p.evaluate(()=>{const z=document.getElementById('days'),T=(t,x)=>z.dispatchEvent(new TouchEvent(t,{bubbles:true,touches:t==='touchend'?[]:[new Touch({identifier:1,target:z,clientX:x,clientY:300})],changedTouches:[new Touch({identifier:1,target:z,clientX:x,clientY:300})]}));T('touchstart',300);T('touchend',120)});await p.clock.runFor(300);
+ check(w+': swipe left moves to week 3',await p.evaluate(()=>document.getElementById('weekJump').value),'3');
+ // Coach: tap a column opens Plan on that week
+ await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
+ check(w+': Coach dots inside the screen',await p.evaluate(()=>document.querySelector('.sgm').getBoundingClientRect().right<=innerWidth),true);
+ await p.click('.sgm-col[data-wk="9"]');await p.clock.runFor(500);
+ check(w+': tapping week 9 on Coach opens Plan on week 9',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('weekJump').value]),['plan','9']);
  await p.close()}
 // untrained today keeps the amber fill
 let p=await open(390,[],'2026-09-29T18:00:00');
-check('today untrained: amber dot with ring',await p.evaluate(()=>document.querySelectorAll('.sgm-col[data-wk="1"] i')[1].className),'b-today now');
+check('today untrained: amber dot with ring',await p.evaluate(()=>(renderSeasonGrid('fred'),document).querySelectorAll('.sgm-col[data-wk="1"] i')[1].className),'b-today now');
 await p.close();
 check('no page errors',errs.join('|'),'');
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();

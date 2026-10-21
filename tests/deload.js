@@ -41,7 +41,7 @@ ok(/Weighted pull-ups\s*3×5\s*80% of last/i.test(fr)&&/EMOM 12′/.test(fr),'To
 ok(await p.evaluate(()=>simPct(PLAN[3]))===75,'Saturday week 4 sim at 75%');
 // Plan
 await p.evaluate(()=>{currentWeek=4;showView('plan')});await p.clock.runFor(400);
-const mon=await p.locator('.day-card[data-day=Mon]').innerText();ok(/EMOM 12′/.test(mon),'Plan Monday card structure line: '+mon.replace(/\n/g,' | ').slice(0,90));
+const mon=await p.locator('.day-card[data-day=Mon]').innerText();ok(/EMOM 12\b/.test(mon),'Plan Monday row subtitle: '+mon.replace(/\n/g,' | ').slice(0,90));
 ok(/\/\s*12\s*km/.test((await p.locator('#weekTrack .wk-tot').innerText()).replace(/\n/g,' ')),'Plan week tracker target 12 km');
 await p.close();
 // week 5 builds from week 3, not from the deload

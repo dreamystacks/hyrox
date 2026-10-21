@@ -8,7 +8,7 @@ await p.addInitScript(()=>{if(sessionStorage.getItem('s'))return;sessionStorage.
 await p.clock.install({time:new Date('2026-10-20T09:00:00')});await p.goto(URL);await p.clock.runFor(5000);
 await p.click('.bottombar [data-view=plan]');await p.clock.runFor(500);
 const mon=p.locator('.day-card[data-day=Mon]');if(!(await mon.evaluate(c=>c.classList.contains('open'))))await mon.locator('.day-head').click();
-check('Monday card (yesterday) offers a rest day',await mon.locator('[data-restpast]').innerText(),'Rested on Mon? Log rest day');
+check('Monday card (yesterday) offers a rest day',await mon.locator('[data-restpast]').innerText(),'Log rest day');
 await mon.locator('[data-restpast]').click();await p.clock.runFor(400);
 check('rest day saved on Monday',await p.evaluate(()=>getLogs().map(x=>x.date+' '+x.session)),['2026-10-19 Rest day']);
 check('button gone once logged',await p.locator('.day-card[data-day=Mon] [data-restpast]').count(),0);

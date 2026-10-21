@@ -1,4 +1,4 @@
-// Season grid (Plan tab, compact 27 columns x 7 rows of dots) + week header check: node tests/grid.js
+// Season grid (Coach tab since v111, compact 27 columns x 7 rows of dots) + week header check: node tests/grid.js
 // Needs playwright; Chromium at /opt/pw-browsers/chromium in Claude's cloud sandbox.
 // Clock pinned to Sat Oct 10 2026 (plan week 2, day 13). Week 2 is swapped: Mon holds Tue's session, Tue holds Mon's.
 // Week 1 has no logs except a logged Rest day on Tue.
@@ -13,7 +13,9 @@ const open=async(w=390)=>{const p=await b.newPage({viewport:{width:w,height:844}
  await p.clock.install({time:new Date('2026-10-10T18:00:00')});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(500);return p};
 const col=(p,wk)=>p.evaluate(wk=>[...document.querySelectorAll(`.sgm-col[data-wk="${wk}"] i`)].map(i=>i.className.replace(/^b-/,'')),wk);
 let p=await open();
-check('Plan order: seg, grid, week nav, header, days, add button',await p.evaluate(()=>[...document.querySelectorAll('#plan > *')].map(e=>e.id||e.className.split(' ')[0])),['planSeg','gridWrap','weekTrack','card','days','addSession']);
+check('Plan order: seg, grid, week nav, header, days, add button',await p.evaluate(()=>[...document.querySelectorAll('#plan > *')].map(e=>e.id||e.className.split(' ')[0])),['planSeg','weekTrack','card','days','addSession']);
+await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
+check('season dots live on Coach now',await p.evaluate(()=>!!document.querySelector('#bench #gridWrap .sgm')),true);
 check('27 columns x 7 = 189 dots',await p.evaluate(()=>[document.querySelectorAll('.sgm-col').length,document.querySelectorAll('.sgm-col i').length]),[27,189]);
 check('one line counter',(await p.locator('#gridWrap .sgm-count').innerText()).replace(/\s+/g,' '),'Day 13 / 189 · 4 trained');
 check('week 1: Rest day log Tue, Wed and Sun rest, rest missed',await col(p,1),['missed','rest','rest','missed','missed','missed','rest']);
@@ -26,8 +28,10 @@ await p.click('.sgm-col[data-wk="4"]');await p.clock.runFor(800);
 check('tap week 4 selects it in Plan',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('weekJump').value==='4']),['plan',true]);
 // header structure
 check('no Plan heading, no tick bar, no x / 7 days pill, one week nav, no eyebrow or Week N: prefix',await p.evaluate(()=>[!!document.querySelector('#plan .section-title'),!!document.querySelector('.td-ticks'),!!document.querySelector('.wk-days'),document.querySelectorAll('#plan .week-nav').length,!!document.querySelector('#weekHero .eyebrow'),/Week \\d+:/.test(document.getElementById('weekHero').textContent)]),[false,false,false,1,false,false]);
+await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
 check('caption row: SEASON left, count right',await p.evaluate(()=>[document.querySelector('#gridWrap .sgm-cap .td-label').textContent,document.querySelector('#gridWrap .sgm-cap .sgm-count').textContent.replace(/\\s+/g,' ')]),['Season','Day 13 / 189 · 4 trained']);
 check('frame moved to the tapped week (4), only one frame',await p.evaluate(()=>[document.querySelectorAll('.sgm-col.sel').length,document.querySelector('.sgm-col.sel').dataset.wk,getComputedStyle(document.querySelector('.sgm-col.sel')).outlineStyle]),[1,'4','solid']);
+await p.click('.bottombar [data-view=plan]');await p.clock.runFor(400);
 check('week focus is one ellipsis line',await p.evaluate(()=>{const f=document.querySelector('.wk-f'),c=getComputedStyle(f);return[c.whiteSpace,c.textOverflow,f.getBoundingClientRect().height<24]}),['nowrap','ellipsis',true]);
 check('stats line has no x / 7 days',(await p.locator('#weekTrack .wk-tot').innerText()).replace(/\\s+/g,' ').includes('/ 7'),false);
 // week header
@@ -35,7 +39,7 @@ await p.evaluate(()=>{currentWeek=2;renderPlan()});
 check('week 2 strip states',await p.evaluate(()=>[...document.querySelectorAll('.td-strip .td-day')].map(d=>d.className.replace('td-day st-','').replace(' now','*'))),['trained','trained','rest','rest','trained','trained*','future']);
 check('week 2 totals: sessions, km, RPE',(await p.locator('#weekTrack .wk-tot').innerText()).replace(/\s+/g,' '),'4 days trained 4/5 sessions 6/'+(await p.evaluate(()=>PLAN[1].runKm))+' km');
 await p.close();
-p=await open(360);
+p=await open(360);await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
 check('360: no horizontal scroll, grid inside its wrap',await p.evaluate(()=>{const w=document.querySelector('.sgm-wrap').getBoundingClientRect(),g=document.querySelector('.sgm').getBoundingClientRect();return [document.documentElement.scrollWidth<=innerWidth,g.left>=w.left&&g.right<=w.right]}),[true,true]);
 await p.close();
 check('no page errors',errs.join('|'),'');

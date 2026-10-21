@@ -19,7 +19,7 @@ await p.click('#finRpe [data-fr="6"]');await p.click('#finSave');await p.clock.r
 check('saved on Thursday, Thu card now shows the hockey result with a lime chip',await p.evaluate(()=>[getLogs().map(x=>x.date+' '+x.session),document.querySelector('.day-card[data-day=Thu] .day-chip').classList.contains('st-trained'),!!document.querySelector('.day-card[data-day=Thu] .day-res')]),[['2026-10-01 Thu: Hockey'],true,true]);
 // Mon and Tue missed: Start plus "log it for Mon"
 const mon=p.locator('.day-card[data-day=Mon]');await mon.locator('.day-head').click();
-check('Mon card: Start and a retro link',[await mon.locator('[data-start]').count(),await mon.locator('[data-retro]').innerText()],[1,'Already done it? Log it for Mon']);
+check('Mon card: Start and a retro link',[await mon.locator('[data-start]').count(),await mon.locator('[data-retro]').innerText()],[1,'Log it as done']);
 await mon.locator('[data-retro]').click();await p.clock.runFor(300);
 check('retro link opens the log form on Monday with its session',await p.evaluate(()=>[document.querySelector('.view.active').id,date.value,session.value]),['log','2026-09-28','Mon: Lower + sled']);
 await p.click('#cancelEdit');await p.clock.runFor(300);

@@ -29,7 +29,8 @@ await p.click('#cancelEdit');await p.clock.runFor(300);check('Cancel returns to 
 check('Add button follows the last opened card',await p.locator('#addSession').innerText(),'+ Add session · Mon, Oct 5');
 await card(p,'Fri').locator('.day-head').click();await p.clock.runFor(200);
 check('Add button now points at Fri',await p.locator('#addSession').innerText(),'+ Add session · Fri, Oct 9');
-await p.click('#addSession');await p.clock.runFor(300);
+check('the Fri day sheet (missed this week) offers Start, Log it as done, Log rest day, Log something else',await card(p,'Fri').locator('.ds-acts').innerText().then(x=>x.split('\n').filter(Boolean)),['Start workout','Log it as done','Log rest day','Log something else']);
+await card(p,'Fri').locator('[data-retro]').click();await p.clock.runFor(300);
 check('log form prefilled with the date and that weekday\'s session',await p.evaluate(()=>[document.querySelector('.view.active').id,date.value,session.value]),['log','2026-10-09','Fri: Upper + erg + arms B']);
 await p.click('#logForm button[type=submit]');await p.clock.runFor(500);
 check('Save returns to Plan on that week and the Fri card shows the result',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('weekJump').value==='2',!!document.querySelector('.day-card[data-day=Fri] .day-res')]),['plan',true,true]);
