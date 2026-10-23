@@ -13,10 +13,10 @@ const open=async(w,logs=LOGS,t='2026-09-29T18:00:00')=>{const p=await b.newPage(
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(600);return p};
 for(const w of [390,360]){
  const p=await open(w);
- check(w+': week 1 dots (Coach) = circles (Plan), one state source',await p.evaluate(()=>{renderSeasonGrid('fred');const d=[...document.querySelectorAll('.sgm-col[data-wk="1"] i')].map(i=>i.className.replace(/^b-/,'').replace(' now','').replace(' race','')),c=[...document.querySelectorAll('.td-strip .td-day')].map(x=>x.className.replace(/.*st-(\w+).*/,'$1'));return JSON.stringify(d)===JSON.stringify(c)}),true);
- check(w+': Mon and Tue trained, Tue is today with the ring and lime fill',await p.evaluate(()=>[...document.querySelectorAll('.sgm-col[data-wk="1"] i')].slice(0,3).map(i=>i.className)),['b-trained','b-trained now','b-future']);
+ check(w+': season bar on Plan above the week tracker, 27 segments',await p.evaluate(()=>[document.querySelector('#plan #seasonBar').nextElementSibling.id,document.querySelectorAll('#seasonBar .sb-wk').length]),['weekTrack',27]);
+ check(w+': week 1 is current and selected, partly filled by Mon and Tue; week 2 future and empty',await p.evaluate(()=>{const a=document.querySelector('.sb-wk[data-wk="1"]'),b=document.querySelector('.sb-wk[data-wk="2"]');return[a.className,parseInt(a.querySelector('i').style.getPropertyValue('--f'))>0,b.className,b.querySelector('i').style.getPropertyValue('--f')]}),['sb-wk cur sel',true,'sb-wk fut','0%']);
  check(w+': stats line',(await p.locator('#weekTrack .wk-tot').innerText()).replace(/\s+/g,' '),'2 days trained 2/5 sessions 2.4/8 km');
- check(w+': no season dots on Plan any more',await p.evaluate(()=>!!document.querySelector('#plan .sgm')),false);
+ check(w+': season counter',(await p.locator('.sb-count').innerText()).replace(/\s+/g,' '),'Week 1 / 27 · 2 days trained');
  check(w+': all 7 day rows fit on screen below the week card (rows about 64 px)',await p.evaluate(()=>{const r=[...document.querySelectorAll('#days .day-card')].map(c=>Math.round(c.getBoundingClientRect().height));return[r.length,r.every(h=>h>=56&&h<=80)]}),[7,true]);
  check(w+': no horizontal scroll',await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  // tap a circle: that day's sheet opens at the bottom of the screen
@@ -33,15 +33,15 @@ for(const w of [390,360]){
  check(w+': arrow moves to week 2',await p.evaluate(()=>document.getElementById('weekJump').value),'2');
  await p.evaluate(()=>{const z=document.getElementById('days'),T=(t,x)=>z.dispatchEvent(new TouchEvent(t,{bubbles:true,touches:t==='touchend'?[]:[new Touch({identifier:1,target:z,clientX:x,clientY:300})],changedTouches:[new Touch({identifier:1,target:z,clientX:x,clientY:300})]}));T('touchstart',300);T('touchend',120)});await p.clock.runFor(300);
  check(w+': swipe left moves to week 3',await p.evaluate(()=>document.getElementById('weekJump').value),'3');
- // Coach: tap a column opens Plan on that week
- await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
- check(w+': Coach dots inside the screen',await p.evaluate(()=>document.querySelector('.sgm').getBoundingClientRect().right<=innerWidth),true);
- await p.click('.sgm-col[data-wk="9"]');await p.clock.runFor(500);
- check(w+': tapping week 9 on Coach opens Plan on week 9',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('weekJump').value]),['plan','9']);
+ // season bar: tap a week opens it
+ check(w+': season bar inside the screen',await p.evaluate(()=>document.querySelector('.sb-row').getBoundingClientRect().right<=innerWidth),true);
+ check(w+': no season dots on Coach',await p.evaluate(()=>!!document.querySelector('#bench .sgm, #bench .sb')),false);
+ await p.click('#seasonBar .sb-wk[data-wk="9"]');await p.clock.runFor(500);
+ check(w+': tapping week 9 in the season bar opens week 9 and rings it',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('weekJump').value,document.querySelector('.sb-wk.sel').dataset.wk]),['plan','9','9']);
  await p.close()}
 // untrained today keeps the amber fill
 let p=await open(390,[],'2026-09-29T18:00:00');
-check('today untrained: amber dot with ring',await p.evaluate(()=>(renderSeasonGrid('fred'),document).querySelectorAll('.sgm-col[data-wk="1"] i')[1].className),'b-today now');
+check('nothing logged: week 1 empty, counter 0',await p.evaluate(()=>[document.querySelector('.sb-wk[data-wk="1"] i').style.getPropertyValue('--f'),document.querySelector('.sb-count').textContent.replace(/\s+/g,' ')]),['0%','Week 1 / 27 · 0 days trained']);
 await p.close();
 check('no page errors',errs.join('|'),'');
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();
