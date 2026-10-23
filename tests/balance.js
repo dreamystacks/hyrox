@@ -1,0 +1,31 @@
+// v113: Monday and Friday balance. Cable crunch moves from Friday arms block B to Monday (before the EMOM) for weeks 5 to 23.
+// No extra leg work on Monday (Fred, Oct 23). node tests/balance.js
+const {chromium}=require('playwright'),path=require('path'),fs=require('fs');const URL='file://'+path.resolve(__dirname,'../index.html');
+let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const errs=[];
+const open=async t=>{const p=await b.newPage({viewport:{width:390,height:844}});p.on('pageerror',e=>errs.push(e.message));
+ await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1')});
+ await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
+let p=await open('2026-10-26T07:00:00');
+const pl=await p.evaluate(()=>PLAN.map(w=>({n:w.week,mon:/Cable crunch 3x10\. EMOM/.test(w.mon),fri:/crunch/i.test(w.fri),calf:/calf/i.test(w.mon+w.fri)})));
+ok(pl.filter(x=>x.n>=5&&x.n<=23).every(x=>x.mon&&!x.fri),'weeks 5 to 23: crunch on Monday before the EMOM, not on Friday');
+ok(pl.filter(x=>x.n<=4).every(x=>!x.mon&&x.fri),'weeks 1 to 4 unchanged');
+ok(pl.every(x=>!x.calf),'no calf raises or extra leg work anywhere');
+const dw=await p.evaluate(()=>[dayWhat('Mon',PLAN[4]),dayWhat('Fri',PLAN[4])]);
+ok(dw[0].what==='3 lifts + EMOM 16′'&&dw[0].areas.join()==='Legs,Core','Monday structure line and badges: '+JSON.stringify(dw[0]));
+ok(dw[1].what==='5 lifts + EMOM 16′'&&dw[1].areas.join()==='Upper,Arms','Friday structure line and badges: '+JSON.stringify(dw[1]));
+const td=await p.locator('#today').innerText();ok(/Hack squat[\s\S]*Cable crunch\s*3×10[\s\S]*EMOM 16′/.test(td),'Today Monday rows: crunch between hack squat and the EMOM');
+await p.evaluate(()=>startWorkout(5,0,'2026-10-26'));await p.clock.runFor(600);
+const wo=await p.evaluate(()=>[...document.querySelectorAll('#workout .wo-item')].map(e=>(e.querySelector('b')||{}).textContent));
+ok(JSON.stringify(wo)==='["Trap bar deadlift","Hack squat","Cable crunch","EMOM 16′"]','workout Monday order '+JSON.stringify(wo));
+ok(await p.evaluate(()=>[...document.querySelectorAll('#workout .wo-item.sets')].find(e=>/Cable crunch/.test(e.innerText)).querySelectorAll('.st-r[data-row]').length)===3,'crunch has 3 set rows');
+await p.evaluate(()=>closeWorkout());await p.evaluate(()=>{currentWeek=5;showView('plan')});await p.clock.runFor(400);
+ok(/Cable crunch/.test(await p.locator('.day-card[data-day=Mon]').evaluate(c=>c.textContent))&&!/crunch/i.test(await p.locator('.day-card[data-day=Fri]').evaluate(c=>c.textContent)),'Plan Monday lists the crunch, Friday does not');
+await p.close();
+p=await open('2026-10-30T07:00:00');const fr=await p.locator('#today').innerText();
+ok(/Hammer curls/.test(fr)&&!/Cable crunch/.test(fr),'Today Friday week 5: ends the arms block with hammer curls');
+await p.evaluate(()=>startWorkout(5,4,'2026-10-30'));await p.clock.runFor(600);
+const fw=await p.evaluate(()=>[...document.querySelectorAll('#workout .wo-item.sets')].map(e=>(e.querySelector('b')||{}).textContent));ok(fw.filter(x=>!/EMOM/.test(x)).length===5&&!fw.some(x=>/crunch/i.test(x)),'workout Friday has 5 lifts '+JSON.stringify(fw));await p.close();
+ok(/Monday and Friday balance \(plan change Oct 23/.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt explains the move');
+ok(!errs.length,'no page errors '+errs.join(' | '));
+await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
