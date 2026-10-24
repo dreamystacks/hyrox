@@ -38,6 +38,19 @@ await p.evaluate(()=>openFinish({date:'2026-10-24',session:'Sat: HYROX sim',dura
 ok(await p.locator('#simCmpModal').evaluate(e=>e.classList.contains('show')),'saving a sim opens the report');
 ok(/First sim to compare with/.test(await p.locator('#simCmpBody').innerText()),'no earlier sim: says it is the first');
 await p.close();
+// v120 like for like: a sim with other mat distances and a heavier sled is scaled to race distance, and the goal variance shows
+{const W3b={...W3,notes:W3.notes.replace('Sled push 250','Sled push 290')+'\nLane: 16 m and 12 m · Sled push 2 × 16 m = 32 m · Sled pull 2 × 16 m = 32 m · Burpee broad jumps 3 × 16 m = 48 m'};
+ p=await open('2026-10-24T14:30:00',[W3b,W4]);
+ const r=await p.evaluate(()=>{const L=getLogs('fred'),a=simParse(L.find(x=>x.id==='b')),b=simParse(L.find(x=>x.id==='a')),same=simParse(L.find(x=>x.id==='b'));return{c:simSame(a,b),pull:simDst(a,b,'Sled pull',a.st.find(q=>q[0]==='Sled pull')[1]),raw:a.st.find(q=>q[0]==='Sled pull')[1]-b.st.find(q=>q[0]==='Sled pull')[1],ins:simInsights(a,b).out,proj:roughProj('fred','2026-10-24').total,projOld:roughProj('fred','2026-10-17').total}});
+ ok(!r.c.same&&r.c.scale&&r.c.why.includes('different distances')&&r.c.why.includes('sled push 290 to 250 lb'),'format change detected '+JSON.stringify(r.c));
+ ok(r.pull!==r.raw&&r.pull===Math.round(127*2-107*50/32),'station delta scaled to race distance '+[r.pull,r.raw]);
+ ok(r.ins.some(t=>/\(race distance\)/.test(t))&&!r.ins.some(t=>/All of the gain/.test(t)),'insights say race distance and skip the raw gain line');
+ ok(r.proj>0&&r.projOld>0&&r.proj!==r.projOld,'projection as of each sim date '+[r.proj,r.projOld]);
+ await p.click('#today [data-simcmp]');await p.clock.runFor(800);
+ ok(/Race projection \d+:\d\d:\d\d · [+−]\d+:\d\d vs the 1:25:00 goal/.test(await p.locator('#simCmpBody .sc-proj').innerText()),'report shows race projection vs goal');
+ ok(/different distances, sled push 290 to 250 lb\. Station and run changes are scaled/.test(await p.locator('#simCmpBody .sc-fmt').innerText()),'report explains the scaling');
+ await p.close();
+ p=await open('2026-10-24T14:30:00',[W3,W4]); ok(!(await p.evaluate(()=>{const L=getLogs('fred');return simSame(simParse(L.find(x=>x.id==='b')),simParse(L.find(x=>x.id==='a'))).scale})),'same format is not scaled');await p.close()}
 // no button on non sim days
 p=await open('2026-10-24T14:30:00',[{id:'h',athlete:'fred',date:'2026-10-24',week:4,session:'Thu: Hockey',duration:60,rpe:7,notes:'',updatedAt:'2026-10-24T19:00:00Z'}]);ok(await p.locator('[data-simcmp]').count()===0,'no report button on other sessions');await p.close();
 ok(!errs.length,'no page errors '+errs.join(' | '));
