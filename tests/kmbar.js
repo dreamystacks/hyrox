@@ -11,21 +11,24 @@ const bar=p=>p.evaluate(sel=>{const el=document.querySelector(sel),fi=el.querySe
 ok(true,'');
 let p=await open('2026-10-24T12:00:00',[L('t','2026-10-21',4,'Tue: Intervals + arms A',2.4)]);
 const fx=await p.evaluate(()=>[sunKm(PLAN[3]),coreKm(PLAN[3]),sunKm(PLAN[24]),coreKm(PLAN[24]),sunKm(PLAN[10]),coreKm(PLAN[10]),sunKm(PLAN[0])]);
-ok(JSON.stringify(fx)==='[5,7,4,14,0,14,0]','Sunday km per week: week 4 5 (core 7), week 25 4, week 11 optional 0, week 1 rest 0 '+JSON.stringify(fx));
-let t=await bar(p);ok(t.n==='2.4/7km','Today fraction 2.4/7 km: '+t.n);
-ok(t.fill==='20%'&&t.cp==='58.33%','one continuous bar: 2.4 of 12 filled, marker at 7 of 12 '+JSON.stringify(t));
-ok(t.mk>=57&&t.mk<=60&&t.one===2,'small marker at the core target, no gap '+JSON.stringify(t));
+ok(JSON.stringify(fx)==='[5,6.4,4,9,0,10,0]','Sunday km per week: week 4 5 (core 6.4, v119 planned runs only), week 25 4, week 11 optional 0, week 1 rest 0 '+JSON.stringify(fx));
+let t=await bar(p);ok(t.n==='2.4/6.4km','Today fraction 2.4/6.4 km: '+t.n);
+ok(t.fill==='21.05%'&&t.cp==='56.14%','one continuous bar: 2.4 of 11.4 filled, marker at 6.4 of 11.4 '+JSON.stringify(t));
+ok(t.mk>=55&&t.mk<=58&&t.one===2,'small marker at the core target, no gap '+JSON.stringify(t));
 ok(/linear-gradient/.test(t.bg),'the Sunday part of the track is lighter');
 await p.evaluate(()=>{currentWeek=4;showView('plan')});await p.clock.runFor(400);
-ok(/2\.4\/7km/.test(await p.locator('#weekTrack').evaluate(e=>e.textContent.replace(/\s+/g,''))),'Plan tracker shows /7 km too');
+ok(/2\.4\/6\.4km/.test(await p.locator('#weekTrack').evaluate(e=>e.textContent.replace(/\s+/g,''))),'Plan tracker shows /6.4 km too');
 await p.close();
 // core done + Sunday run: goes over into the Sunday part
 p=await open('2026-10-25T18:00:00',[L('t','2026-10-21',4,'Tue: Intervals + arms A',4.5),L('s','2026-10-24',4,'Sat: HYROX sim',3),L('u','2026-10-25',4,'Sun: Optional easy run',5)]);
-t=await bar(p);ok(t.n==='12.5/7km'&&t.fill==='100%'&&t.over,'Sunday run fills the whole bar and it is marked over '+JSON.stringify(t));
+t=await bar(p);ok(t.n==='12.5/6.4km'&&t.fill==='100%'&&t.over,'Sunday run fills the whole bar and it is marked over '+JSON.stringify(t));
 await p.close();
 p=await open('2026-10-24T12:00:00',[L('t','2026-10-21',4,'Tue: Intervals + arms A',4.5),L('s','2026-10-24',4,'Sat: HYROX sim',4)],360);
-t=await bar(p);ok(t.fill==='70.83%'&&t.over,'over the core without Sunday: 8.5 km runs past the marker '+JSON.stringify(t));
+t=await bar(p);ok(t.fill==='74.56%'&&t.over,'over the core without Sunday: 8.5 km runs past the marker '+JSON.stringify(t));
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=360),'no overflow at 360');
+// v119: doing exactly the planned Tuesday and Saturday runs fills the core part and is not over
+await p.close();p=await open('2026-10-24T18:00:00',[L('t','2026-10-21',4,'Tue: Intervals + arms A',2.4),L('s','2026-10-24',4,'Sat: HYROX sim',4)]);t=await bar(p);ok(t.n==='6.4/6.4km'&&t.fill==='56.14%'&&!t.over,'every planned session done: 6.4 of 6.4, core full '+JSON.stringify(t));
+ok(await p.evaluate(()=>PLAN.map(w=>w.runKm).join())==='4.4,5.2,12,11.4,13,14,14,13,19,13,10,13,14,17,14,13,17,17,18,13,22,15,17,18,13,4,11','runKm per week is the planned run distance');
 // Coach trend target uses the core km
 ok(await p.evaluate(()=>{showView('bench');return true}),'');await p.clock.runFor(500);
 const tr=await p.evaluate(()=>document.querySelector('#bench')?document.querySelector('#bench').textContent:'');ok(!/of 12 target/.test(tr),'Coach trend never shows the Sunday inclusive target');

@@ -14,7 +14,7 @@ let p=await open('2026-10-19T07:00:00',W3);
 // plan content
 const pl=await p.evaluate(()=>{const w=PLAN[3];return{mon:w.mon,tue:w.tue,fri:w.fri,sat:w.sat,km:w.runKm,all:[4,8,12,16,20].map(n=>PLAN[n-1]).every(x=>/3 x 5 @ 80%/.test(x.mon)&&/EMOM 12 min \(3 rounds\), normal loads/.test(x.mon)&&!/light/i.test(x.mon+x.fri)&&/^4 x /.test(x.tue)&&/3 sets each/.test(x.tue)&&!/2 sets/.test(x.tue+x.fri)&&/75%/.test(x.sat)&&/Weighted pull ups 3 x 5 @ 80%/.test(x.fri))}});
 ok(pl.all,'every deload week: 3 sets @ 80%, EMOM 12 min at normal loads, 4 intervals, arms 3 sets, sim 75%');
-ok(/^4 x 600 m, 90 s rest/.test(pl.tue)&&pl.km===12,'week 4 Tuesday 4 x 600 m, run km 12');
+ok(/^4 x 600 m, 90 s rest/.test(pl.tue)&&pl.km===11.4,'week 4 Tuesday 4 x 600 m, run km 11.4 (v119)');
 // Today card
 const td=await p.locator('#today').innerText();
 ok(/Trap bar deadlift\s*240 lb[^\n]*\s*3×5\s*80% of last/.test(td)&&!/Light/.test(td),'Today Monday card: clean name, 3×5 and an 80% of last chip');
@@ -42,7 +42,7 @@ ok(await p.evaluate(()=>simPct(PLAN[3]))===75,'Saturday week 4 sim at 75%');
 // Plan
 await p.evaluate(()=>{currentWeek=4;showView('plan')});await p.clock.runFor(400);
 const mon=await p.locator('.day-card[data-day=Mon]').innerText();ok(/EMOM 12\b/.test(mon),'Plan Monday row subtitle: '+mon.replace(/\n/g,' | ').slice(0,90));
-ok(/\/\s*7\s*km/.test((await p.locator('#weekTrack .wk-tot').innerText()).replace(/\n/g,' ')),'Plan week tracker target 7 km (12 minus the Sunday run, v116)');
+ok(/\/\s*6\.4\s*km/.test((await p.locator('#weekTrack .wk-tot').innerText()).replace(/\n/g,' ')),'Plan week tracker target 7 km (12 minus the Sunday run, v116)');
 await p.close();
 // week 5 builds from week 3, not from the deload
 p=await open('2026-10-26T07:00:00',[W4,...W3]);

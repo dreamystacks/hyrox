@@ -9,7 +9,7 @@ await p.addInitScript(()=>{if(localStorage.getItem('seed'))return;localStorage.s
 await p.goto(URL);await p.click('[data-who=fred]');await p.clock.runFor(4500);
 const fx=await p.evaluate(()=>{const x=getLogs('fred').find(l=>l.id==='r1');return[x.distance,x.duration,x.pace,/5\.01 km in 30:51/.test(x.notes),!/Workout 0:04/.test(x.notes)]});
 ok(JSON.stringify(fx)===JSON.stringify([5.01,31,'6:09',true,true]),'Oct 18 run fixed to 5.01 km, 31 min, 6:09/km '+JSON.stringify(fx));
-ok(/9(\.0|\.01)?\/9km/.test(await p.locator('#today .wk-tot').innerText().then(t=>t.replace(/\s+/g,''))),'Today km tracker counts the run: '+(await p.locator('#today .wk-tot').innerText()).replace(/\s+/g,' '));
+ok(/9(\.0|\.01)?\/7km/.test(await p.locator('#today .wk-tot').innerText().then(t=>t.replace(/\s+/g,''))),'Today km tracker counts the run: '+(await p.locator('#today .wk-tot').innerText()).replace(/\s+/g,' '));
 ok(/Easy run/i.test(await p.locator('#today').innerText())&&!/Recovery/i.test(await p.locator('#today .td-done').innerText()),'Today done card says Easy run, not Recovery');
 await p.evaluate(()=>showView('plan'));await p.clock.runFor(500);
 const sun=await p.locator('.day-card[data-day=Sun]').innerText();ok(/EASY RUN|Easy run/.test(sun)&&!/RECOVERY|Recovery/.test(sun),'Plan Sunday card tag and title: '+sun.replace(/\n/g,' | ').slice(0,80));
