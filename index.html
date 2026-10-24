@@ -1228,23 +1228,51 @@ function simInsights(a,b){const out=[],g=goalOf(RUNPACE),pk=v=>v/a.km;
   const rd=a.runs.reduce((s,v,i)=>s+(b.runs[i]!=null?v-b.runs[i]:0),0),sd=ch.reduce((s,c)=>s+c[1],0);if(a.tot&&b.tot&&a.tot<b.tot&&rd<0&&sd>0)out.push(`All of the gain came from running (${sgn(rd)}), stations were ${sgn(sd)}.`)}
  const pct=simPct((PLAN[(a.wk||1)-1])||{});if(pct&&pct<=80&&a.x.rpe>=9)out.push(`The plan said ${pct}% and you went at RPE ${a.x.rpe}.`);if(typeof gainTxt!=='undefined'&&gainTxt)out.push(gainTxt);
  const tip=a.runs.length>1&&(a.runs[a.runs.length-1]-a.runs[0]>20||pk(a.runs[0])<g-10)?`Next: start run 1 at ${fmt(g*1000)}/km and keep every run within 15 s.`:'';return{out:out.slice(0,5),tip}}
-function simStory(a,b,who){const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),cs=getComputedStyle(document.documentElement),v=n=>cs.getPropertyValue(n).trim()||'#888',g1=v('--g1'),g2=v('--g2'),N='"Barlow Condensed","SF Pro Display",sans-serif',U='-apple-system,"SF Pro Text",system-ui,sans-serif';
- x.fillStyle='#0b0c0f';x.fillRect(0,0,W,H);const glow=(cx,cy,r,col)=>{const gr=x.createRadialGradient(cx,cy,0,cx,cy,r);gr.addColorStop(0,col);gr.addColorStop(1,'transparent');x.globalAlpha=.55;x.fillStyle=gr;x.fillRect(0,0,W,H);x.globalAlpha=1};glow(120,260,760,g1);glow(980,1700,820,g2);
- const T=(s,px,y,o={})=>{x.font=`${o.w||600} ${px}px ${o.f||U}`;x.fillStyle=o.c||'#fff';x.textAlign=o.a||'left';x.fillText(s,o.x!=null?o.x:80,y)};
- // Instagram covers about the top 220 px and bottom 260 px, so everything sits between 230 and 1660.
- const wk=a.wk,d=new Date(a.x.date+'T12:00:00').toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'}),up=upcomingRaces();
- T(['Road to HYROX Brisbane',...up.slice(0,1).map(r=>`${raceDays(r)} days to ${r.name}`)].join(' · '),30,250,{w:600,c:'#ffffffaa'});
- T(`${ATHLETES[who]||who} · Week ${wk} sim`,46,320,{w:700});T(d+(b?` · vs ${new Date(b.x.date+'T12:00:00').toLocaleDateString('en',{month:'short',day:'numeric'})}`:''),32,370,{w:500,c:'#ffffffaa'});
- T(a.tot?fmt(a.tot*1000):'—',230,590,{f:N,w:600});
- if(b&&a.tot&&b.tot){const dd=a.tot-b.tot,txt=`${sgn(dd)} vs last sim`;x.font=`700 38px ${U}`;const tw=x.measureText(txt).width+56;x.fillStyle=dd<=0?g2:g1;x.beginPath();x.roundRect(80,625,tw,68,34);x.fill();T(txt,38,672,{x:108,w:700})}
- const ins=simInsights(a,b),wrap=(s,px,w)=>{x.font=`${w} ${px}px ${U}`;const ws=s.split(' '),ls=[];let l='';ws.forEach(t=>{const n=l?l+' '+t:t;if(x.measureText(n).width>W-220&&l){ls.push(l);l=t}else l=n});if(l)ls.push(l);return ls};
- const many=a.runs.length+a.st.length>8,rows=[...ins.out.slice(0,many?1:2).map(s=>({ls:wrap('• '+s,30,500),w:500,c:'#ffffffdd'})),...(ins.tip?[{ls:wrap(ins.tip,30,700),w:700,c:'#fff',gap:8}]:[])],boxH=rows.length?40+rows.reduce((h,r0)=>h+r0.ls.length*42+16+(r0.gap||0),0):0,boxTop=1660-boxH;
- let y=770;const mx=Math.max(...a.runs,...(b?b.runs:[]),1)*1.08,dcol=(t,o)=>t<=o?'#fff':g1;
- if(a.runs.length){T('Runs',38,y,{w:700});y+=28;
-  if(a.runs.length<=4){a.runs.forEach((t,i)=>{const yy=y+i*72,bw=600;x.fillStyle='#ffffff1f';x.beginPath();x.roundRect(80,yy,bw,44,22);x.fill();x.fillStyle=g2;x.beginPath();x.roundRect(80,yy,Math.max(44,bw*t/mx),44,22);x.fill();const o=b&&b.runs[i];if(o){const ox=80+bw*o/mx;x.fillStyle='#fff';x.fillRect(ox-3,yy-7,6,58)}T(fmt(t*1000),44,yy+38,{x:850,a:'right',f:N,w:600});if(o)T(sgn(t-o),30,yy+36,{x:W-80,a:'right',w:700,c:dcol(t,o)})});y+=a.runs.length*72+40}
-  else{const n=a.runs.length,cw=(W-160)/n,ch=150,lo=Math.min(...a.runs,...(b?b.runs:[]))*.8,sc=t=>ch*(t-lo)/(mx-lo);a.runs.forEach((t,i)=>{const h=sc(t),cx=80+i*cw;x.fillStyle=g2;x.beginPath();x.roundRect(cx+8,y+ch-h,cw-16,h,12);x.fill();const o=b&&b.runs[i];if(o){x.fillStyle='#fff';x.fillRect(cx+2,y+ch-sc(o)-3,cw-4,6)}T(fmt(t*1000),30,y+ch+42,{x:cx+cw/2,a:'center',f:N,w:600});if(o)T(sgn(t-o),22,y+ch+74,{x:cx+cw/2,a:'center',w:700,c:dcol(t,o)})});y+=ch+(b?110:95)}}
- if(a.st.length){T('Stations',38,y,{w:700});y+=20;const rh=Math.max(42,Math.min(66,(boxTop-30-y)/a.st.length)),fs=rh>=60?40:rh>=50?34:30;a.st.forEach(([n,t])=>{y+=rh;const o=b&&b.st.find(s=>s[0]===n);T(n,fs,y,{w:500});T(fmt(t*1000),fs+6,y,{x:780,a:'right',f:N,w:600});if(o)T(sgn(t-o[1]),fs-4,y,{x:W-80,a:'right',w:700,c:dcol(t,o[1])})})}
- if(rows.length){x.fillStyle='#ffffff14';x.beginPath();x.roundRect(60,boxTop,W-120,boxH,32);x.fill();let yy=boxTop+56;rows.forEach(r0=>{yy+=r0.gap||0;r0.ls.forEach((l,i)=>{T(l,30,yy,{x:i?112:100,w:r0.w,c:r0.c});yy+=42});yy+=16})}
+// v119 story image in the trader P&L card style (Fred, Oct 24: like TradeZella / day trader stories): near black, one framed card,
+// huge total with a green or red delta pill, run "equity curve" vs last sim, stat grid, station rows with delta pills, one takeaway.
+// Instagram covers about the top 220 px and bottom 260 px, so everything sits between 230 and 1660.
+function simStory(a,b,who){const W=1080,H=1920,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),cs=getComputedStyle(document.documentElement),v=n=>cs.getPropertyValue(n).trim()||'#888',g1=v('--g1'),g2=v('--g2'),N='"Barlow Condensed","SF Pro Display",sans-serif',U='Inter,-apple-system,"SF Pro Text",system-ui,sans-serif',UP='#22c55e',DN='#f43f5e',MU='#8b8f98',LN='#ffffff14';
+ const T=(s,px,X,y,o={})=>{x.font=`${o.w||600} ${px}px ${o.f||U}`;x.fillStyle=o.c||'#fff';x.textAlign=o.a||'left';if(o.ls!=null)x.letterSpacing=o.ls+'px';x.fillText(s,X,y);x.letterSpacing='0px';return x.measureText(s).width};
+ const RR=(X,y,w,h,r,fill,stroke)=>{x.beginPath();x.roundRect(X,y,w,h,r);if(fill){x.fillStyle=fill;x.fill()}if(stroke){x.strokeStyle=stroke;x.lineWidth=2;x.stroke()}};
+ const col=d=>d==null?MU:d<=0?UP:DN,tint=d=>d==null?'#ffffff12':d<=0?'#22c55e22':'#f43f5e22',dTxt=d=>d==null?'':(d<=0?'▼ ':'▲ ')+fmt(Math.abs(d)*1000);
+ const pill=(txt,X,y,d,px=30,al='left')=>{x.font=`700 ${px}px ${U}`;const w=x.measureText(txt).width+px*1.1,h=px*1.75,x0=al==='right'?X-w:X;RR(x0,y-h*.72,w,h,h/2,tint(d));T(txt,px,x0+w/2,y,{w:700,c:col(d),a:'center'});return w};
+ // ground: near black, faint grid, one glow in the result colour behind the hero
+ x.fillStyle='#07080a';x.fillRect(0,0,W,H);x.strokeStyle='#ffffff07';x.lineWidth=1;for(let i=0;i<=W;i+=60){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke()}for(let j=0;j<=H;j+=60){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke()}
+ const dd=b&&a.tot&&b.tot?a.tot-b.tot:null,gl=x.createRadialGradient(330,560,0,330,560,620);gl.addColorStop(0,dd==null?g2+'55':dd<=0?'#22c55e40':'#f43f5e40');gl.addColorStop(1,'transparent');x.fillStyle=gl;x.fillRect(0,0,W,H);
+ // brand row
+ const lg=x.createLinearGradient(60,236,116,292);lg.addColorStop(0,g1);lg.addColorStop(1,g2);RR(60,236,56,56,16,lg);T('H',34,88,276,{w:800,a:'center',f:N});
+ T('HYROX',30,134,262,{w:800,ls:2});const up=upcomingRaces();T(up.length?up.map(r=>`${raceDays(r)} d to ${r.name}`).join(' · '):'Road to Brisbane 2027',24,134,292,{w:500,c:MU});
+ const d=new Date(a.x.date+'T12:00:00').toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'});x.font=`600 26px ${U}`;const dw=x.measureText(d).width+44;RR(W-60-dw,240,dw,52,26,'#ffffff0d','#ffffff1a');T(d,26,W-60-dw/2,275,{w:600,a:'center',c:'#ffffffcc'});
+ // card
+ const cx=60,cy=330,cw=W-120,ch=1320,cg=x.createLinearGradient(0,cy,0,cy+ch);cg.addColorStop(0,'#14161cf2');cg.addColorStop(1,'#0c0d11f2');RR(cx,cy,cw,ch,44,cg,'#ffffff1c');
+ const L=cx+48,R=cx+cw-48;
+ T(`${(ATHLETES[who]||who).toUpperCase()} · WEEK ${a.wk} SIM`,24,L,cy+70,{w:700,c:MU,ls:3});if(b)T('VS '+new Date(b.x.date+'T12:00:00').toLocaleDateString('en',{month:'short',day:'numeric'}).toUpperCase(),24,R,cy+70,{w:700,c:MU,ls:3,a:'right'});
+ T(a.tot?fmt(a.tot*1000):'—',230,L-6,cy+280,{f:N,w:600});
+ if(dd!=null){const pct=Math.abs(dd/b.tot*100).toFixed(1);pill(`${dTxt(dd)}  ·  ${pct}% ${dd<=0?'faster':'slower'}`,L,cy+352,dd,30)}else T('First sim on record',30,L,cy+352,{w:600,c:MU});
+ // run curve: this sim solid with a fill, last sim dashed; higher = faster
+ let y=cy+420;const rn=a.runs,ro=b?b.runs:[];
+ if(rn.length>=2){const chH=200,pX=L+10,pW=R-L-20,all=[...rn,...ro],lo=Math.min(...all),hi=Math.max(...all),pad=Math.max(8,(hi-lo)*.25),Y=t=>y+30+(t-(lo-pad))/((hi+pad)-(lo-pad))*(chH-60),X=i=>pX+(rn.length===1?pW/2:i*pW/(Math.max(rn.length,ro.length)-1));
+  const line=rn.length&&ro.length&&rn.reduce((s,t)=>s+t,0)/rn.length>ro.slice(0,rn.length).reduce((s,t)=>s+t,0)/Math.min(rn.length,ro.length)?DN:UP;
+  T('RUN SPLITS',22,L,y,{w:700,c:MU,ls:3});x.font=`600 22px ${U}`;const lw2=ro.length?x.measureText('last sim').width:0,lx2=R-lw2,lx1=ro.length?lx2-44-x.measureText('this sim').width-36:R-x.measureText('this sim').width;if(ro.length){x.setLineDash([6,6]);x.strokeStyle='#ffffff88';x.lineWidth=4;x.beginPath();x.moveTo(lx2-38,y-8);x.lineTo(lx2-8,y-8);x.stroke();x.setLineDash([]);T('last sim',22,lx2,y,{w:600,c:MU})}x.fillStyle=line;x.fillRect(lx1-38,y-11,30,6);T('this sim',22,lx1,y,{w:600})
+  y+=20;[0,1,2].forEach(k=>{const yy=y+30+k*(chH-60)/2;x.strokeStyle=LN;x.lineWidth=1;x.beginPath();x.moveTo(L,yy);x.lineTo(R,yy);x.stroke()});
+  if(ro.length>=2){x.setLineDash([10,10]);x.strokeStyle='#ffffff55';x.lineWidth=4;x.beginPath();ro.forEach((t,i)=>{i?x.lineTo(X(i),Y(t)):x.moveTo(X(i),Y(t))});x.stroke();x.setLineDash([])}
+  const fg=x.createLinearGradient(0,y,0,y+chH);fg.addColorStop(0,line+'55');fg.addColorStop(1,line+'00');x.beginPath();rn.forEach((t,i)=>{i?x.lineTo(X(i),Y(t)):x.moveTo(X(i),Y(t))});x.lineTo(X(rn.length-1),y+chH);x.lineTo(X(0),y+chH);x.closePath();x.fillStyle=fg;x.fill();
+  x.strokeStyle=line;x.lineWidth=7;x.lineJoin='round';x.beginPath();rn.forEach((t,i)=>{i?x.lineTo(X(i),Y(t)):x.moveTo(X(i),Y(t))});x.stroke();
+  const many=rn.length>5;rn.forEach((t,i)=>{x.fillStyle='#07080a';x.beginPath();x.arc(X(i),Y(t),11,0,7);x.fill();x.strokeStyle=line;x.lineWidth=5;x.stroke();const ax=i===0?'left':i===rn.length-1?'right':'center',tx=i===0?X(i)-6:i===rn.length-1?X(i)+6:X(i);T(fmt(t*1000),many?30:38,tx,Y(t)-26,{f:N,w:600,a:ax});const o=ro[i];if(o!=null&&!many)T(dTxt(t-o),22,tx,Y(t)+50,{w:700,c:col(t-o),a:ax})});
+  y+=chH+22}
+ // stat grid
+ const avg=s=>s.length?s.reduce((p,q)=>p+q,0)/s.length:null,sum=s=>s.reduce((p,q)=>p+q[1],0),fade=s=>s.length>1?s[s.length-1]-s[0]:null,sts=[['AVG RUN',avg(rn),b?avg(ro):null],['RUN FADE',fade(rn),b?fade(ro):null],['STATIONS',a.st.length?sum(a.st):null,b&&b.st.length?sum(b.st.filter(s=>a.st.some(q=>q[0]===s[0]))):null]];
+ x.strokeStyle=LN;x.lineWidth=2;x.beginPath();x.moveTo(L,y);x.lineTo(R,y);x.stroke();const gw=(R-L)/3;
+ sts.forEach(([lb,val,old],i)=>{const X0=L+i*gw+(i?28:0);if(i){x.beginPath();x.moveTo(L+i*gw,y+22);x.lineTo(L+i*gw,y+150);x.stroke()}T(lb,21,X0,y+50,{w:700,c:MU,ls:2.5});T(val==null?'—':(lb==='RUN FADE'&&val>0?'+':'')+fmt(Math.abs(val)*1000),64,X0,y+114,{f:N,w:600});if(val!=null&&old!=null){const dl=val-old;T(dTxt(dl)||'= 0:00',22,X0,y+146,{w:700,c:col(dl)})}});
+ y+=172;x.beginPath();x.moveTo(L,y);x.lineTo(R,y);x.stroke();
+ // stations: rows with a delta pill, two columns when there are more than 4
+ const box=cy+ch-36,st=a.st;let tip=simInsights(a,b).tip||'',tipH=tip?130:0;
+ if(st.length){y+=50;T('STATIONS',22,L,y,{w:700,c:MU,ls:3});y+=18;const two=st.length>4,cols=two?2:1,per=Math.ceil(st.length/cols);if(tip&&box-tipH-y-10<per*52){tip='';tipH=0}const avail=box-tipH-y-10,rh=Math.max(52,Math.min(84,avail/per)),colW=(R-L-(two?36:0))/cols;
+  st.forEach(([n,t],i)=>{const ci=Math.floor(i/per),ri=i%per,X0=L+ci*(colW+36),X1=X0+colW,yy=y+ri*rh+rh*.68,o=b&&b.st.find(s=>s[0]===n),dl=o?t-o[1]:null,fs=two?26:32;
+   T(two?n.replace('Burpee broad jumps','Burpee BJ').replace('Sandbag lunges','Lunges').replace('Farmers carry','Farmers'):n,fs,X0,yy,{w:500,c:'#ffffffdd'});if(dl!=null){pill(dTxt(dl),X1,yy-2,dl,two?20:24,'right');T(fmt(t*1000),two?36:44,X1-(two?120:150),yy+2,{f:N,w:600,a:'right'})}else T(fmt(t*1000),two?36:44,X1,yy+2,{f:N,w:600,a:'right'});
+   if(ri<per-1&&i<st.length-1){x.strokeStyle=LN;x.lineWidth=1;x.beginPath();x.moveTo(X0,y+(ri+1)*rh);x.lineTo(X1,y+(ri+1)*rh);x.stroke()}})}
+ // takeaway strip
+ if(tip){const ty=box-tipH+10;RR(L-8,ty,R-L+16,tipH-10,24,'#ffffff0a');RR(L-8,ty,8,tipH-10,4,g2);T('NEXT SIM',20,L+24,ty+34,{w:700,c:MU,ls:3});x.font=`600 30px ${U}`;const ws=tip.replace(/^Next:\s*/,'').split(' '),ls=[];let l='';ws.forEach(t=>{const nn=l?l+' '+t:t;if(x.measureText(nn).width>R-L-60&&l){ls.push(l);l=t}else l=nn});if(l)ls.push(l);ls.slice(0,2).forEach((s,i)=>T(i===0?s[0].toUpperCase()+s.slice(1):s,28,L+24,ty+70+i*34,{w:600}))}
  return c}
 function openSimCmp(log,who){who=who||log.athlete||athlete;const a=simParse(log),pl=simPrev(log,who),b=pl?simParse(pl):null,box=$('simCmpBody');simCmpCur={a,b,who};const draw=()=>{const cv=simStory(a,b,who);simCmpCur.cv=cv;const ins=simInsights(a,b);box.innerHTML=`<img class="sc-img" alt="Sim report image" src="${cv.toDataURL('image/png')}"><div class="sc-acts"><button class="primary" type="button" id="simShare">Share</button></div>${b?'':'<p class="muted tiny">First sim to compare with. Next week shows the change.</p>'}${ins.out.length?`<ul class="sc-ins">${ins.out.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:''}${ins.tip?`<p class="sc-tip">${esc(ins.tip)}</p>`:''}`;$('simShare').onclick=simShare};
  $('simCmpModal').classList.add('show');box.innerHTML='<p class="muted">Building your report…</p>';(document.fonts&&document.fonts.load?document.fonts.load('600 80px "Barlow Condensed"').catch(()=>{}):Promise.resolve()).then(draw,draw)}
