@@ -945,6 +945,14 @@ body{background:var(--bg)}body::before{display:none}
 .wk3.kp .wk3-n b{font-family:inherit;font-weight:650;font-size:1.3rem;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--text)}
 .wk3.kp .wk3-n em{font-style:normal;font-size:.78rem;font-weight:500;color:var(--muted);margin-left:2px}
 .wk3.kp .wk3-seg,.wk3.kp .wk3-bar{margin-top:5px}.wk3-bar.km2{position:relative;overflow:visible;background:linear-gradient(to right,color-mix(in srgb,var(--muted) 22%,transparent) var(--cp),color-mix(in srgb,var(--muted) 9%,transparent) var(--cp))}.km2 .km-fill{display:block;height:100%;background:var(--lime);border-radius:4px}.km2 .km-mk{position:absolute;top:-2px;bottom:-2px;left:var(--cp);width:2px;margin-left:-1px;border-radius:1px;background:color-mix(in srgb,var(--text) 45%,transparent)}
+/* v122 weigh-in history */
+.bwh{margin:14px 0 6px;border-top:1px solid var(--line);padding-top:10px}
+.bwh-h{display:flex;justify-content:space-between;font-size:.8rem;font-weight:600;color:var(--text);margin:0 0 4px}.bwh-h span+span{color:var(--muted);font-weight:500}
+.bwh-r{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.bwh-d{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.bwh-d b{font-size:.9rem;font-weight:600}.bwh-d i{font-style:normal;font-size:.72rem;color:var(--muted)}
+.bwh-v{font-variant-numeric:tabular-nums;font-weight:650;font-size:1rem}.bwh-v small{font-size:.7rem;color:var(--muted);font-weight:500}
+.bwh-c{min-width:52px;text-align:right;font-size:.78rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted)}.bwh-c.up{color:var(--g1)}.bwh-c.dn{color:var(--g2)}
+.bwh-more summary{list-style:none;cursor:pointer;padding:10px 0 2px;font-size:.82rem;font-weight:600;color:var(--g2)}.bwh-more summary::-webkit-details-marker{display:none}
 </style></head><body data-pg="today">
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-volt-dark-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
 <div id="workout" aria-live="polite"></div>
@@ -1703,6 +1711,9 @@ function bwHas(L,week,slot){return L.some(x=>x.week===week&&x.slot===slot)}
 function bwDue(){const n=bwSlotNow();if(n.pre)return null;return bwHas(bwList(athlete),n.week,n.slot)?null:n}
 function bwWeekAvg(L){const m=new Map();L.forEach(p=>{const a=m.get(p.week)||[];a.push(p.kg);m.set(p.week,a)});return[...m].map(([week,a])=>({week,kg:a.reduce((s,v)=>s+v,0)/a.length}))}
 function saveBW(val){const v=parseFloat(String(val||'').replace(',','.'));if(!(v>30&&v<450)){toastMsg('Enter your weight, like 82.4');return false}const n=bwSlotNow(),cur=load(k('bench'),{}),t=new Date().toISOString(),key='bw_'+n.week+(n.slot==='b'?'b':'');cur[key]={v:v.toFixed(1)+' '+unit(),t};store(k('bench'),cur);markDirty('bench',athlete,key,t);scheduleSync();toastMsg('Weigh-in saved');return true}
+// v122 weigh-in history (Fred, Oct 29): every logged weigh-in, newest first, with its date (plan week Mon or Thu) and the change vs the one before.
+function bwHistHTML(L,u){if(!L.length)return'';const R=L.map((p,i)=>{const W=PLAN[p.week-1],d=W?dateAt(W.date,p.slot==='b'?3:0):null,pr=L[i-1],dv=pr?p.kg-pr.kg:null;return{p,d,dv}}).reverse(),row=({p,d,dv})=>`<div class="bwh-r"><span class="bwh-d"><b>${d?d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'}):''}</b><i>Week ${p.week} · ${p.slot==='a'?'Mon':'Thu'}</i></span><span class="bwh-v">${bwShow(p.kg)} <small>${u}</small></span><span class="bwh-c${dv==null?'':dv>0?' up':dv<0?' dn':''}">${dv==null?'first':(dv>0?'+':dv<0?'−':'±')+bwShow(Math.abs(dv))}</span></div>`;
+ return`<div class="bwh"><div class="bwh-h"><span>Weigh-ins</span><span>${L.length} logged</span></div>${R.slice(0,6).map(row).join('')}${R.length>6?`<details class="bwh-more"><summary>Show all ${R.length}</summary>${R.slice(6).map(row).join('')}</details>`:''}</div>`}
 function renderBW(who){const el=$('bwWrap');if(!el)return;const mine=who===athlete,L=bwList(who),u=unit(),n=bwSlotNow(),A=bwWeekAvg(L);
  const lastA=A[A.length-1],firstA=A[0];let meta='';if(lastA&&A.length>1){const d=lastA.kg-firstA.kg,rate=d/Math.max(1,lastA.week-firstA.week);meta=`<b>${d>0?'+':d<0?'−':''}${bwShow(Math.abs(d))} ${u}</b> since week ${firstA.week}<br>${rate>0?'+':rate<0?'−':''}${bwShow(Math.abs(rate))} ${u} / week`}else if(lastA)meta=L.length>1?'Week 1 average':'First weigh-in logged';
  const next=bwHas(L,n.week,n.slot)?(n.slot==='a'?'Thursday':'Monday'):(n.slot==='a'?'Monday':'Thursday')+(n.pre?'':' (due)');
@@ -1713,7 +1724,8 @@ function renderBW(who){const el=$('bwWrap');if(!el)return;const mine=who===athle
  el.innerHTML=`<div class="td-label" style="margin:26px 0 4px">Body weight</div><div class="muted tiny" style="margin-bottom:10px">Weigh in Monday and Thursday mornings, fasted, after the bathroom. Same scale every time. The line is your weekly average, which smooths out water swings.</div>
  <div class="bw-top"><div class="bw-big">${lastA?bwShow(lastA.kg):'—'}<small>${u}</small></div><div class="bw-meta">${meta}${meta?'<br>':''}Next: <b>${next}</b></div></div>
  ${svg||'<div class="cv-empty">No weigh-ins yet</div>'}
- ${mine?`<div class="bw-in"><input class="wt" id="bwInput" inputmode="decimal" placeholder="${u}" value="${curV?bwShow(curV):''}"><span class="wt-u">${u} · wk ${n.week} ${n.slot==='a'?'Mon':'Thu'}</span><span style="flex:1"></span><button id="bwSaveP" type="button">Save</button></div>`:''}`;
+ ${mine?`<div class="bw-in"><input class="wt" id="bwInput" inputmode="decimal" placeholder="${u}" value="${curV?bwShow(curV):''}"><span class="wt-u">${u} · wk ${n.week} ${n.slot==='a'?'Mon':'Thu'}</span><span style="flex:1"></span><button id="bwSaveP" type="button">Save</button></div>`:''}
+ ${bwHistHTML(L,u)}`;
  el.querySelectorAll('.bw-pt').forEach(c=>c.onclick=()=>{el.querySelector('.cv-tip').textContent=c.dataset.tip});
  const sb=el.querySelector('#bwSaveP');if(sb)sb.onclick=()=>{if(saveBW($('bwInput').value))renderBench()}}
 // sessions logged in a plan week by stored session name, so a swapped day still maps to the right card
