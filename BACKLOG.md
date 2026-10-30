@@ -3,9 +3,7 @@
 Single source of truth for app work. Fred writes app feedback in his training notes on a line starting with `App:` (the coach ignores those lines). The brain chat reads them from the Sheet and moves them here. Code works from this file. Keep entries short; move finished items to Done with the commit subject.
 
 ## Open
-- [ ] **Adaptive coach (Fred, Oct 30, top priority):** the Saturday coach rewrites the next 7 days per athlete from logs, RPE, feel and sim reports; the app shows "Adjusted by coach" on every surface. Full spec in `ADAPTIVE_COACH.md`. This supersedes the two coach items below.
-- [ ] Wednesday coach check-in that can adjust Fri and Sat (decide after 2 or 3 Saturday reports)
-- [ ] Coach overrides for sets and reps (today it only changes loads, EMOM moves and volume trims; decide after 2 or 3 reports)
+- [ ] Wednesday coach check-in that can adjust Fri and Sat (decide after 2 or 3 adaptive Saturday reports)
 - [ ] Monday ankle test (knee to wall distance, cm) stored like body weight in Benchmarks rows, only if Fred wants to track the mobility routine
 - [ ] Guided mobility mode (auto timer through the daily 3), only if the tick list is not enough
 
@@ -13,6 +11,7 @@ Single source of truth for app work. Fred writes app feedback in his training no
 - [ ] Confirm on iPhone: screen stays awake through a whole workout, the lock screen and island Next button works, EMOM beeps keep going with the screen locked
 
 ## Done
+- [x] Adaptive coach: weekly per athlete plan changes from coach.json, badges on every surface, Settings toggle (v123)
 - [x] Timer stays visible while typing notes (workout screen follows the visual viewport)
 - [x] Bar weight input for barbell lifts (per side + bar = total)
 - [x] Gym lane length setting, sled distances rounded to whole lengths, real distance logged
