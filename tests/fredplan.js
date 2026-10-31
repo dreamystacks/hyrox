@@ -1,4 +1,4 @@
-// v124: Fred only plan changes (PLAN_ATH). Fridays weeks 6 to 21 add Wall ball technique 2 x 10 before the EMOM;
+// v124: Fred only plan changes (PLAN_ATH). v125: the 9 kg ball and 25 kg lunges are in PLAN for everyone; only the technique sets are Fred's. Fridays weeks 6 to 21 add Wall ball technique 2 x 10 before the EMOM;
 // weeks 15 to 21 EMOM wall balls 9 kg (20 lb) and Monday sandbag lunges 25 kg. Will and Grady keep the base plan.
 // The EMOM plan weight wins over a lighter last load. node tests/fredplan.js
 const {chromium}=require('playwright'),path=require('path'),fs=require('fs');const URL='file://'+path.resolve(__dirname,'../index.html');
@@ -23,7 +23,7 @@ const sg=await p.evaluate(()=>[suggestLoad('wallball',15,9,1),suggestLoad('wallb
 ok(sg[0].kg===20&&sg[0].why==='plan','week 15 EMOM ball suggestion is the plan 20 lb over the last 14 lb');ok(sg[1].why!=='plan','week 6 keeps the history rule');
 await p.evaluate(()=>{currentWeek=15;showView('plan')});await p.clock.runFor(400);
 ok(/9 kg/.test(await p.locator('.day-card[data-day=Fri]').evaluate(c=>c.textContent))&&/25 kg/.test(await p.locator('.day-card[data-day=Mon]').evaluate(c=>c.textContent)),'Plan week 15 Friday and Monday sheets show the heavier loads');
-ok(await p.evaluate(()=>{viewAthlete='will';const r=PLAN[14].fri===PLAN0[14].fri&&PLAN[14].mon===PLAN0[14].mon;viewAthlete=null;return r}),'viewing Will shows the base plan');
+ok(await p.evaluate(()=>{viewAthlete='will';const r=PLAN[14].fri===PLAN0[14].fri&&/9 kg \(20 lb\)/.test(PLAN[14].fri)&&/25 kg/.test(PLAN[14].mon)&&!/technique/.test(PLAN[5].fri);viewAthlete=null;return r}),'viewing Will: heavier ball and lunges (v125, everyone), no technique sets');
 await p.close();
 p=await open('2026-11-06T07:00:00','will');ok(!/Wall ball technique/.test(await p.locator('#today').innerText()),'Will\'s Friday has no technique sets');await p.close();
 ok(/PLAN_ATH/.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt explains the Fred only plan');
