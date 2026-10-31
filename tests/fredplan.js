@@ -1,0 +1,31 @@
+// v124: Fred only plan changes (PLAN_ATH). Fridays weeks 6 to 21 add Wall ball technique 2 x 10 before the EMOM;
+// weeks 15 to 21 EMOM wall balls 9 kg (20 lb) and Monday sandbag lunges 25 kg. Will and Grady keep the base plan.
+// The EMOM plan weight wins over a lighter last load. node tests/fredplan.js
+const {chromium}=require('playwright'),path=require('path'),fs=require('fs');const URL='file://'+path.resolve(__dirname,'../index.html');
+let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
+const LOG=[{id:'x',athlete:'fred',date:'2026-10-30',week:5,session:'Fri: Upper + erg + arms B',duration:60,rpe:7,notes:'Loads (lb): Wall ball 14 (20+)',updatedAt:'2026-10-30T20:00:00Z',savedAt:'2026-10-30T20:00:00Z'}];
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const errs=[];
+const open=async(t,who='fred')=>{const p=await b.newPage({viewport:{width:390,height:844}});p.on('pageerror',e=>errs.push(e.message));
+ await p.addInitScript(([w,lg])=>{localStorage.setItem('hrx_active_athlete',w);localStorage.setItem('hrx_migrated','1');localStorage.setItem(`hrx_${w}_unit_v2`,JSON.stringify('lb'));localStorage.setItem(`hrx_${w}_logs_v2`,JSON.stringify(lg))},[who,who==='fred'?LOG:[]]);
+ await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
+let p=await open('2026-11-06T07:00:00');
+const d=await p.evaluate(()=>PLAN.map(w=>({n:w.week,t:/Wall ball technique 2 x 10\.\nFinisher/.test(w.fri),b9:/wall balls 9 kg \(20 lb\)/.test(w.fri),l25:/sandbag lunges 25 m, 25 kg/.test(w.mon)})));
+ok(d.every(x=>x.t===(x.n>=6&&x.n<=21)),'technique sets on Fridays weeks 6 to 21 only');
+ok(d.every(x=>x.b9===(x.n>=15&&x.n<=21))&&d.every(x=>x.l25===(x.n>=15&&x.n<=21)),'9 kg ball and 25 kg lunges in weeks 15 to 21 only');
+ok(await p.evaluate(()=>PLAN0[5].fri.indexOf('technique')<0),'PLAN0 keeps the base plan');
+const td=await p.locator('#today .td-session').innerText();ok(/Hammer curls[\s\S]*Wall ball technique[^|]*?\n[\s\S]{0,20}2×10[\s\S]*EMOM 16′/.test(td)&&!/Adjusted by coach/.test(td),'Today Friday: technique row before the EMOM, no coach badge');
+await p.evaluate(()=>startWorkout(6,4,'2026-11-06'));await p.clock.runFor(600);
+const wo=await p.evaluate(()=>[...document.querySelectorAll('#workout .wo-item')].map(e=>(e.querySelector('b')||{}).textContent));
+ok(wo.slice(-2).join()==='Wall ball technique,EMOM 16′','workout order ends with technique then EMOM '+JSON.stringify(wo));
+ok(await p.evaluate(()=>[...document.querySelectorAll('#workout .wo-item.sets')].find(e=>/Wall ball technique/.test(e.innerText)).querySelectorAll('.st-r[data-row]').length)===2,'technique has 2 set rows');
+await p.evaluate(()=>closeWorkout());
+const sg=await p.evaluate(()=>[suggestLoad('wallball',15,9,1),suggestLoad('wallball',6,null,1)]);
+ok(sg[0].kg===20&&sg[0].why==='plan','week 15 EMOM ball suggestion is the plan 20 lb over the last 14 lb');ok(sg[1].why!=='plan','week 6 keeps the history rule');
+await p.evaluate(()=>{currentWeek=15;showView('plan')});await p.clock.runFor(400);
+ok(/9 kg/.test(await p.locator('.day-card[data-day=Fri]').evaluate(c=>c.textContent))&&/25 kg/.test(await p.locator('.day-card[data-day=Mon]').evaluate(c=>c.textContent)),'Plan week 15 Friday and Monday sheets show the heavier loads');
+ok(await p.evaluate(()=>{viewAthlete='will';const r=PLAN[14].fri===PLAN0[14].fri&&PLAN[14].mon===PLAN0[14].mon;viewAthlete=null;return r}),'viewing Will shows the base plan');
+await p.close();
+p=await open('2026-11-06T07:00:00','will');ok(!/Wall ball technique/.test(await p.locator('#today').innerText()),'Will\'s Friday has no technique sets');await p.close();
+ok(/PLAN_ATH/.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt explains the Fred only plan');
+ok(!errs.length,'no page errors '+errs.join(' | '));
+await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();

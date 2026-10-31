@@ -1006,9 +1006,17 @@ function adjValid(wk,k,t){const id=wk+'|'+k+'|'+t;if(ADJ_OK.has(id))return ADJ_O
   if(v&&k==='sun')v=/^(Optional|Easy run|Rest)/i.test(t)}catch{v=false}
  ADJ_BUSY=false;ADJ_OK.set(id,v);return v}
 function planAdjDays(wk,who){return PLAN_DAYS.filter(k=>planAdj(wk,k,who))}
-PLAN.forEach(w=>[...PLAN_DAYS,'runKm'].forEach(k=>{if(!(k in w))return;let base=w[k];Object.defineProperty(w,k,{enumerable:true,configurable:true,get(){if(ADJ_BUSY)return base;const a=planAdj(w.week,k);return a?a.text:base},set(v){base=v}})}));
+PLAN.forEach(w=>[...PLAN_DAYS,'runKm'].forEach(k=>{if(!(k in w))return;let base=w[k];Object.defineProperty(w,k,{enumerable:true,configurable:true,get(){const b=planAth(w.week,k);if(ADJ_BUSY)return b!=null?b:base;const a=planAdj(w.week,k);return a?a.text:b!=null?b:base},set(v){base=v}})}));
+// v124 per athlete base plan (Fred, Oct 31: wall ball weakness, every station at or above race weight before Brisbane; Fred only, not Will or Grady).
+// Built from PLAN0 by small text edits, read by the PLAN getters under any coach change. Not a coach change: no badge, the Settings toggle does not remove it.
+const PLAN_ATH={fred:{}};
+(()=>{const F=PLAN_ATH.fred;PLAN0.forEach(w=>{const n=w.week,o={};
+ if(n>=6&&n<=21&&/Finisher: EMOM/.test(w.fri))o.fri=w.fri.replace(/\nFinisher: EMOM/,'\nWall ball technique 2 x 10.\nFinisher: EMOM');
+ if(n>=15&&n<=21){if(o.fri)o.fri=o.fri.replace(/(\d+) wall balls/,'$1 wall balls 9 kg (20 lb)');if(/sandbag lunges 25 m, 20 kg/.test(w.mon))o.mon=w.mon.replace(/sandbag lunges 25 m, 20 kg/,'sandbag lunges 25 m, 25 kg (above race weight)')}
+ if(Object.keys(o).length)F[n]=o})})();
+function planAth(wk,k,who){who=who||planWho();const p=who&&PLAN_ATH[who]&&PLAN_ATH[who][wk];return p&&p[k]!=null?p[k]:null}
 const ADJ_DAY={Mon:'mon',Tue:'tue',Fri:'fri',Sat:'sat',Sun:'sun'};
-function adjBadgeHTML(w,day,cls){const k=ADJ_DAY[day],a=w&&k&&planAdj(w.week,k);if(!a)return'';return`<div class="adj-b${cls?' '+cls:''}"><b>Adjusted by coach</b>${a.why?`<span>${esc(a.why)}</span>`:''}${PLAN0[w.week-1][k]!==a.text?`<small>Original: ${esc(PLAN0[w.week-1][k])}</small>`:''}</div>`}
+function adjBadgeHTML(w,day,cls){const k=ADJ_DAY[day],a=w&&k&&planAdj(w.week,k);if(!a)return'';return`<div class="adj-b${cls?' '+cls:''}"><b>Adjusted by coach</b>${a.why?`<span>${esc(a.why)}</span>`:''}${(planAth(w.week,k)??PLAN0[w.week-1][k])!==a.text?`<small>Original: ${esc(planAth(w.week,k)??PLAN0[w.week-1][k])}</small>`:''}</div>`}
 const $=id=>document.getElementById(id),whoBtn=$('whoBtn'),whoName=$('whoName'),whoInitial=$('whoInitial'),whoModal=$('whoModal'),benchTable=$('benchTable'),weekJump=$('weekJump'),weekHero=$('weekHero'),days=$('days'),modal=$('modal'),modalBody=$('modalBody'),closeModal=$('closeModal'),guideGrid=$('guideGrid'),guideSearch=$('guideSearch'),prevWeek=$('prevWeek'),nextWeek=$('nextWeek'),date=$('date'),session=$('session'),logForm=$('logForm'),editId=$('editId'),duration=$('duration'),distance=$('distance'),pace=$('pace'),rpe=$('rpe'),knee=$('knee'),stations=$('stations'),notes=$('notes'),cancelEdit=$('cancelEdit'),toast=$('toast'),exportBtn=$('exportBtn'),importFile=$('importFile'),clearBtn=$('clearBtn');
 const GUIDES={
  run:{name:'Running intervals / tempo',type:'run',setup:'Stand tall with a slight forward lean from the ankles. Keep shoulders relaxed and eyes ahead.',move:'Land under your hips, drive the elbows back, and hold the prescribed pace without sprinting the first rep.',mistake:'Overstriding with the foot landing far ahead of the body.'},
@@ -2023,7 +2031,7 @@ function sortedLogs(){return getLogs().filter(x=>x.date).sort((a,b)=>String(b.da
 const DL_W=[4,8,12,16,20],isDl=w=>DL_W.includes(+w);
 function lastLoad(ek,session,skipDl){if(skipDl){const a=lastLoad(ek,session,false);if(!a||!isDl(a.week))return a;for(const x of sortedLogs()){if(session&&x.session!==session)continue;if(isDl(x.week||weekOf(x.date)))continue;const f=parseLoads(x).find(l=>l.ek===ek&&l.kg);if(f)return{...f,date:x.date,week:x.week||weekOf(x.date)}}return a}for(const x of sortedLogs()){if(session&&x.session!==session)continue;const f=parseLoads(x).find(l=>l.ek===ek&&l.kg);if(f)return{...f,date:x.date,week:x.week||weekOf(x.date)}}return null}
 function toUnit(v,from,to){return from&&from!==to?(to==='lb'?v*2.2046:v/2.2046):v}
-function suggestLoad(ek,week,planKg,em){const u=unitFor(ek),as=assistOn(ek),co=as?null:coachLoad(ek);if(co)return{kg:co,why:'coach',u};let l=lastLoad(ek,null,true);if(l&&!!l.as!==as){l=null;for(const x of sortedLogs()){const f=parseLoads(x).find(q=>q.ek===ek&&q.kg&&!!q.as===as);if(f){l={...f,date:x.date};break}}}if(as&&!l)return null;if(!l)return planKg?{kg:rnd(toUnit(planKg,'kg',u),u,ek),why:'plan',u}:null;const base=toUnit(l.kg,l.u,u);let kg=base;const inc=incFor(ek,u),dl=isDl(week);let why='same';
+function suggestLoad(ek,week,planKg,em){const u=unitFor(ek),as=assistOn(ek),co=as?null:coachLoad(ek);if(co)return{kg:co,why:'coach',u};let l=lastLoad(ek,null,true);if(l&&!!l.as!==as){l=null;for(const x of sortedLogs()){const f=parseLoads(x).find(q=>q.ek===ek&&q.kg&&!!q.as===as);if(f){l={...f,date:x.date};break}}}if(as&&!l)return null;if(!l)return planKg?{kg:rnd(toUnit(planKg,'kg',u),u,ek),why:'plan',u}:null;const base=toUnit(l.kg,l.u,u);let kg=base;const inc=incFor(ek,u),dl=isDl(week);let why='same';if(em&&planKg&&!as&&toUnit(planKg,'kg',u)>base*1.1)return{kg:rnd(toUnit(planKg,'kg',u),u,ek),why:'plan',u,last:l};
  if(dl&&em)return{kg:rnd(base,u,ek),why:'dlhold',last:l,u,as};
  if(dl){return{kg:rnd(as?kg*1.2:kg*.8,u,ek),why:'deload',last:l,u,as}}
  const full=/^(\d+)\/(\1)$/.test(l.st||''),part=/^\d+\/\d+$/.test(l.st||'')&&!full;
