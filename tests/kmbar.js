@@ -28,7 +28,7 @@ t=await bar(p);ok(t.fill==='74.56%'&&t.over,'over the core without Sunday: 8.5 k
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=360),'no overflow at 360');
 // v119: doing exactly the planned Tuesday and Saturday runs fills the core part and is not over
 await p.close();p=await open('2026-10-24T18:00:00',[L('t','2026-10-21',4,'Tue: Intervals + arms A',2.4),L('s','2026-10-24',4,'Sat: HYROX sim',4)]);t=await bar(p);ok(t.n==='6.4/6.4km'&&t.fill==='56.14%'&&!t.over,'every planned session done: 6.4 of 6.4, core full '+JSON.stringify(t));
-ok(await p.evaluate(()=>PLAN.map(w=>w.runKm).join())==='4.4,5.2,12,11.4,13,14,14,13,19,13,10,13,14,17,14,13,17,17,18,13,22,15,17,18,13,4,11','runKm per week is the planned run distance');
+ok(await p.evaluate(()=>PLAN.map(w=>w.runKm).join())==='4.4,5.2,12,11.4,13,18,14,13,19,13,10,13,14,17,14,13,17,17,18,13,22,15,17,18,13,4,11','runKm per week is the planned run distance');
 // Coach trend target uses the core km
 ok(await p.evaluate(()=>{showView('bench');return true}),'');await p.clock.runFor(500);
 const tr=await p.evaluate(()=>document.querySelector('#bench')?document.querySelector('#bench').textContent:'');ok(!/of 12 target/.test(tr),'Coach trend never shows the Sunday inclusive target');

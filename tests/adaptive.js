@@ -4,7 +4,7 @@
 // node tests/adaptive.js
 const {chromium}=require('playwright'),path=require('path'),fs=require('fs');const URL='file://'+path.resolve(__dirname,'../index.html');
 let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
-const SAT='Half sim, 75%, half volume, all 8 stations in race order: 8 x (1 km run + station at half volume)';
+const SAT='Half sim, 75%, all 8 stations in race order: 8 x (1 km run + station at full volume)';
 const COACH={week:5,generated:'2026-10-31T23:00:00Z',athletes:{fred:{headline:'Runs are the lever',summary:'Good week.',tweaks:[],plan:{
  '6':{sat:{text:SAT,why:'Full 1 km runs: you and Will felt ready for more running, stations stay at half'},runKm:17},
  '9':{sat:{text:'Half sim, 50%',why:'should be ignored, full sim week'}},
@@ -16,11 +16,11 @@ const open=async(t,who='fred')=>{const p=await b.newPage({viewport:{width:390,he
  await p.evaluate(c=>{window.COACH=c;refreshViews()},COACH);await p.clock.runFor(300);return p};
 let p=await open('2026-11-06T07:00:00');
 const d=await p.evaluate(()=>({sat:PLAN[5].sat,orig:PLAN0[5].sat,km:PLAN[5].runKm,mon:PLAN[5].mon===PLAN0[5].mon,w9:PLAN[8].sat===PLAN0[8].sat,w11:PLAN[10].tue===PLAN0[10].tue,w7:PLAN[6].mon===PLAN0[6].mon,runs:simSegments(PLAN[5]).filter(s=>s.kind==='run').map(s=>s.km),json:JSON.parse(JSON.stringify(PLAN))[5].sat}));
-ok(d.sat.includes('1 km run')&&d.orig.includes('500 m run'),'PLAN week 6 Saturday follows the coach, PLAN0 keeps the original');
+ok(d.sat.includes('full volume')&&d.orig.includes('half volume)'),'PLAN week 6 Saturday follows the coach, PLAN0 keeps the original');
 ok(d.km===17&&d.mon,'runKm override 17, untouched days stay original');
 ok(d.w7,'invalid override (Monday text without its EMOM) falls back to PLAN');ok(d.w9&&d.w11,'locked weeks ignored (full sim week 9 Saturday, Nashville week 11)');
 ok(d.runs.length===8&&d.runs.every(k=>k===1),'sim segments: 8 runs of 1 km '+JSON.stringify(d.runs));
-ok(d.json.includes('1 km run'),'JSON copy of PLAN carries the override');
+ok(d.json.includes('full volume'),'JSON copy of PLAN carries the override');
 // Today Friday: Up next is Saturday with the badge
 const td=await p.locator('#today').innerText();ok(/Up next[\s\S]*Adjusted by coach/.test(td),'Up next shows Adjusted by coach for Saturday');
 // Plan row and sheet
@@ -28,7 +28,7 @@ await p.evaluate(()=>{currentWeek=6;showView('plan')});await p.clock.runFor(400)
 ok(await p.locator('.day-card[data-day=Sat] .day-head .adj-m').count()===1&&await p.locator('.day-card[data-day=Mon] .day-head .adj-m').count()===0,'Plan Saturday row has the Coach pill, Monday does not');
 await p.locator('.day-card[data-day=Sat] .day-head').click();await p.clock.runFor(300);
 const sh=await p.locator('.day-card[data-day=Sat] .day-body').innerText();
-ok(/Adjusted by coach/.test(sh)&&/you and Will felt ready/.test(sh)&&/Original: Half sim[^\n]*500 m run/.test(sh),'Plan sheet: badge, why and original');
+ok(/Adjusted by coach/.test(sh)&&/you and Will felt ready/.test(sh)&&/Original: Half sim[^\n]*1 km run \+ station at half volume/.test(sh),'Plan sheet: badge, why and original');
 ok(/1 km run/.test(await p.locator('.day-card[data-day=Sat] .day-body').textContent()),'Plan sheet plan text is the coach version');
 ok(/\/\s*12\s*km/.test((await p.locator('#weekTrack').innerText()).replace(/\n/g,' ')),'Plan km tracker uses runKm 17 (12 without the Sunday 5 km): '+(await p.locator('#weekTrack').innerText()).replace(/\n/g,' '));
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=390),'no overflow at 390');await p.screenshot({path:(process.env.SHOTS||'/tmp')+'/adj-sheet.png'});
@@ -49,7 +49,7 @@ await p.evaluate(()=>closeWorkout());
 await p.evaluate(()=>$('adjRow').click());await p.clock.runFor(200);
 ok(await p.evaluate(()=>PLAN[5].sat===PLAN0[5].sat&&localStorage.getItem('hrx_fred_planorig_v2')==='1'&&$('adjVal').textContent==='Off'),'Settings off: original plan');
 ok(!/Adjusted by coach/.test(await p.locator('#today').innerText()),'Today drops the badge when off');
-await p.evaluate(()=>$('adjRow').click());await p.clock.runFor(200);ok(await p.evaluate(()=>PLAN[5].sat.includes('1 km run')),'Settings on again: coach plan back');
+await p.evaluate(()=>$('adjRow').click());await p.clock.runFor(200);ok(await p.evaluate(()=>PLAN[5].sat.includes('full volume')),'Settings on again: coach plan back');
 // viewing Will: his plan is the original
 ok(await p.evaluate(()=>{viewAthlete='will';const r=PLAN[5].sat===PLAN0[5].sat;viewAthlete=null;return r}),'Will (no plan in coach.json) sees the original');
 await p.close();
