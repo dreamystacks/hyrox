@@ -1,0 +1,118 @@
+{
+  "generated": "2026-10-31T22:55:28Z",
+  "week": 5,
+  "team": "Fred logged 4 of 5 (Monday missed) and ran his most even sim yet: 33:34 with runs inside 21 s and every station ahead of Will. Will logged 3 of 5 with no Tuesday or Friday, and finished Saturday with right knee pain 7/10, so his priority this week is the knee, not the plan.",
+  "athletes": {
+    "fred": {
+      "headline": "Even sim runs, Monday missed",
+      "summary": "Tuesday, hockey, Friday and the sim done, Monday logged as a rest day, knee 0 all week. Run km 8 of the 8 km core target before Sunday's zone 2 run, and average RPE rose from 7.0 to 7.8. The sim (stations 5 to 8, 1 km runs) was 33:34 with runs 6:06, 6:10, 6:09, 6:27: a 21 s spread vs 82 s last week, at RPE 7, and you wrote it felt comfortable and sustainable.",
+      "strengths": [
+        "Pacing fixed: sim runs 6:06 to 6:27 after last week's 5:22 to 6:44 fade, and the RPE dropped from 9 to 7.",
+        "Wall balls 2:30 for 50 reps in the sim, about 5:00 per 100, already faster than the 5:33 goal split for 1:25.",
+        "You progressed the Friday EMOM yourself (200 m ski, 20 wall balls, 200 m row) and still finished at 10-20 s rest; curls moved up to Bayesian 40 lb x 10 to 13 and hammer 27.5 lb x 10."
+      ],
+      "weaknesses": [
+        "No Monday lift this week, so trap bar and hack squat have not been trained since Oct 20 (deload). That is the only leg strength session of the week.",
+        "Tuesday 1 km reps went 6:10, 5:43, 5:57, 5:15: a 55 s spread, and the incline curls were skipped (0/4).",
+        "Sim stations at race distance are slow on the grip and legs side: farmers 1:18 for 96 m (about 2:43 for 200 m vs a 1:50 goal) and lunges 2:16 for 48 m (about 4:43 per 100 m vs 4:21)."
+      ],
+      "tips": [
+        "Wall balls (your stated weakness): before each set, set feet just wider than shoulders with toes slightly out, ball high under the chin with elbows under it, about an arm's length from the wall, eyes on one spot on the target, and sit straight down with heels flat. Your daily ankle rocks are what let the heels stay down, so keep them going.",
+        "Tuesday is 5 x 1 km at about 5:45/km on every rep. The first rep is the one to hold back, exactly like Saturday.",
+        "Body weight averaged 160.1 lb this week vs 159.0 last week and 160.9 in week 3, so roughly flat since the cut started. Keep both weigh-ins and judge it on the 2 week average. Also edit Friday's log: it saved 240 min because the timer ran for almost 8 hours."
+      ],
+      "tweaks": [
+        {
+          "week": 6,
+          "day": "Mon",
+          "text": "Do Monday on Monday: trap bar 235 lb for 3 x 5 and hack squat 170 lb for 3 x 8 at RPE 7, the loads planned for last week."
+        },
+        {
+          "week": 6,
+          "day": "Fri",
+          "text": "Friday EMOM now matches what you did last week (200 m SkiErg, 20 wall balls, 200 m row); keep the 14 lb ball until the technique sets feel clean, then try 20 lb."
+        }
+      ],
+      "loads": {
+        "trap": 235,
+        "hack": 170,
+        "crunch": 60,
+        "sledpush": 190,
+        "lunge": 44,
+        "carry": 60,
+        "lateral": 17.5,
+        "inclinecurl": 27.5,
+        "tricepoh": 85,
+        "dbbench": 60,
+        "facepull": 75,
+        "hammercurl": 30,
+        "wallball": 14
+      },
+      "unit": "lb",
+      "plan": {
+        "6": {
+          "tue": {
+            "text": "5 x 1 km @ 10k pace of about 5:45/km, 2 min rest\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Last Tuesday's 1 km reps averaged about 5:46/km but spread 55 s (6:10 to 5:15); same pace, every rep even."
+          },
+          "fri": {
+            "text": "Weighted pull ups 3 x 5, DB bench 3 x 8.\nThen arms block B: Face pulls 3x15, Bayesian cable curls 3x10-12, hammer curls 3x10-12\nWall ball technique 2 x 10.\nFinisher: EMOM 16 min: 1) SkiErg 200 m 2) 20 wall balls 3) row 200 m 4) rest",
+            "why": "You found the 150 m / 15 rep EMOM too easy (Oct 16, Oct 23 at 20+) and did 200 m, 20 wall balls, 200 m on Oct 30 at 10-20 s rest."
+          }
+        }
+      }
+    },
+    "will": {
+      "headline": "Knee 7/10: settle it first",
+      "summary": "Monday (done Tuesday), hockey and the sim done; Tuesday was not logged and Friday was a rest day for the third week running. Run km is 4 of the 8 km core target. The sim (stations 5 to 8, 1 km runs) was 37:19 at RPE 9 with right knee pain 7/10, and you wrote you had alcohol the night before and slept badly.",
+      "strengths": [
+        "Monday at heavier loads: trap bar 235 lb (RIR 2), hack squat 170 lb (RIR 1), sled push 210 lb, and the full 16 min EMOM done at 10-20 s rest on every move.",
+        "First three sim runs were steady: 6:14, 6:17, 6:26.",
+        "Hockey every week and both weigh-ins logged; body weight steady at about 186 lb."
+      ],
+      "weaknesses": [
+        "Right knee 7/10 on Saturday (2/10 on Monday). That is over the 4/10 stop line.",
+        "Friday missed three weeks in a row and no Tuesday run this week, so the upper body and interval work is falling behind.",
+        "Sim run 4 dropped to 7:00 and lunges took 3:08 for 48 m (about 6:32 per 100 m at race distance vs a 4:21 goal)."
+      ],
+      "tips": [
+        "Knee first: no running, lunges or burpees while it is 4/10 or more. If it is still sore after a few days, or the pain is sharp, get it checked before Saturday.",
+        "Friday is the session to protect: pull ups, DB bench 50 lb 3 x 8 and the EMOM are the minimum, about 45 minutes.",
+        "Sleep and no alcohol the night before a sim are worth more than any load change: RPE 9 at a 75% session tells you the body was not ready."
+      ],
+      "tweaks": [
+        {
+          "week": 6,
+          "day": "Mon",
+          "text": "Knee safe Monday: hack squat dropped and lunges swapped for step ups; stop any move that brings the knee to 4/10, and skip the leg work if it is still at 4 or more."
+        },
+        {
+          "week": 6,
+          "day": "Sat",
+          "text": "If the knee is still 4/10 or more on Saturday, skip the sim and log a rest day; do not run or lunge through it."
+        }
+      ],
+      "loads": {
+        "trap": 235,
+        "crunch": 65,
+        "sledpush": 210,
+        "carry": 53,
+        "lateral": 15,
+        "inclinecurl": 22.5,
+        "tricepoh": 60,
+        "dbbench": 50,
+        "facepull": 30,
+        "wallball": 14
+      },
+      "unit": "lb",
+      "plan": {
+        "6": {
+          "mon": {
+            "text": "Trap bar DL 3 x 5 heavy. Cable crunch 3x10. EMOM 16 min (4 rounds), moderate: 1) sled push 20 m (last round at race weight) 2) step ups 10/leg bodyweight 3) farmers carry 50 m, 2 x 28 kg (above race weight, grip) 4) rest",
+            "why": "Right knee 7/10 after Saturday's sim: hack squat out, step ups instead of lunges, until the knee is back under 4."
+          }
+        }
+      }
+    }
+  }
+}
