@@ -9,12 +9,12 @@ const open=async(tz,when='2026-10-07T10:00:00')=>{const ctx=await b.newContext({
  await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1')});await p.clock.install({time:new Date(when)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('America/Toronto');
 const tabs=await p.evaluate(()=>[...document.querySelectorAll('.bottombar .tab')].map(t=>t.dataset.view+':'+(t.textContent.trim()||'(today)')));
-check('bar: Plan, Today, Coach in a floating pill (v127); no History, Guides or Progress',tabs,['plan:Plan','today:Today','bench:Coach']);
+check('bar: Plan, Today, Coach in a floating pill (v127); no History, Guides or Progress',tabs,['plan:Plan','today:Today','bench:Progress']);
 check('app opens on Today',await p.evaluate(()=>document.querySelector('.view.active').id),'today');
 check('Settings has no Guides row',await p.locator('#settingsModal #guidesBtn').count(),0);
 await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
 check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#bench > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,7)),['benchSeg','standWrap','projWrap','leverWrap','card','splitWrap','testWrap']);
-check('Coach title in the top bar',await p.locator('#pgTitle').innerText(),'Coach');
+check('Progress title in the top bar (v128 rename)',await p.locator('#pgTitle').innerText(),'Progress');
 check('no athlete toggle in the Coach or Plan header',await p.evaluate(()=>[document.querySelectorAll('#bench .seg').length,document.querySelectorAll('#plan .seg').length]),[0,0]);
 await p.evaluate(()=>{syncCfg=()=>({url:'x',key:'y'});setSegRender();settingsModal.classList.add('show')});
 check('Settings has the viewing switch without (you)',await p.locator('#setSeg button').allInnerTexts(),['Fred','Will','Grady']);
