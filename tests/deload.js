@@ -48,7 +48,7 @@ await p.close();
 p=await open('2026-10-26T07:00:00',[W4,...W3]);
 const w5=await p.evaluate(()=>[suggestLoad('trap',5).kg,suggestLoad('trap',5).last.kg,sledSuggest('sledpush',5,'Mon').total]);
 ok(w5[1]===300&&w5[0]>300,'week 5 trap bar builds from the week 3 300 lb, not the deload 240: '+JSON.stringify(w5));
-ok(Math.round(w5[2])===250,'week 5 sled base is the normal EMOM load');
+ok(Math.round(w5[2])>=250&&Math.round(w5[2])<=300,'week 5 sled builds from the normal EMOM load 250, not the deload (v136 ramp): '+Math.round(w5[2]));
 const td5=await p.locator('#today').innerText();ok(!/80% of last/.test(td5),'week 5 Today has no 80% chip');
 await p.close();
 // coach prompt and Excel note
