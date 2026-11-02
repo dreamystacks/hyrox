@@ -1056,6 +1056,10 @@ main.shell{transition:none!important}
 .sheet.grow,.day-card.dr.open .day-body{animation:sgrow2 .28s cubic-bezier(.2,.8,.2,1) both!important;will-change:transform}
 @keyframes sgrow2{from{transform:translateY(28px) scale(.97);opacity:.6}}
 .modal.show{animation:mdim .22s ease both}
+/* v135 (Fred, Nov 2: Progress still jumped on scroll): no layer promotion on the sticky header or title, no scroll anchoring */
+.topbar{transform:none!important;-webkit-backface-visibility:visible;backface-visibility:visible}
+.pg-title,body.hdr-min .pg-title{will-change:auto!important}
+html,body{overflow-anchor:none}
 </style></head><body data-pg="today">
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-studio-light-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
 <div id="workout" aria-live="polite"></div>
@@ -1839,7 +1843,7 @@ function renderDash(who){const el=$('dash');if(!el)return;let P=null;try{P=rough
  const bk=load(nsKey(who,'bench'),{}),nTests=Object.keys(bk).filter(k=>!/^bw_/.test(k)&&bv(bk[k])).length,c=coachFor(who),head=c&&(c.headline||c.title)||'Baseline week, first report Saturday',rp=logs.filter(x=>weekOf(x.date)===cw&&x.rpe&&x.session!=='Rest day').map(x=>+x.rpe),rpe=rp.length?(rp.reduce((a,b)=>a+b,0)/rp.length).toFixed(1):'—';
  const gv=P?P.total-GOAL_TOTAL:0,bar=i=>{if(i.g==null)return'<i class="db-none"></i>';const h=Math.max(8,Math.min(50,Math.abs(i.g)/(i.n==='Runs'?240:60)*50));return`<i class="${i.g>0?'up':'dn'}" style="height:${h}%"></i>`};
  const sp=A.length>1?spark(A.map(p=>({x:p.week,y:p.kg})),{w:140,h:28}):'';
- el.innerHTML=`<div class="dgrid">
+ const H=`<div class="dgrid">
  <button class="dt dt-hero" type="button" data-dash="proj"><span class="dt-k">Projected Brisbane finish${P?`<em class="pl ${cls(gv)}">${sg(gv)}</em>`:''}</span><span class="dt-big" id="dashBig">${P?fmtSec(Math.round(P.total)):'-:--:--'}</span>${P?`<span class="dt-lad"><i class="dl-tr"></i><i class="dl-you" style="left:${pos(P.total)}%"></i><b class="dl-goal" style="left:${pos(GOAL_TOTAL)}%"><span>1:25</span></b></span>`:'<span class="dt-s">Unlocks with your first sim</span>'}</button>
  <button class="dt dt-wide" type="button" data-dash="splits"><span class="dt-k">Race splits vs goal<em>${P?`${ahead} ahead · ${behind} behind`:'No sims yet'} ›</em></span>${P?`<span class="db-bars">${items.map((i,k)=>`<span class="db-c" style="--d:${k*35}ms">${bar(i)}<small>${esc(i.s)}</small></span>`).join('')}</span>`:''}</button>
  <button class="dt" type="button" data-dash="splits"><span class="dt-k">Biggest lever</span><span class="dt-m">${worst&&worst.g>0?esc(worst.n):'None'}</span><span class="dt-s ${worst&&worst.g>0?'behind':''}">${worst&&worst.g>0?sg(worst.g):'Nothing behind'}</span></button>
@@ -1850,6 +1854,7 @@ function renderDash(who){const el=$('dash');if(!el)return;let P=null;try{P=rough
  <button class="dt" type="button" data-dash="tests"><span class="dt-k">Fresh tests</span><span class="dt-m">${nTests}<small> logged</small></span><span class="dt-s">Log a retest ›</span></button>
  <button class="dt dt-wide dt-coach" type="button" data-dash="coach"><span class="dt-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg></span><span class="dt-ct"><span class="dt-k">Coach · week ${cw}</span><span class="dt-h">${esc(head)}</span></span><span class="dt-ch">›</span></button>
  </div>`;
+ if(el._h===H&&!(!dashAnimDone))return;el._h=H;el.innerHTML=H;
  el.querySelectorAll('[data-dash]').forEach(b=>b.onclick=()=>openDash(b.dataset.dash,b));
  const anim=!dashAnimDone;dashAnimDone=true;el.classList.toggle('still',!anim);if(P&&anim)rollNum($('dashBig'),P.total,v=>fmtSec(Math.round(v)))}
 let dashAnimDone=false;
@@ -2306,11 +2311,14 @@ renderPlan();renderGuides();renderToday();updateSyncBadge();loadCoach();document
   sh.addEventListener('touchend',()=>{if(y0==null)return;y0=null;sh.style.transition='transform .2s';if(dy>90){sh.style.transform='translateY(100%)';setTimeout(()=>{close();sh.style.transition='none';sh.style.transform=''},180)}else sh.style.transform='';dy=0})})})();
 if(athlete){const wx=woState();if(wx){if(wx.min){woRestore();woRun()}else openWorkout()}else{const t=tmState();if(t&&t.start&&!t.done)openTimerView()}}if(athlete&&syncCfg())sync();
 </script><script>(function(){const vv=window.visualViewport;let raf=0;function fix(){raf=0;const bar=document.querySelector('.bottombar');if(!bar)return;const ae=document.activeElement,typing=ae&&(ae.tagName==='TEXTAREA'||(ae.tagName==='INPUT'&&/^(text|search|tel|url|email|number|password|)$/i.test(ae.type||'')));const maxY=document.documentElement.scrollHeight-innerHeight;if(scrollY<0||scrollY>maxY+1)return;if(!bar.offsetHeight)return;let off=0;if(!typing&&vv){const m=/translateY\((-?[\d.]+)px\)/.exec(bar.style.transform),cur=m?+m[1]:0,nat=bar.getBoundingClientRect().bottom-cur;off=vv.height+vv.offsetTop-nat-(parseFloat(getComputedStyle(bar).bottom)||0)}off=Math.round(off);const v=off>1?`translateY(${off}px)`:'';if(bar.style.transform!==v)bar.style.transform=v}
+let busy=0,touch=false;const mv=()=>{busy=Date.now()};addEventListener('touchstart',()=>{touch=true;mv()},{passive:true});addEventListener('touchend',()=>{touch=false;mv()},{passive:true});addEventListener('touchcancel',()=>{touch=false},{passive:true});addEventListener('scroll',mv,{passive:true});const moving=()=>touch||Date.now()-busy<900;window.scrollMoving=moving;
 function q(){if(!raf)raf=requestAnimationFrame(fix)}if(vv){vv.addEventListener('resize',q);vv.addEventListener('scroll',q)}addEventListener('scroll',q,{passive:true});addEventListener('resize',q);addEventListener('orientationchange',()=>setTimeout(q,300));
 document.addEventListener('change',e=>{const t=e.target;if(t&&(t.tagName==='SELECT'||t.type==='date')){setTimeout(()=>{try{t.blur()}catch{}q()},50);[300,900].forEach(d=>setTimeout(q,d))}});
-document.addEventListener('focusout',()=>setTimeout(()=>{scrollTo(scrollX,scrollY);q()},300));document.addEventListener('visibilitychange',q);addEventListener('pageshow',q);window.realignBar=q;(function(){let on=false,raf=0;addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const y=scrollY;if(!on&&y>48){on=true;document.body.classList.add('hdr-min')}else if(on&&y<12){on=false;document.body.classList.remove('hdr-min')}})},{passive:true})})();
+document.addEventListener('focusout',()=>setTimeout(()=>{if(!moving())scrollTo(scrollX,scrollY);q()},300));document.addEventListener('visibilitychange',q);addEventListener('pageshow',q);window.realignBar=q;(function(){let on=false,raf=0;addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;const y=scrollY,mx=document.documentElement.scrollHeight-innerHeight;if(y<0||y>mx+1)return;if(!on&&y>48){on=true;document.body.classList.add('hdr-min')}else if(on&&y<12){on=false;document.body.classList.remove('hdr-min')}})},{passive:true})})();
 // First open: iOS standalone can paint the fixed bar against a stale layout viewport until something forces a relayout (a tab switch fixed it). Do the same work a tab switch does, a few times while the app settles.
-function kick(){const bar=document.querySelector('.bottombar');if(!bar||document.body.classList.contains('focus'))return;const de=document.documentElement,y=scrollY,short=de.scrollHeight<=innerHeight+1;
+function kick(){const bar=document.querySelector('.bottombar');if(!bar||document.body.classList.contains('focus'))return;if(moving()){setTimeout(kick,400);return}const de=document.documentElement,y=scrollY,short=de.scrollHeight<=innerHeight+1;
+ // v135: a page that already scrolls needs no nudge (scrolling 1 px and back made Progress jump on iOS)
+ if(!short){bar.style.display='none';void bar.offsetHeight;bar.style.display='';q();return}
  // A tab switch fixes the bar because the document becomes taller than the screen and scrolls. Do the same on short pages: grow by 2px, scroll 1px, scroll back, shrink.
  if(short)de.style.minHeight='calc(100vh + 2px)';bar.style.display='none';void bar.offsetHeight;bar.style.display='';scrollTo(scrollX,y+1);requestAnimationFrame(()=>{scrollTo(scrollX,y);if(short)requestAnimationFrame(()=>{de.style.minHeight='';q()});else q()})}
 window.kickBar=kick;[0,300,900,1900,3000].forEach(d=>setTimeout(kick,d));addEventListener('pageshow',()=>[0,300,900].forEach(d=>setTimeout(kick,d)));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')[100,600].forEach(d=>setTimeout(kick,d))});setInterval(()=>{if(!document.hidden)q()},500);q()})();</script><script>

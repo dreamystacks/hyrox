@@ -17,6 +17,9 @@ for(const w of [390,360]){const p=await b.newPage({viewport:{width:w,height:844}
  ok(/^160\.1\s*lb$/.test(d.bw),w+': body weight tile '+d.bw);
  ok(d.lever==='Runs',w+': biggest lever is Runs');
  ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),w+': no horizontal scroll');
+ const j=await p.evaluate(async()=>{scrollTo(0,30);await new Promise(r=>setTimeout(r,1000));const ys=[];const h=()=>ys.push(scrollY);addEventListener('scroll',h);const n=document.querySelector('#dash .dt');kickBar();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>setTimeout(r,100))));renderBench();removeEventListener('scroll',h);const same=document.querySelector('#dash .dt')===n;scrollTo(0,0);return{ys,same}});
+ ok(!j.ys.length,w+': v135 the bar kick never scrolls a page that already scrolls '+j.ys);
+ ok(j.same,w+': v135 a re-render with the same data leaves the tiles in place');
  await p.click('[data-dash=splits]');await p.clock.runFor(600);
  const s=await p.evaluate(()=>({show:document.getElementById('dashModal').classList.contains('show'),title:document.getElementById('dashTitle').textContent,inSheet:['projWrap','leverWrap','splitWrap'].every(id=>document.getElementById('dashBody').contains(document.getElementById(id))),scaled:document.body.classList.contains('dsh-open'),grow:document.querySelector('#dashModal .sheet').classList.contains('grow')}));
  ok(s.show&&s.title==='Race splits'&&s.inSheet,w+': splits tile opens a sheet over the page with the splits table '+JSON.stringify(s));
