@@ -9,9 +9,9 @@ const open=async(t,who='fred')=>{const p=await b.newPage({viewport:{width:390,he
  await p.addInitScript(([w,lg])=>{localStorage.setItem('hrx_active_athlete',w);localStorage.setItem('hrx_migrated','1');localStorage.setItem(`hrx_${w}_unit_v2`,JSON.stringify('lb'));localStorage.setItem(`hrx_${w}_logs_v2`,JSON.stringify(lg))},[who,who==='fred'?LOG:[]]);
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('2026-11-06T07:00:00');
-const d=await p.evaluate(()=>PLAN.map(w=>({n:w.week,t:/Wall ball technique 2 x 10\.\nFinisher/.test(w.fri),b9:/wall balls 9 kg \(20 lb\)/.test(w.fri),l25:/sandbag lunges 25 m, 25 kg/.test(w.mon)})));
-ok(d.every(x=>x.t===(x.n>=6&&x.n<=21)),'technique sets on Fridays weeks 6 to 21 only');
-ok(d.every(x=>x.b9===(x.n>=15&&x.n<=21))&&d.every(x=>x.l25===(x.n>=15&&x.n<=21)),'9 kg ball and 25 kg lunges in weeks 15 to 21 only');
+const d=await p.evaluate(()=>PLAN.map(w=>({n:w.week,t:/Wall ball technique 2 x 10\.\n(Finisher|Station volume)/.test(w.fri),b9:/wall balls 9 kg \(20 lb\)/.test(w.fri),l25:/sandbag lunges 25 m, 25 kg/.test(w.mon)})));
+ok(d.every(x=>x.t===(x.n>=6&&x.n<=21&&x.n!==7)),'technique sets on Fridays weeks 6 to 21 only (not week 7, 150 wall balls, v131)');
+ok(d.every(x=>x.b9===(x.n>=15&&x.n<=21&&x.n!==17))&&d.every(x=>x.l25===(x.n>=15&&x.n<=21)),'9 kg ball and 25 kg lunges in weeks 15 to 21 only');
 ok(await p.evaluate(()=>PLAN0[5].fri.indexOf('technique')<0),'PLAN0 keeps the base plan');
 const td=await p.locator('#today .td-session').innerText();ok(/Hammer curls[\s\S]*Wall ball technique[^|]*?\n[\s\S]{0,20}2×10[\s\S]*EMOM 16′/.test(td)&&!/Adjusted by coach/.test(td),'Today Friday: technique row before the EMOM, no coach badge');
 await p.evaluate(()=>startWorkout(6,4,'2026-11-06'));await p.clock.runFor(600);
