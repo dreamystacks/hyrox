@@ -7,7 +7,7 @@ const T='2026-10-29T12:00:00Z',BW={bw_1:{v:'157.4 lb',t:T},bw_1b:{v:'158.0 lb',t
 (async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const errs=[];
 const open=async w=>{const p=await b.newPage({viewport:{width:w,height:844}});p.on('pageerror',e=>errs.push(e.message));
  await p.addInitScript(bw=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_bench_v2',JSON.stringify(bw));localStorage.setItem('hrx_will_bench_v2',JSON.stringify({bw_4:{v:'80.0 kg',t:'2026-10-20T12:00:00Z'}}))},BW);
- await p.clock.install({time:new Date('2026-10-29T09:00:00')});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=bench]');await p.clock.runFor(600);
+ await p.clock.install({time:new Date('2026-10-29T09:00:00')});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=bench]');await p.evaluate(()=>{const s=document.getElementById('dashStore');if(s)s.hidden=false});await p.clock.runFor(600);
  await p.evaluate(()=>document.querySelector('.tr[data-tr=bw]').click());await p.clock.runFor(300);return p};
 for(const w of [390,360]){const p=await open(w);
  const r=await p.evaluate(()=>{const rt=x=>[x.querySelector('.bwh-d b'),x.querySelector('.bwh-d i'),x.querySelector('.bwh-v'),x.querySelector('.bwh-c')].map(e=>e.textContent.replace(/\s+/g,' ').trim()).join(' ');const h=document.querySelector('#bwWrap .bwh');return h&&{head:h.querySelector('.bwh-h').textContent,rows:[...h.querySelectorAll(':scope > .bwh-r')].map(rt),more:h.querySelector('.bwh-more summary')&&h.querySelector('.bwh-more summary').textContent,hidden:h.querySelectorAll('.bwh-more .bwh-r').length}});

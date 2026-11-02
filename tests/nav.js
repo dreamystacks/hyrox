@@ -12,8 +12,8 @@ const tabs=await p.evaluate(()=>[...document.querySelectorAll('.bottombar .tab')
 check('bar: Plan, Today, Coach in a floating pill (v127); no History, Guides or Progress',tabs,['plan:Plan','today:Today','bench:Progress']);
 check('app opens on Today',await p.evaluate(()=>document.querySelector('.view.active').id),'today');
 check('Settings has no Guides row',await p.locator('#settingsModal #guidesBtn').count(),0);
-await p.click('.bottombar [data-view=bench]');await p.clock.runFor(500);
-check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#bench > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,7)),['benchSeg','standWrap','projWrap','leverWrap','card','splitWrap','testWrap']);
+await p.click('.bottombar [data-view=bench]');await p.evaluate(()=>{const s=document.getElementById('dashStore');if(s)s.hidden=false});await p.clock.runFor(500);
+check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#dashStore > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,6)),['standWrap','projWrap','leverWrap','card','splitWrap','testWrap']);
 check('Progress title in the top bar (v128 rename)',await p.locator('#pgTitle').innerText(),'Progress');
 check('no athlete toggle in the Coach or Plan header',await p.evaluate(()=>[document.querySelectorAll('#bench .seg').length,document.querySelectorAll('#plan .seg').length]),[0,0]);
 await p.evaluate(()=>{syncCfg=()=>({url:'x',key:'y'});setSegRender();settingsModal.classList.add('show')});
@@ -26,9 +26,9 @@ await p.evaluate(()=>{syncCfg=()=>null;});
 check('Next report (Toronto viewer, Wed)',await p.locator('#nextReport').innerText(),'Next report: Sat 6:52 PM');
 check('the line is there even with no report at all',await p.evaluate(()=>[document.querySelector('#coachWrap .cc-head').textContent==='Baseline week',$('nextReport').offsetHeight>0]),[true,true]);
 await p.evaluate(()=>{});await p.context().close();
-p=await open('Australia/Brisbane');await p.click('.bottombar [data-view=bench]');await p.clock.runFor(400);
+p=await open('Australia/Brisbane');await p.click('.bottombar [data-view=bench]');await p.evaluate(()=>{const s=document.getElementById('dashStore');if(s)s.hidden=false});await p.clock.runFor(400);
 check('Next report shown in the viewer\'s own time zone (Brisbane)',await p.locator('#nextReport').innerText(),'Next report: Sun 8:52 AM');await p.context().close();
-p=await open('America/Toronto','2026-10-10T20:00:00-04:00');await p.click('.bottombar [data-view=bench]');await p.clock.runFor(400);
+p=await open('America/Toronto','2026-10-10T20:00:00-04:00');await p.click('.bottombar [data-view=bench]');await p.evaluate(()=>{const s=document.getElementById('dashStore');if(s)s.hidden=false});await p.clock.runFor(400);
 check('Saturday after 6:52 PM rolls to next Saturday',await p.locator('#nextReport').innerText(),'Next report: Sat 6:52 PM');
 check('...and it is really 6 to 7 days away (Sat 20:00 to next Sat 18:52)',await p.evaluate(()=>{const d=(nextReportAt()-Date.now())/864e5;return d>6.9&&d<7}),true);await p.context().close();
 // Guides from Today (Tuesday: a training day, so the card has exercises)

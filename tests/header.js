@@ -20,7 +20,7 @@ for(const w of [390,360]){
  check(w+': all 7 day rows fit on screen below the week card (rows about 64 px)',await p.evaluate(()=>{const r=[...document.querySelectorAll('#days .day-card')].map(c=>Math.round(c.getBoundingClientRect().height));return[r.length,r.every(h=>h>=56&&h<=80)]}),[7,true]);
  check(w+': no horizontal scroll',await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  // tap a circle: that day's sheet opens at the bottom of the screen
- await p.click('.td-strip [data-jump=Fri]');await p.clock.runFor(300);
+ await p.click('.td-strip [data-jump=Fri]');await p.clock.runFor(300);await p.waitForTimeout(600);
  const r=await p.evaluate(()=>{const c=document.querySelector('.day-card[data-day=Fri]'),bd=c.querySelector('.day-body').getBoundingClientRect();return{open:c.classList.contains('open'),bottom:Math.round(bd.bottom),dim:getComputedStyle(document.getElementById('planDim')).display,title:c.querySelector('.ds-h b').textContent}});
  check(w+': tapping the Fri circle opens the Fri sheet at the bottom with a dim backdrop',[r.open,Math.abs(r.bottom-844)<=2,r.dim,r.title],[true,true,'block','Upper + EMOM']);
  await p.click('.day-card[data-day=Fri] [data-dclose]');await p.clock.runFor(200);
