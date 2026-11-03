@@ -28,7 +28,10 @@ await p.close();
 // next week builds from seconds
 p=await open('2026-11-09T07:00:00',[L('m6','2026-11-02','Mon: Lower + sled','Loads (lb): Sled push 250 (25s) · Farmers carry 62 (15s)'),...FRED]);
 const s2=await p.evaluate(()=>{const a=sledSuggest('sledpush',7,'Mon');return[a.total,a.why]});ok(s2[0]>250&&/25 s left|race weight/.test(s2[1]),'25 s left → sled goes up next week '+JSON.stringify(s2));
+const s4=await p.evaluate(()=>{window.__l=null;return 1});
 const s3=await p.evaluate(()=>suggestLoad('carry',7,28,1));ok(s3.why!=='up','carry 15 s left does not go up by the old rule '+JSON.stringify(s3.why));
+const hold=await p.evaluate(()=>{const lg=getLogs('fred');lg.unshift({id:'m7',athlete:'fred',date:'2026-11-08',week:6,session:'Mon: Lower + sled',notes:'Loads (lb): Sled push 235 (5s)',updatedAt:'2026-11-08T20:00:00Z',savedAt:'2026-11-08T20:00:00Z'});localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(lg));const a=sledSuggest('sledpush',7,'Mon');return[Math.round(a.total),a.why]});
+ok(hold[0]===235&&/hold/.test(hold[1]),'5 s left holds 235 (no ramp, no sim floor) '+JSON.stringify(hold));
 await p.close();
 ok(/rest left in seconds/i.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt explains seconds');
 ok(!errs.length,'no page errors '+errs.join(' | '));

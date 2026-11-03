@@ -2161,6 +2161,8 @@ function sledSuggest(ek,week,day){const ctx=sledCtx(day),c=sledCfg(sledCk(ek,ctx
  const fc=feelCat(l.st),secs=(String(l.st||'').match(/^(\d+)s$/)||[])[1],ftx=secs!=null?`last EMOM: ${secs} s left`:fc==='20+'?'last EMOM: 20+ s left':fc==='10-20'?'last EMOM: 10 to 20 s left':'';
  if(fc==='missed')return out(plateBuild(E,base-inc,'le',R),'last EMOM: missed minutes');
  if(week<5){if(fc==='20+')return out(plateBuild(E,base+inc,'ge',R),ftx);return out(plateBuild(E,base,'near',R),ftx||'last EMOM load, no feel logged')}
+ // v137 (Fred, Nov 2: EMOM very tough at 5 s left, "keep it like this till I can manage 10 s+"): 0 to 5 s left holds the load, no ramp, no sim floor
+ if(fc==='low')return out(plateBuild(E,base,'near',R),ftx+': hold until 10 s or more');
  const sim=lastLoad(ek,'Sat: HYROX sim',true),simLb=sim?toUnit(sim.kg,sim.u,'lb'):0,ramp=Math.min(1,.75+Math.max(0,week-5)*.0625),tgt=Math.round(R*Math.min(ov,1)*ramp+(ov>1?R*(ov-1):0));
  let want=base,why=ftx||'no feel logged last time';
  if(fc==='20+'||!/^(10-20|low)$/.test(fc))want=base+inc;else if(fc==='10-20'&&base<tgt)want=base+inc;
