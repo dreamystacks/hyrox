@@ -187,6 +187,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 ### AI coach (weekly scheduled task)
 - The scheduled task "HYROX weekly AI coach" runs Saturdays at 6:52 PM America/Toronto (`trig_014ofjxYnXwYGhiNEjs8D3rf`).
 - It reads the Sheet through the Google Drive connector and the plan from this repo, then writes `coach.json` and `coach-history/`.
+- **Nightly coach check (Fred, Nov 2: "why do I have to point this out"):** scheduled task "HYROX nightly coach check", Sunday to Friday 9:40 PM Toronto, follows `coach/NIGHTLY.md` (live, read at run time): reads today's logs, adjusts only the athlete's next sessions in `coach.json` (`plan`, `loads`, one tweak, top level `nightly` timestamp), commits only when something changed. The app's own rules (`suggestLoad`, `sledSuggest`, v136) already react right after each workout; the nightly check adds judgement from notes, pain, RPE and pacing.
 - The app loads `coach.json` with no-store: `loadCoach`, `coachFor`, tweaks on Today cards, and `loads` that pre-fill weight fields.
 - **`coach/PROMPT.md` is the live prompt, not a copy.** The scheduled task reads it from the repo at run time, so whatever is on `main` is what the coach follows on Saturday.
 - **Any change to log formats, session names or stored data must update `coach/PROMPT.md` in the same commit.** That covers the notes lines (`Loads`, `Runs`, `Sim week`, `Note:`), the stations string, session names such as `Rest day`, Benchmarks or `bw` rows, `PLAN` keys, and `coach.json` fields.
