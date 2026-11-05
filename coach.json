@@ -83,8 +83,8 @@
       "tweaks": [
         {
           "week": 6,
-          "day": "Mon",
-          "text": "Knee safe Monday: hack squat dropped and lunges swapped for step ups; stop any move that brings the knee to 4/10, and skip the leg work if it is still at 4 or more."
+          "day": "Tue",
+          "text": "Your 5 x 1 km is still open and you already did Friday's session, so run it Friday at the latest and cut it to 3 x 1 km with the arms: Saturday is 8 km plus all 8 stations, the first big test of the knee since 7/10, so protect it."
         },
         {
           "week": 6,
@@ -114,5 +114,6 @@
         }
       }
     }
-  }
+  },
+  "nightly": "2026-11-05T03:59:47Z"
 }
