@@ -66,6 +66,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 | `tests/stationvol.js` | Playwright check for the v131 station volume Fridays: weeks 7, 10, 14, 17, 22 replace the EMOM, timed block item, structure line, Today title and picker "Upper + station volume", Plan row, stations logged, Fred technique sets (not week 7). |
 | `tests/dash.js` | Playwright check for the v133 Progress dashboard: tiles and values from `roughProj`, bars, sheets open over the page with the right sections and put them back on close, closing on leaving Progress, 390 and 360. |
 | `tests/emfeel.js` | Playwright check for the v136 EMOM rest left in seconds (dock chips 0 to 30+ and Missed in two rows, per move steppers, Loads line `(25s)`) and the Monday sled ramp toward race weight (sim weight floor). |
+| `tests/simclock.js` | Playwright check for the v138 sim clock: once the sim starts the top bar and the big clock show the sim time (label Sim), the workout time moves to a small line, and both freeze at the sim total after the last lap. |
 | `tests/today85.js` | Playwright check for the v85 Today header: Fred lands on Studio light, race tile days (DST safe), days trained strip, Needs you list (weigh-in, missed day jumps to Plan), compact height, 390 and 360. |
 
 ### Data and sync
