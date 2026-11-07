@@ -10,7 +10,7 @@ let p=await open('2026-11-13T07:00:00','will');
 const d=await p.evaluate(()=>PLAN.map(w=>({n:w.week,v:/\nStation volume: /.test(w.fri),em:/EMOM/.test(w.fri)})));
 ok(d.filter(x=>x.v).map(x=>x.n).join()==='7,10,14,17,22'&&d.filter(x=>x.v).every(x=>!x.em),'station volume replaces the EMOM in weeks 7, 10, 14, 17, 22');
 const it=await p.evaluate(()=>sessionItems('Fri',PLAN[6].fri,PLAN[6]).map(i=>[i.title,i.keys[0],timedKind(i,'Fri',PLAN[6]),!!i.vol]));
-ok(JSON.stringify(it[it.length-1])==='["150 wall balls for time in sets of 25","wallball","st",true]','week 7 last item is the timed wall ball block '+JSON.stringify(it[it.length-1]));
+ok(JSON.stringify(it[it.length-2])==='["150 wall balls for time in sets of 25","wallball","st",true]'&&JSON.stringify(it[it.length-1])==='["Sandbag lunges 100 m with 20 kg in 4 pieces","lunge","st",true]','week 7 ends with the timed wall ball block, then the v139 lunge block '+JSON.stringify(it.slice(-2)));
 ok(await p.evaluate(()=>dayWhat('Fri',PLAN[6]).what)==='5 lifts + station volume','structure line: 5 lifts + station volume');
 const td=await p.locator('#today .td-session').innerText();ok(/Upper \+ station volume/.test(td)&&/150 wall balls/i.test(td)&&!/EMOM/.test(td.replace(/Mon: Legs lift \+ EMOM/,'')),'Today Friday week 7: title Upper + station volume, the block, no EMOM');
 await p.evaluate(()=>{currentWeek=7;showView('plan')});await p.clock.runFor(400);
