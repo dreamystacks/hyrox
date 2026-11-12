@@ -93,7 +93,7 @@
         {
           "week": 7,
           "day": "Fri",
-          "text": "Assisted pull-up at 50 lb of assistance (55 was RIR 2), and Friday is the 150 wall balls only, no lunge block this week."
+          "text": "You were sick on Wednesday: 2 sets per lift (pull ups at 50 lb of assistance) and 100 wall balls; if you still have a fever on Friday, log a rest day instead."
         }
       ],
       "loads": {
@@ -126,12 +126,12 @@
             "why": "Your 1 km reps averaged 6:38 with only 15 s spread; knee safe tired legs work instead of broad jumps and lunges."
           },
           "fri": {
-            "text": "Weighted pull ups 3 x 5, DB bench 3 x 8.\nThen arms block B: Face pulls 3x15, Bayesian cable curls 3x10-12, hammer curls 3x10-12\nStation volume: 150 wall balls for time in sets of 25.",
-            "why": "Sandbag lunges took 5:00 for 48 m today with a sore knee: the 100 m lunge block is out until the knee is checked."
+            "text": "Weighted pull ups 2 x 5, DB bench 2 x 8.\nThen arms block B: Face pulls 2x15, Bayesian cable curls 2x10-12, hammer curls 2x10-12\nStation volume: 100 wall balls for time in sets of 25.",
+            "why": "Nov 11 you were tired and sick (\"fatigué et grippé\"), skipped the arms and had knee 3/10: one set less on each lift and 100 wall balls instead of 150, still no lunge block."
           }
         }
       }
     }
   },
-  "nightly": "2026-11-05T03:59:47Z"
+  "nightly": "2026-11-12T02:42:50Z"
 }
