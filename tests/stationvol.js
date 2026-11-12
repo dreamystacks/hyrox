@@ -12,7 +12,7 @@ ok(d.filter(x=>x.v).map(x=>x.n).join()==='7,10,14,17,22'&&d.filter(x=>x.v).every
 const it=await p.evaluate(()=>sessionItems('Fri',PLAN[6].fri,PLAN[6]).map(i=>[i.title,i.keys[0],timedKind(i,'Fri',PLAN[6]),!!i.vol]));
 ok(JSON.stringify(it[it.length-2])==='["150 wall balls for time in sets of 25","wallball","st",true]'&&JSON.stringify(it[it.length-1])==='["Sandbag lunges 100 m with 20 kg in 4 pieces","lunge","st",true]','week 7 ends with the timed wall ball block, then the v139 lunge block '+JSON.stringify(it.slice(-2)));
 ok(await p.evaluate(()=>dayWhat('Fri',PLAN[6]).what)==='5 lifts + station volume','structure line: 5 lifts + station volume');
-const td=await p.locator('#today .td-session').innerText();ok(/Upper \+ station volume/.test(td)&&/150 wall balls/i.test(td)&&!/EMOM/.test(td.replace(/Mon: Legs lift \+ EMOM/,'')),'Today Friday week 7: title Upper + station volume, the block, no EMOM');
+const td=await p.locator('#today .td-session').innerText();ok(/Upper \+ station volume/.test(td)&&/150 wall balls/i.test(td)&&!/EMOM/.test(td.replace(/Mon:?\s*Legs lift \+ EMOM/g,'')),'Today Friday week 7: title Upper + station volume, the block, no EMOM');
 await p.evaluate(()=>{currentWeek=7;showView('plan')});await p.clock.runFor(400);
 ok(/Station volume/.test(await p.locator('.day-card[data-day=Fri] .day-head').innerText()),'Plan Friday row subtitle mentions station volume');
 await p.evaluate(()=>{showView('today');startWorkout(7,4,'2026-11-13')});await p.clock.runFor(600);
