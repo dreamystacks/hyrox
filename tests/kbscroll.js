@@ -22,7 +22,7 @@ ok(await p.evaluate(()=>[document.getElementById('workout').style.top,scrollY].j
 await p.evaluate(()=>{__vv.offsetTop=0;__vv.height=innerHeight;document.activeElement.blur();__vv.fire('resize')});await p.clock.runFor(1000);
 const after=await p.evaluate(()=>({lock:document.body.style.position,top:document.getElementById('workout').style.top,h:document.getElementById('workout').style.height}));
 ok(after.lock===''&&after.top===''&&after.h==='','blur unlocks the body and clears the fit');
-await p.evaluate(()=>closeWorkout());await p.clock.runFor(500);ok(Math.abs(await p.evaluate(()=>scrollY)-y0)<5,'closing the workout restores the Plan scroll '+y0);
+await p.evaluate(()=>closeWorkout());await p.clock.runFor(500);{const y1=await p.evaluate(()=>scrollY);ok(Math.abs(y1-y0)<5,'closing the workout restores the Plan scroll '+y0+' -> '+y1)}
 // the note box too
 await p.evaluate(()=>startWorkout(4,1,'2026-10-20'));await p.clock.runFor(600);
 await p.evaluate(()=>{const t=document.querySelector('#workout textarea');t.focus()});await p.clock.runFor(300);ok(await p.evaluate(()=>document.body.style.position)==='fixed','textarea focus locks too');

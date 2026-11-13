@@ -2381,10 +2381,12 @@ function q(){if(!raf)raf=requestAnimationFrame(fit)}
 // v109: Fred (Oct 20) still saw the whole workout screen scroll up when a box got focus. The window behind the overlay could still scroll, and the fit only ran a few times. While a field in #workout has focus: lock the body at its scroll (like emfLock), refit every 60 ms, keep window.scrollY at 0, and scroll #workout itself so the field sits above the keyboard.
 const B=document.body;function inW(){const ae=document.activeElement;return W.classList.contains('show')&&ae&&W.contains(ae)&&/^(INPUT|TEXTAREA)$/.test(ae.tagName)&&!(document.getElementById('emFocus')||{}).contains?.(ae)}
 function show(){const ae=document.activeElement;if(!inW())return;const r=ae.getBoundingClientRect(),st=W.querySelector('.wo-sticky'),topY=Math.round(vv.offsetTop)+(st?st.getBoundingClientRect().height:0)+8,botY=Math.round(vv.offsetTop+vv.height)-16;if(r.bottom>botY)W.scrollTop+=r.bottom-botY;else if(r.top<topY)W.scrollTop-=topY-r.top}
-function lock(){if(B.dataset.woLock||B.dataset.emfLock)return;const y=scrollY;B.dataset.woLock=String(y);B.style.position='fixed';B.style.top=-y+'px';B.style.left='0';B.style.right='0';B.style.width='100%';clearInterval(window._woIv);window._woIv=setInterval(()=>{if(!B.dataset.woLock){clearInterval(window._woIv);return}fit();if(window.scrollY)window.scrollTo(0,0)},60)}
+function lock(){if(B.dataset.woLock||B.dataset.emfLock)return;const y=scrollY;B.dataset.woLock=String(y);B.style.position='fixed';B.style.top=-y+'px';B.style.left='0';B.style.right='0';B.style.width='100%';if(window.scrollY)window.scrollTo(0,0)}
+// v141 (Fred, Nov 13: the page bounced for a couple of seconds when a notes box got focus): the 60 ms refit loop that forced scrollY back to 0 and three timed scrolls fought iOS while the keyboard slid up. Now nothing moves while the keyboard animates: the fit follows visualViewport events in one frame, and the field is scrolled into view once, after the viewport has been still for 180 ms.
+let sT=0;function settle(d){clearTimeout(sT);sT=setTimeout(()=>{fit();show()},d||180)}
 function unlock(){if(!B.dataset.woLock)return;const y=+B.dataset.woLock||0;delete B.dataset.woLock;clearInterval(window._woIv);B.style.position=B.style.top=B.style.left=B.style.right=B.style.width='';window.scrollTo(0,y);[0,200,500,900].forEach(d=>setTimeout(()=>{fit();if(window.realignBar)window.realignBar()},d))}
-vv.addEventListener('resize',()=>{q();setTimeout(show,60)});vv.addEventListener('scroll',q);
-document.addEventListener('focusin',()=>{if(inW())lock();q();[150,400,800].forEach(d=>setTimeout(q,d));[120,350,700].forEach(d=>setTimeout(show,d))});
+vv.addEventListener('resize',()=>{q();if(inW())settle()});vv.addEventListener('scroll',()=>{q();if(inW())settle()});
+document.addEventListener('focusin',()=>{if(!inW())return;lock();q();settle(450)});
 document.addEventListener('focusout',()=>{setTimeout(()=>{if(!inW())unlock()},80);[0,200,500].forEach(d=>setTimeout(q,d))});
 window.pinWorkout=q;window.woUnlock=unlock})();
 </script>
