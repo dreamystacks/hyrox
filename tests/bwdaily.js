@@ -1,0 +1,24 @@
+// v144 daily weigh-ins (Fred, Nov 14): the weigh-in box shows every day (Mon and Thu "due", other days optional), any day saves its own key (bw_<week>d<dow>), history and weekly average use every day. node tests/bwdaily.js
+const {chromium}=require('playwright'),path=require('path'),fs=require('fs');const URL='file://'+path.resolve(__dirname,'../index.html');
+let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const errs=[];
+const open=async(t,bw)=>{const p=await b.newPage({viewport:{width:390,height:844}});p.on('pageerror',e=>errs.push(e.message));
+ await p.addInitScript(bw=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_unit_v2',JSON.stringify('lb'));localStorage.setItem('hrx_fred_bench_v2',JSON.stringify(bw))},bw);
+ await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
+let p=await open('2026-11-17T07:00:00',{bw_8:{v:'157.0 lb'}});
+let td=await p.locator('#today').innerText();ok(/Weigh in today[\s\S]*Optional, morning, fasted/.test(td),'Tuesday: optional weigh-in row on Today');
+await p.fill('#bwToday','156.4');await p.click('#bwTodaySave');await p.clock.runFor(500);
+const bk=await p.evaluate(()=>JSON.parse(localStorage.getItem('hrx_fred_bench_v2')));ok(bk.bw_8d1&&/156\.4 lb/.test(bk.bw_8d1.v)&&/157\.0/.test(bk.bw_8.v),'saved as bw_8d1, Monday kept');
+ok(await p.evaluate(()=>{const id='bw_8d1',i=id.lastIndexOf('_');return id.slice(0,i)==='bw'&&id.slice(i+1)==='8d1'}),'sync row: test bw, week 8d1');
+ok(!/Weigh in today/.test(await p.locator('#today').innerText()),'row gone once logged');
+const L=await p.evaluate(()=>{const L=bwList('fred');return{n:L.length,last:L[L.length-1],avg:bwWeekAvg(L).pop().kg/LB}});
+ok(L.n===2&&L.last.dow===1&&Math.abs(L.avg-156.7)<.05,'list has Tuesday, week 8 average 156.7');
+await p.evaluate(()=>showView('bench'));await p.clock.runFor(800);await p.locator('[data-dash=bw]').click();await p.clock.runFor(600);
+const sh=await p.locator('#dashModal').innerText();ok(/Week 8 · Tue/.test(sh)&&/wk 8 Tue/i.test(sh),'history row Week 8 · Tue, input labelled wk 8 Tue');
+await p.close();
+p=await open('2026-11-16T07:00:00',{});td=await p.locator('#today').innerText();ok(/Weigh-in due[\s\S]*Monday check/.test(td),'Monday: weigh-in due');await p.close();
+p=await open('2026-11-22T07:00:00',{bw_8:{v:'157.0 lb'},bw_8b:{v:'156.0 lb'},bw_8d6:{v:'156.6 lb'}});ok(/Weigh in today/.test(await p.locator('#today').innerText())===false,'Sunday already logged: no row');
+ok(await p.evaluate(()=>bwList('fred').map(x=>x.dow).join())==='0,3,6','Mon, Thu, Sun read back in order');await p.close();
+ok(/8d1|d<dow>|other days/i.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt explains daily rows');
+ok(!errs.length,'no page errors '+errs.join(' | '));
+await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
