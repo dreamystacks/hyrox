@@ -1,0 +1,150 @@
+{
+  "generated": "2026-11-14T23:58:00Z",
+  "week": 7,
+  "team": "A sick week for both of you: Monday and Tuesday were lost. Fred came back with his best run pacing yet (four 1 km sim runs at 5:50 average, inside 1:25 goal pace), while Will's interval reps beat his target by 20 s per km and his knee eased to 2 to 3 out of 10.",
+  "athletes": {
+    "fred": {
+      "headline": "Sick week, then goal pace runs",
+      "summary": "You lost Monday and Tuesday to illness (rest days logged), then did hockey, Friday's 150 wall balls plus 100 m of lunges as one 15 min block, and the sim; knee 0 all week and average RPE 7.7 vs 8.0 last week. The sim was 32:16 vs 33:34 on the same stations in week 5, with runs 5:44, 5:55, 5:44, 5:55: you aimed for 5:50 and hit it, 23 s per km faster than week 5 with only 11 s of spread. Run km is 4 of the 9 km core target because Tuesday was missed; Sunday's 6 km zone 2 run is still to come, and week 8 is a normal week for you (week 7 was your deload).",
+      "strengths": [
+        "Pacing: 5:50 average over four 1 km sim runs, faster than the 5:53 goal pace, after stations, with an 11 s spread (target under 15 s).",
+        "RowErg 2:23 for half volume, 12 s faster than week 5 (2:35), and lunges held at 2:14 the day after 100 m of Friday lunges.",
+        "Friday bench back to 60 lb x 7, 8, 8 at RIR 1 (last week 8, 6, 7 at RIR 0) and Bayesian curls up to 50 lb x 10 on all 3 sets."
+      ],
+      "weaknesses": [
+        "Burpee broad jumps and sandbag lunges are still the biggest race losses: about 3:30 behind goal pace combined from the week 6 sim. Monday's new DB walking lunges have not been done yet because of the sick days.",
+        "Farmers carry 1:42 at 53 lb vs 1:18 at 60 lb in week 5: slower at a lighter weight, so grip was cooked after hockey and Friday's block.",
+        "Hammer curls skipped two Fridays running (0/3) and face pulls only 1 of 3 sets, the part of the biceps block you asked for. Friday's station volume was not timed separately, so there is no baseline for the next one in week 10."
+      ],
+      "tips": [
+        "Wall balls: you had to swap Saturday's wall balls for SkiErg because Friday's 150 left you burnt. That is the station endurance gap to close. On Friday's technique sets: feet just wider than shoulders, toes slightly out, ball high under the chin with elbows under it, about an arm's length from the wall, eyes on one spot on the target, sit straight down with heels flat. The daily ankle rocks are what keep those heels down.",
+        "Monday is your first DB walking lunge day: start at 25 lb per hand (12 kg) for 3 x 20 m and only go up a dumbbell once all 3 sets are RIR 2 or more. Next Saturday is stations 1 to 4 (SkiErg, sleds, burpee broad jumps): run the first 200 m after the burpees at a controlled jog, then build back to 5:50.",
+        "Body weight averaged 157.3 lb this week (156.0, 158.0, 158.0) vs 157.0 last week: on pace with the 157 lb start of your plan line, which is about 156.3 lb next week. The party weekends start now, so judge the weekly average: protein first, no late night food after drinking, back on plan Monday."
+      ],
+      "tweaks": [
+        {
+          "week": 8,
+          "day": "Tue",
+          "text": "5 x 1 km at about 5:45/km with 90 s rest; reps 2 and 4 follow the burpee broad jumps and lunges, so keep them within 10 s of the others."
+        },
+        {
+          "week": 8,
+          "day": "Mon",
+          "text": "Your EMOM rule stands: keep lunges at 44 lb until you log 10 s or more. The app will offer 250 lb on the sled (your sim weight); if round 1 leaves you 0 to 5 s, hold that weight for the whole EMOM and log the seconds."
+        }
+      ],
+      "loads": {
+        "trap": 235,
+        "crunch": 65,
+        "lunge": 44,
+        "carry": 53,
+        "lateral": 20,
+        "inclinecurl": 30,
+        "tricepoh": 90,
+        "dbbench": 60,
+        "facepull": 75,
+        "hammercurl": 30,
+        "wallball": 14
+      },
+      "unit": "lb",
+      "plan": {
+        "6": {
+          "tue": {
+            "text": "5 x 1 km @ 10k pace of about 5:45/km, 2 min rest\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Last Tuesday's 1 km reps averaged about 5:46/km but spread 55 s (6:10 to 5:15); same pace, every rep even."
+          },
+          "fri": {
+            "text": "Weighted pull ups 3 x 5, DB bench 3 x 8.\nThen arms block B: Face pulls 3x15, Bayesian cable curls 3x10-12, hammer curls 3x10-12\nWall ball technique 2 x 10.\nFinisher: EMOM 16 min: 1) SkiErg 200 m 2) 20 wall balls 3) row 200 m 4) rest",
+            "why": "You found the 150 m / 15 rep EMOM too easy (Oct 16, Oct 23 at 20+) and did 200 m, 20 wall balls, 200 m on Oct 30 at 10-20 s rest."
+          }
+        },
+        "7": {
+          "tue": {
+            "text": "5 x 1 km @ 10k pace of about 5:45/km, 90 s rest\nLegs: 10 burpee broad jumps before rep 2, 20 m sandbag lunges before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Your Nov 4 reps averaged 5:45/km but spread 24 s (5:36 to 6:00); same pace, and reps 2 and 4 now start on tired legs like the sim."
+          }
+        },
+        "8": {
+          "tue": {
+            "text": "5 x 1 km @ 10k pace of about 5:45/km, 90 s rest\nLegs: 10 burpee broad jumps before rep 2, 20 m sandbag lunges before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "You missed this Tuesday while sick; your last 1 km reps averaged 5:45 with 24 s spread, and Saturday's sim runs held 5:50, so same pace, every rep even."
+          }
+        }
+      }
+    },
+    "will": {
+      "headline": "Knee calming down, keep it that way",
+      "summary": "You were sick Monday and Tuesday (rest days logged), ran the intervals on Wednesday, played hockey, then rested Friday; no Saturday sim is logged yet. Run km is 5 of the 9 km core target and average RPE 5.0. The good news is the knee: 3/10 on the run and 2/10 at hockey, after 7 and 6 two weeks ago.",
+      "strengths": [
+        "Intervals while sick (\"fatigué et grippé\"): 5 x 1 km at a 6:19 average, 20 s per km faster than the 6:40 target.",
+        "Body weight steady: 184.6 lb average this week (186.0, 183.2) vs 185.0 last week and 185.4 in week 1.",
+        "Wall balls are still the best station on the team: 2:06 for 50 in the week 6 sim, about 1:20 per 100 faster than goal pace."
+      ],
+      "weaknesses": [
+        "Right knee: under the 4/10 stop line now, but sore for three weeks in a row (7, 6, 3, 3, 2). It has not been checked yet.",
+        "Missed training this week: Monday, Friday and so far the sim, and the arms block was skipped on Tuesday (0 of 11 sets).",
+        "From the week 6 sim, sandbag lunges (5:00 for 48 m) and burpee broad jumps (3:53 for 40 m) are where most of your 1:25 gap sits, and runs averaged about 7:05/km vs the 5:53 goal pace."
+      ],
+      "tips": [
+        "Get the knee looked at by a physio this week: it keeps coming back after lunges and sims, and you need those stations at full volume from week 9. Until then step ups replace lunges.",
+        "Week 8 is your deload and benchmark week: lifts at 80% (the app suggests them), EMOM 12 min, 4 x 1 km. Do the fresh tests you can do knee free (1 km run, SkiErg, row, wall balls, sled, farmers) and skip the lunge test if the knee is above 2.",
+        "On the 1 km reps, your last rep was 6:36 vs 6:04 on rep 2. Start rep 1 at 6:20, not faster, and make the last one the same."
+      ],
+      "tweaks": [
+        {
+          "week": 8,
+          "day": "Mon",
+          "text": "Deload Monday with step ups 10 per leg instead of lunges and no DB walking lunges; stop and log a rest day if the knee reaches 4/10."
+        },
+        {
+          "week": 8,
+          "day": "Sat",
+          "text": "If the knee is 4/10 or more on Saturday, do the sim with 20 step ups per leg instead of the sandbag lunges; never lunge through it."
+        }
+      ],
+      "loads": {
+        "crunch": 60,
+        "carry": 53,
+        "facepull": 50,
+        "hammercurl": 22.5,
+        "wallball": 14,
+        "lateral": 15,
+        "inclinecurl": 22.5,
+        "tricepoh": 60
+      },
+      "unit": "lb",
+      "plan": {
+        "6": {
+          "mon": {
+            "text": "Trap bar DL 3 x 5 heavy. Cable crunch 3x10. EMOM 16 min (4 rounds), moderate: 1) sled push 20 m (last round at race weight) 2) step ups 10/leg bodyweight 3) farmers carry 50 m, 2 x 28 kg (above race weight, grip) 4) rest",
+            "why": "Right knee 7/10 after Saturday's sim: hack squat out, step ups instead of lunges, until the knee is back under 4."
+          }
+        },
+        "7": {
+          "mon": {
+            "text": "Trap bar DL 3 x 5 heavy. Cable crunch 3x10. EMOM 16 min (4 rounds), moderate: 1) sled push 20 m (last round at race weight) 2) step ups 10/leg bodyweight 3) farmers carry 50 m, 2 x 28 kg (above race weight, grip) 4) rest",
+            "why": "Knee 6/10 on Thursday's run and 3/10 in the sim after 7/10 last Saturday: no walking lunges, step ups instead of lunges until it is checked."
+          },
+          "tue": {
+            "text": "5 x 1 km @ 10k pace of about 6:40/km, 90 s rest\nLegs: 10 burpees (no jump) before rep 2, 10 step ups per leg before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Your 1 km reps averaged 6:38 with only 15 s spread; knee safe tired legs work instead of broad jumps and lunges."
+          },
+          "fri": {
+            "text": "Weighted pull ups 2 x 5, DB bench 2 x 8.\nThen arms block B: Face pulls 2x15, Bayesian cable curls 2x10-12, hammer curls 2x10-12\nStation volume: 100 wall balls for time in sets of 25.",
+            "why": "Nov 11 you were tired and sick (\"fatigué et grippé\"), skipped the arms and had knee 3/10: one set less on each lift and 100 wall balls instead of 150, still no lunge block."
+          }
+        },
+        "8": {
+          "mon": {
+            "text": "Trap bar DL 3 x 5 @ 80%. Cable crunch 3x10. EMOM 12 min (3 rounds), normal loads: 1) sled push 20 m 2) step ups 10/leg bodyweight 3) farmers carry 50 m, 2 x 28 kg (above race weight, grip) 4) rest",
+            "why": "Knee 3/10 on Tuesday and 2/10 at hockey, down from 7 and 6: getting better but not gone, so step ups instead of lunges and no walking lunges for one more week."
+          },
+          "tue": {
+            "text": "4 x 1 km @ 10k pace of about 6:20/km, 2 min rest\nThen arms block A, 3 sets each: Lateral raises 3x12-15, incline DB curls 3x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Sick and tired, you still ran 6:19, 6:04, 6:17, 6:17, 6:36 (average 6:19 vs the 6:40 target); hold 6:20 and close the 32 s spread."
+          }
+        }
+      }
+    }
+  }
+}
