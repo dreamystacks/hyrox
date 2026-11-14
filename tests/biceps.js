@@ -8,7 +8,7 @@ const open=async(t,logs=[])=>{const p=await b.newPage({viewport:{width:390,heigh
  await p.addInitScript(([lg])=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_unit_v2',JSON.stringify('lb'));localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(lg))},[logs]);
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('2026-10-23T07:00:00');
-const pl=await p.evaluate(()=>PLAN.map(w=>[w.week,(w.tue.match(/incline DB curls ([\dx-]+)/)||[])[1],/Bayesian cable curls 3x10-12, hammer curls 3x10-12/.test(w.fri)]));
+const pl=await p.evaluate(()=>PLAN0.map(w=>[w.week,(w.tue.match(/incline DB curls ([\dx-]+)/)||[])[1],/Bayesian cable curls 3x10-12, hammer curls 3x10-12/.test(w.fri)]));
 ok(pl.filter(x=>x[0]<=3).every(x=>x[1]==='3x10'&&!x[2]),'weeks 1 to 3 unchanged (history)');
 ok(pl.filter(x=>x[0]>=5&&x[0]<=24).every(x=>x[1]===([8,12,16,20].includes(x[0])?'3x8-12':'4x8-12')),'Tuesday incline curls 4x8-12, 3x8-12 in deloads, weeks 5 to 24');
 ok(pl.filter(x=>x[0]>=4&&x[0]<=24).every(x=>x[2]),'Friday adds Bayesian and hammer curls, weeks 4 to 24');

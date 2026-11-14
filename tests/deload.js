@@ -12,7 +12,7 @@ const open=async(t,logs)=>{const p=await b.newPage({viewport:{width:390,height:8
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('2026-10-19T07:00:00',W3);
 // plan content
-const pl=await p.evaluate(()=>{const w=PLAN[3];return{mon:w.mon,tue:w.tue,fri:w.fri,sat:w.sat,km:w.runKm,all:[4,8,12,16,20].map(n=>PLAN[n-1]).every(x=>/3 x 5 @ 80%/.test(x.mon)&&/EMOM 12 min \(3 rounds\), normal loads/.test(x.mon)&&!/light/i.test(x.mon+x.fri)&&/^4 x /.test(x.tue)&&/3 sets each/.test(x.tue)&&!/2 sets/.test(x.tue+x.fri)&&/75%/.test(x.sat)&&/Weighted pull ups 3 x 5 @ 80%/.test(x.fri))}});
+const pl=await p.evaluate(()=>{const w=PLAN[3];return{mon:w.mon,tue:w.tue,fri:w.fri,sat:w.sat,km:w.runKm,all:[4,8,12,16,20].map(n=>PLAN0[n-1]).every(x=>/3 x 5 @ 80%/.test(x.mon)&&/EMOM 12 min \(3 rounds\), normal loads/.test(x.mon)&&!/light/i.test(x.mon+x.fri)&&/^4 x /.test(x.tue)&&/3 sets each/.test(x.tue)&&!/2 sets/.test(x.tue+x.fri)&&/75%/.test(x.sat)&&/Weighted pull ups 3 x 5 @ 80%/.test(x.fri))}});
 ok(pl.all,'every deload week: 3 sets @ 80%, EMOM 12 min at normal loads, 4 intervals, arms 3 sets, sim 75%');
 ok(/^4 x 600 m, 90 s rest/.test(pl.tue)&&pl.km===11.4,'week 4 Tuesday 4 x 600 m, run km 11.4 (v119)');
 // Today card
