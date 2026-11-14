@@ -12,7 +12,7 @@ let p=await open('2026-11-09T08:00:00');
 const d=await p.evaluate(()=>PLAN0.map(w=>({n:w.week,mon:w.mon,tue:w.tue,fri:w.fri})));
 const W=n=>d[n-1];
 ok(d.filter(x=>x.n>=7&&x.n<=21).every(x=>/DB walking lunges 1[25] kg per hand [23] x 20 m\./.test(x.mon)&&!/Hack squat|RDL/.test(x.mon)),'Mondays 7 to 21: DB walking lunges, no hack squat or RDL');
-ok(/Hack squat/.test(W(6).mon)&&/DB walking lunges 12 kg per hand 3 x 20 m/.test(W(7).mon)&&/12 kg per hand 2 x 20 m/.test(W(8).mon)&&/12 kg per hand 2 x 20 m/.test(W(11).mon)&&/15 kg per hand 3 x 20 m/.test(W(15).mon)&&/15 kg per hand 2 x 20 m/.test(W(20).mon),'loads and sets by week (deloads and Nashville week 2 sets)');
+ok(/Hack squat/.test(W(6).mon)&&/DB walking lunges 12 kg per hand 3 x 20 m/.test(W(7).mon)&&/12 kg per hand 2 x 20 m/.test(W(8).mon)&&/12 kg per hand 3 x 20 m/.test(W(11).mon)&&/15 kg per hand 3 x 20 m/.test(W(15).mon)&&/15 kg per hand 2 x 20 m/.test(W(20).mon),'loads and sets by week (deloads 2 sets; week 11 back to 3, v146 no Nashville race)');
 const TW=[7,9,10,14,17,21,22,23];ok(d.every(x=>/\nLegs: 10 burpee broad jumps before rep 2, 20 m sandbag lunges before rep 4\n/.test(x.tue)===TW.includes(x.n)),'Tuesday legs line only in weeks '+TW);
 const FW=[7,10,14,17,22];ok(d.every(x=>/\nStation volume: sandbag lunges 100 m with (20|25) kg in 4 pieces\.$/.test(x.fri)===FW.includes(x.n))&&/25 kg/.test(W(17).fri)&&/20 kg/.test(W(22).fri),'station volume Fridays add 100 m lunges (25 kg in week 17)');
 // parsing

@@ -15,7 +15,7 @@ Every Saturday the coach writes a bespoke next 7 days per athlete (Fred, Will an
 - Tuesday intervals: pace target from the last session's average rep pace; if the reps spread more than 15 s, keep the pace and work on evenness.
 - Saturday sims: keep the station set, order and plan % (dates and sim types are fixed), adjust run lap length or station volume only when the sim report shows a clear need (fade over 45 s: keep runs, cap run 1 pace).
 - Fatigue: session RPE 8.5+ two weeks running, knee 4+, or lifts down two weeks in a row: trim volume (fewer rounds or sets), never add.
-- Fixed: deload weeks (4, 8, 12, 16, 20), benchmark weeks, full sim weeks (9, 19, 21, 24), Nashville week 11, taper 25 to 27, Fred's stated rules (no extra Monday leg work, biceps block, Sunday zone 2).
+- Fixed: deload weeks (4, 8, 12, 16, 20), benchmark weeks, full sim weeks (9, 19, 21, 24), taper 25 to 27 (week 11 unlocked in v146: no Nashville race), Fred's stated rules (no extra Monday leg work, biceps block, Sunday zone 2).
 - Max 3 changed days per athlete per week, each with a one line `why` that cites the data.
 
 ## UI

@@ -8,17 +8,17 @@ const SAT='Half sim, 75%, all 8 stations in race order: 8 x (1 km run + station 
 const COACH={week:5,generated:'2026-10-31T23:00:00Z',athletes:{fred:{headline:'Runs are the lever',summary:'Good week.',tweaks:[],plan:{
  '6':{sat:{text:SAT,why:'Full 1 km runs: you and Will felt ready for more running, stations stay at half'},runKm:17},
  '9':{sat:{text:'Half sim, 50%',why:'should be ignored, full sim week'}},
- '11':{tue:{text:'Rest',why:'ignored, Nashville week'}},'7':{mon:{text:'Just vibes',why:'invalid, no EMOM'}}}},will:{headline:'x',tweaks:[]}}};
+ '25':{tue:{text:'Rest',why:'ignored, taper week'}},'7':{mon:{text:'Just vibes',why:'invalid, no EMOM'}}}},will:{headline:'x',tweaks:[]}}};
 (async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const errs=[];
 const open=async(t,who='fred')=>{const p=await b.newPage({viewport:{width:390,height:844}});p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>d.accept());
  await p.addInitScript(([w])=>{localStorage.setItem('hrx_active_athlete',w);localStorage.setItem('hrx_migrated','1');localStorage.setItem(`hrx_${w}_unit_v2`,JSON.stringify('lb'))},[who]);
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);
  await p.evaluate(c=>{window.COACH=c;refreshViews()},COACH);await p.clock.runFor(300);return p};
 let p=await open('2026-11-06T07:00:00');
-const d=await p.evaluate(()=>({sat:PLAN[5].sat,orig:PLAN0[5].sat,km:PLAN[5].runKm,mon:PLAN[5].mon===PLAN0[5].mon,w9:PLAN[8].sat===PLAN0[8].sat,w11:PLAN[10].tue===PLAN0[10].tue,w7:PLAN[6].mon===PLAN0[6].mon,runs:simSegments(PLAN[5]).filter(s=>s.kind==='run').map(s=>s.km),json:JSON.parse(JSON.stringify(PLAN))[5].sat}));
+const d=await p.evaluate(()=>({sat:PLAN[5].sat,orig:PLAN0[5].sat,km:PLAN[5].runKm,mon:PLAN[5].mon===PLAN0[5].mon,w9:PLAN[8].sat===PLAN0[8].sat,w11:PLAN[24].tue===PLAN0[24].tue,w7:PLAN[6].mon===PLAN0[6].mon,runs:simSegments(PLAN[5]).filter(s=>s.kind==='run').map(s=>s.km),json:JSON.parse(JSON.stringify(PLAN))[5].sat}));
 ok(d.sat.includes('full volume')&&d.orig.includes('half volume)'),'PLAN week 6 Saturday follows the coach, PLAN0 keeps the original');
 ok(d.km===17&&d.mon,'runKm override 17, untouched days stay original');
-ok(d.w7,'invalid override (Monday text without its EMOM) falls back to PLAN');ok(d.w9&&d.w11,'locked weeks ignored (full sim week 9 Saturday, Nashville week 11)');
+ok(d.w7,'invalid override (Monday text without its EMOM) falls back to PLAN');ok(d.w9&&d.w11,'locked weeks ignored (full sim week 9 Saturday, taper week 25)');
 ok(d.runs.length===8&&d.runs.every(k=>k===1),'sim segments: 8 runs of 1 km '+JSON.stringify(d.runs));
 ok(d.json.includes('full volume'),'JSON copy of PLAN carries the override');
 // Today Friday: Up next is Saturday with the badge

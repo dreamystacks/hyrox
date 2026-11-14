@@ -82,6 +82,6 @@ await p.close();
 check('no page errors',errs.join('|'),'');
 // Nashville tracker (v79): second goal line and flag before Dec 10, gone after
 p=await open({t:'2026-10-13T22:00:00',logs:[],bench:{}});
-check('Nashville line and flag on the hero before the race',await p.evaluate(()=>[!!document.querySelector('.hs-nsh'),/Nashville 1:40:00/.test(document.querySelector('.hs-nsh').textContent),!!document.querySelector('.hl-g2')]),[true,true,true]);
+check('no Nashville line or flag (v146 race cancelled)',await p.evaluate(()=>[!!document.querySelector('.hs-nsh'),!!document.querySelector('.hl-g2')]),[false,false]);
 await p.close();
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();
