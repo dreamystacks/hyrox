@@ -1,0 +1,30 @@
+// v143 body weight goal, Fred only: 1 lb a week from 157 lb (week 7 average) to 143 lb by week 21. Progress tile status, Body weight sheet goal block and dashed plan line; Will has none. node tests/bwgoal.js
+const {chromium}=require('playwright'),path=require('path'),fs=require('fs');const URL='file://'+path.resolve(__dirname,'../index.html');
+let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
+const BW={bw_6:{v:'157.6 lb'},bw_6b:{v:'156.4 lb'},bw_7:{v:'156.0 lb'},bw_7b:{v:'158.0 lb'}};
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const errs=[];
+const open=async(t,who,bw,vw=390)=>{const p=await b.newPage({viewport:{width:vw,height:844}});p.on('pageerror',e=>errs.push(e.message));
+ await p.addInitScript(([w,bw])=>{localStorage.setItem('hrx_active_athlete',w);localStorage.setItem('hrx_migrated','1');localStorage.setItem(`hrx_${w}_unit_v2`,JSON.stringify('lb'));localStorage.setItem(`hrx_${w}_bench_v2`,JSON.stringify(bw))},[who,bw]);
+ await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
+let p=await open('2026-11-14T14:00:00','fred',BW);
+const g=await p.evaluate(()=>{const g=bwGoal('fred');return{end:g.endWk,p7:g.planLb(7),p10:g.planLb(10),p25:g.planLb(25),s:bwGoalStat('fred')}});
+ok(g.end===21&&g.p7===157&&g.p10===154&&g.p25===143,'plan: 157 in week 7, 154 in week 10, 143 from week 21');
+ok(g.s.st==='on'&&g.s.txt==='On pace','week 7 average 157.0 = on pace');
+await p.evaluate(()=>showView('bench'));await p.clock.runFor(800);
+const tile=await p.locator('[data-dash=bw]').innerText();ok(/On pace · goal 143\.0/.test(tile),'Progress tile: On pace · goal 143.0 ('+tile.replace(/\n/g,' | ')+')');
+await p.locator('[data-dash=bw]').click();await p.clock.runFor(600);
+const sh=await p.locator('#dashModal').innerText();ok(/Goal 143\.0 lb by week 21 \(Feb 15\)/.test(sh)&&/Week 7 average 157\.0/.test(sh)&&/14\.0 lb to go/.test(sh),'sheet goal block: goal, average, plan, to go');
+ok(await p.locator('#dashModal .bw-goal').count()===1,'chart has the dashed plan line');
+ok(await p.evaluate(()=>document.documentElement.scrollWidth<=390),'no overflow at 390');
+await p.screenshot({path:(process.env.SHOTS||'/tmp')+'/bwgoal.png'});await p.close();
+// behind and too fast
+p=await open('2026-12-01T14:00:00','fred',{...BW,bw_10:{v:'157.0 lb'}});ok(await p.evaluate(()=>bwGoalStat('fred').st)==='behind','157 in week 10 (plan 154) = behind');await p.close();
+p=await open('2026-12-01T14:00:00','fred',{...BW,bw_10:{v:'151.0 lb'}});ok(await p.evaluate(()=>bwGoalStat('fred').txt)==='3.0 lb ahead, slow down','151 in week 10 = too fast');await p.close();
+p=await open('2026-11-14T14:00:00','fred',BW,360);await p.evaluate(()=>showView('bench'));await p.clock.runFor(800);await p.locator('[data-dash=bw]').click();await p.clock.runFor(600);
+ok(await p.evaluate(()=>document.documentElement.scrollWidth<=360),'no overflow at 360');await p.close();
+p=await open('2026-11-14T14:00:00','will',{bw_7:{v:'186.0 lb'},bw_7b:{v:'183.2 lb'}});
+ok(await p.evaluate(()=>bwGoal('will')===null),'Will has no goal');await p.evaluate(()=>showView('bench'));await p.clock.runFor(800);
+ok(!/goal/i.test(await p.locator('[data-dash=bw]').innerText()),'Will tile unchanged');await p.close();
+ok(/BW_GOAL|143 lb/.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt has the goal');
+ok(!errs.length,'no page errors '+errs.join(' | '));
+await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
