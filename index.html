@@ -1133,16 +1133,18 @@ function planAdjDays(wk,who){return PLAN_DAYS.filter(k=>planAdj(wk,k,who))}
 PLAN.forEach(w=>[...PLAN_DAYS,'runKm','focus','notes'].forEach(k=>{if(!(k in w))return;let base=w[k];Object.defineProperty(w,k,{enumerable:true,configurable:true,get(){const b=planAth(w.week,k);if(ADJ_BUSY)return b!=null?b:base;const a=k==='focus'||k==='notes'?null:planAdj(w.week,k);return a?a.text:b!=null?b:base},set(v){base=v}})}));
 // v124 per athlete base plan (Fred, Oct 31: wall ball weakness, technique sets are Fred only; v125: the above race weight ball and lunges moved into PLAN for everyone).
 // Built from PLAN0 by small text edits, read by the PLAN getters under any coach change. Not a coach change: no badge, the Settings toggle does not remove it.
-const PLAN_ATH={fred:{}};
+const PLAN_ATH={fred:{},will:{}};
 (()=>{const F=PLAN_ATH.fred;PLAN0.forEach(w=>{const n=w.week,o={};
  if(n>=6&&n<=21&&/\n(Finisher: EMOM|Station volume:)/.test(w.fri)&&!/\nStation volume: \d+ wall balls/.test(w.fri))o.fri=w.fri.replace(/\n(Finisher: EMOM|Station volume:)/,'\nWall ball technique 2 x 10.\n$1');
  // v142 (Fred, Nov 14): sick for Mon and Tue of week 7, so week 7 was his deload and week 8 becomes a normal week: week 7's Monday and Tuesday he missed, a normal Friday, and stations 1 to 4 on Saturday (week 7's sim had 5 to 8). No week 8 benchmarks for him (next ones in week 16).
  if(n===8){const w7=PLAN0[6];o.focus='Build (deload moved: week 7 was light after illness)';o.mon=w7.mon;o.tue=w7.tue;o.fri='Weighted pull ups 3 x 5, DB bench 3 x 8.\nThen arms block B: Face pulls 3x15, Bayesian cable curls 3x10-12, hammer curls 3x10-12\nWall ball technique 2 x 10.\nFinisher: EMOM 16 min: 1) SkiErg 200 m 2) 20 wall balls 3) row 200 m 4) rest';o.sat='Half sim, 75%: 4 x (1 km + stations 1 to 4 at half volume)';o.runKm=15;o.notes='Normal week for Fred: week 7 was his deload (sick Mon and Tue). Benchmarks next in week 16.'}
  // v146 (Fred, Nov 14): no HYROX Nashville (no ticket, not ready). He is in Nashville on business Thu Dec 10 to Mon Dec 14, so week 11: Mon and Tue as planned, Friday's session on Wednesday, no hockey, an easy run on Saturday in Nashville, Sunday optional.
  if(n===11){o.sat='Easy run 30 to 40 min in zone 2 in Nashville: 130 to 140 bpm, slow is fine (about 5 km)';o.sun='Optional: easy 20 to 30 min in zone 2 if you feel like it';o.runKm=11;o.notes='Nashville business trip Thu Dec 10 to Mon Dec 14: do Friday\'s session on Wednesday, no hockey, easy run Saturday, Sunday optional. Damage control on food and drinks.'}
- if(Object.keys(o).length)F[n]=o})})();
+ if(Object.keys(o).length)F[n]=o})
+ // v148 (Fred, Nov 16): Will skips the week 8 deload too (same reason: sick early in week 7, so week 7 was light). Same week 8 as Fred minus the wall ball technique sets.
+ const f8=F[8];PLAN_ATH.will[8]=Object.assign({},f8,{fri:f8.fri.replace('Wall ball technique 2 x 10.\n',''),notes:'Normal week for Will: week 7 was light (sick early in the week). Benchmarks next in week 16.'})})();
 // Deload weeks per athlete: Fred's week 8 is a normal week (v142)
-const DL_SKIP={fred:[8]};
+const DL_SKIP={fred:[8],will:[8]};
 function planAth(wk,k,who){who=who||planWho();const p=who&&PLAN_ATH[who]&&PLAN_ATH[who][wk];return p&&p[k]!=null?p[k]:null}
 const ADJ_DAY={Mon:'mon',Tue:'tue',Fri:'fri',Sat:'sat',Sun:'sun'};
 function adjBadgeHTML(w,day,cls){const k=ADJ_DAY[day],a=w&&k&&planAdj(w.week,k);if(!a)return'';return`<div class="adj-b${cls?' '+cls:''}"><b>Adjusted by coach</b>${a.why?`<span>${esc(a.why)}</span>`:''}${(planAth(w.week,k)??PLAN0[w.week-1][k])!==a.text?`<small>Original: ${esc(planAth(w.week,k)??PLAN0[w.week-1][k])}</small>`:''}</div>`}
