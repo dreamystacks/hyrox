@@ -13,7 +13,7 @@ check('bar: Plan, Today, Coach in a floating pill (v127); no History, Guides or 
 check('app opens on Today',await p.evaluate(()=>document.querySelector('.view.active').id),'today');
 check('Settings has no Guides row',await p.locator('#settingsModal #guidesBtn').count(),0);
 await p.click('.bottombar [data-view=bench]');await p.evaluate(()=>{const s=document.getElementById('dashStore');if(s)s.hidden=false});await p.clock.runFor(500);
-check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#dashStore > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,6)),['standWrap','projWrap','leverWrap','card','splitWrap','testWrap']);
+check('Coach view order: hero, levers, coach card (with next report), splits, tests',await p.evaluate(()=>[...document.querySelectorAll('#dashStore > *')].map(e=>e.id||e.className.split(' ')[0]).slice(0,6)),['standWrap','projWrap','leverWrap','card','askWrap','splitWrap']);
 check('Progress title in the top bar (v128 rename)',await p.locator('#pgTitle').innerText(),'Progress');
 check('no athlete toggle in the Coach or Plan header',await p.evaluate(()=>[document.querySelectorAll('#bench .seg').length,document.querySelectorAll('#plan .seg').length]),[0,0]);
 await p.evaluate(()=>{syncCfg=()=>({url:'x',key:'y'});setSegRender();settingsModal.classList.add('show')});

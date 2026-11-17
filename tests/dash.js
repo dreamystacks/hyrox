@@ -10,7 +10,7 @@ for(const w of [390,360]){const p=await b.newPage({viewport:{width:w,height:844}
  await p.addInitScript(([lg,bw])=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(lg));localStorage.setItem('hrx_fred_bench_v2',JSON.stringify(bw))},[LOGS,BW]);
  await p.clock.install({time:new Date('2026-11-03T10:00:00')});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=bench]');await p.clock.runFor(1500);
  const d=await p.evaluate(()=>{const P=roughProj('fred'),t=[...document.querySelectorAll('#dash [data-dash]')].map(x=>x.dataset.dash);return{t,big:document.getElementById('dashBig').textContent,want:fmtSec(Math.round(P.total)),bars:document.querySelectorAll('#dash .db-c i').length,hidden:document.getElementById('dashStore').hidden,store:['standWrap','projWrap','splitWrap','trendWrap','bwWrap','tlWrap'].every(id=>document.getElementById('dashStore').contains(document.getElementById(id))),bw:document.querySelector('[data-dash=bw] .dt-m').textContent.trim(),lever:document.querySelector('#dash .dt:nth-child(3) .dt-m').textContent}});
- ok(JSON.stringify(d.t)==='["proj","splits","splits","splits","bw","trends","trends","tests","coach"]',w+': tiles in order '+d.t);
+ ok(JSON.stringify(d.t)==='["proj","splits","splits","splits","bw","trends","trends","tests","coach","ask"]',w+': tiles in order '+d.t);
  ok(d.big===d.want,w+': hero shows the rough projection '+d.big);
  ok(d.bars===9,w+': 9 split bars');
  ok(d.hidden&&d.store,w+': old sections live in the hidden store');
