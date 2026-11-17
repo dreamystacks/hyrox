@@ -24,20 +24,20 @@
       "tweaks": [
         {
           "week": 8,
-          "day": "Tue",
-          "text": "5 x 1 km at about 5:45/km with 90 s rest; reps 2 and 4 follow the burpee broad jumps and lunges, so keep them within 10 s of the others."
+          "day": "Mon",
+          "text": "Your EMOM rule stands: keep lunges at 44 lb until you log 10 s or more. The app will offer 250 lb on the sled (your sim weight); if round 1 leaves you 0 to 5 s, hold that weight for the whole EMOM and log the seconds."
         },
         {
           "week": 8,
-          "day": "Mon",
-          "text": "Your EMOM rule stands: keep lunges at 44 lb until you log 10 s or more. The app will offer 250 lb on the sled (your sim weight); if round 1 leaves you 0 to 5 s, hold that weight for the whole EMOM and log the seconds."
+          "day": "Tue",
+          "text": "4 x 1 km at 5:45/km instead of 5 after Monday's RPE 9; keep reps 2 and 4 within 10 s of the others."
         }
       ],
       "loads": {
         "trap": 235,
         "crunch": 65,
         "lunge": 44,
-        "carry": 53,
+        "carry": 70,
         "lateral": 20,
         "inclinecurl": 30,
         "tricepoh": 90,
@@ -66,8 +66,15 @@
         },
         "8": {
           "tue": {
-            "text": "5 x 1 km @ 10k pace of about 5:45/km, 90 s rest\nLegs: 10 burpee broad jumps before rep 2, 20 m sandbag lunges before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
-            "why": "You missed this Tuesday while sick; your last 1 km reps averaged 5:45 with 24 s spread, and Saturday's sim runs held 5:50, so same pace, every rep even."
+            "text": "4 x 1 km @ 10k pace of about 5:45/km, 90 s rest\nLegs: 10 burpee broad jumps before rep 2, 20 m sandbag lunges before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Monday was RPE 9 with 5 s left on every EMOM move and burnt legs: one rep less, same 5:45 pace and the same tired legs reps."
+          },
+          "runKm": 14
+        },
+        "9": {
+          "mon": {
+            "text": "Back squat 3 x 5. DB walking lunges 12 kg per hand 3 x 20 m. Cable crunch 3x10. EMOM 16 min (4 rounds, shorter: full sim Saturday): 1) sled push 25 m race weight 2) RowErg 200 m 3) farmers 60 m, 2 x 32 kg (above race weight, grip) 4) sled pull 12.5 m race weight",
+            "why": "Nov 16: the DB walking lunges before the EMOM burnt your legs for the EMOM lunges, so you rowed instead. Lunges stay as the lift, RowErg in the EMOM."
           }
         }
       }
@@ -146,5 +153,6 @@
         }
       }
     }
-  }
+  },
+  "nightly": "2026-11-17T02:50:00Z"
 }
