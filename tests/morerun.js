@@ -16,7 +16,7 @@ ok(d.every(x=>Math.abs(x.km-x.sun-x.core)<0.01),'core target is runKm minus Sund
 const nx=await p.locator('#today').innerText();ok(/Zone 2 · 45 to 55 min/.test(nx),'Up next: Sunday week 16 Zone 2 45 to 55 min');
 await p.evaluate(()=>{currentWeek=17;showView('plan')});await p.clock.runFor(400);
 ok(/50 to 60 min/.test(await p.locator('.day-card[data-day=Sun]').evaluate(c=>c.textContent)),'Plan week 17 Sunday 50 to 60 min');
-ok(/5 x 2 km/.test(await p.locator('.day-card[data-day=Tue]').evaluate(c=>c.textContent)),'Plan week 17 Tuesday 5 x 2 km');
+ok(/5×2 km/.test(await p.locator('.day-card[data-day=Tue]').evaluate(c=>c.textContent)),'Plan week 17 Tuesday 5 x 2 km');
 ok(/\/\s*14\s*km/.test((await p.locator('#weekTrack').innerText()).replace(/\n/g,' ')),'Plan week 17 km target 14 without Sunday');
 ok(/More running \(v130/.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt explains it');
 ok(!errs.length,'no page errors '+errs.join(' | '));
