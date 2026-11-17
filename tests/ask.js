@@ -1,4 +1,4 @@
-// v149 Ask the coach: Progress tile, sheet with input, question saved as bench ask_q<stamp> and queued for sync (Benchmarks row test=ask), waiting line, coach.json answers shown, New answer state cleared on open, viewing another athlete read only, not counted as a fresh test, 390 and 360. node tests/ask.js
+// v149 Ask the coach (v150 edit and delete): Progress tile, sheet with input, question saved as bench ask_q<stamp> and queued for sync (Benchmarks row test=ask), waiting line, coach.json answers shown, New answer state cleared on open, viewing another athlete read only, not counted as a fresh test, 390 and 360. node tests/ask.js
 const {chromium}=require('playwright');
 (async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});let fail=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fail++};
 for(const W of [390,360]){const p=await b.newPage({viewport:{width:W,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
@@ -21,6 +21,17 @@ await p.click('.dt-ask');await p.clock.runFor(500);ok(/Coach\s*Yes: hold last we
 await p.evaluate(()=>closeDash());await p.clock.runFor(300);await p.evaluate(()=>renderBench());
 ok(!/New answer/.test(await p.locator('.dt-ask').innerText()),W+' new state cleared after reading');
 ok(/0\s*logged|Fresh tests/.test(await p.locator('#dash').innerText())&&!/1\s*logged/.test(await p.locator('#dash').innerText()),W+' question not counted as a fresh test');
+// v150: edit while waiting, delete any time
+await p.evaluate(()=>{athlete='will';viewAthlete=null;closeDash();COACH={week:7,athletes:{will:{headline:'x'}}};renderBench()});await p.clock.runFor(300);
+await p.click('.dt-ask');await p.clock.runFor(500);
+await p.click('#dashModal [data-askact=edit]');await p.fill('#dashModal .ask-ed','Should I go lighter on Monday and Tuesday?');await p.click('#dashModal [data-askact=save]');await p.clock.runFor(300);
+const ed=await p.evaluate(()=>{const b=JSON.parse(localStorage.getItem('hrx_will_bench_v2')),k=Object.keys(b).find(x=>x.startsWith('ask_q'));return{v:b[k].v,t:document.querySelector('#askWrap').innerText}});
+ok(ed.v==='Should I go lighter on Monday and Tuesday?'&&/Monday and Tuesday/.test(ed.t),W+' edit saved');
+await p.evaluate(()=>{COACH={week:7,athletes:{will:{headline:'x',answers:Object.fromEntries(Object.keys(JSON.parse(localStorage.getItem('hrx_will_bench_v2'))).filter(x=>x.startsWith('ask_q')).map(x=>[x.slice(4),{a:'Yes.'}]))}}};renderAsk('will',1)});
+ok(!(await p.locator('#dashModal [data-askact=edit]').count())&&(await p.locator('#dashModal [data-askact=del]').count())===1,W+' answered: Delete only, no Edit');
+p.once('dialog',d=>d.accept());await p.click('#dashModal [data-askact=del]');await p.clock.runFor(300);
+const dl=await p.evaluate(()=>{const b=JSON.parse(localStorage.getItem('hrx_will_bench_v2')),k=Object.keys(b).find(x=>x.startsWith('ask_q')),d=JSON.parse(localStorage.getItem('hrx_dirty_v1')||'{}');return{v:b[k].v,n:askList('will').length,dirty:!!d['bench|will|'+k],items:document.querySelectorAll('#askWrap .ask-it').length}});
+ok(dl.v===''&&dl.n===0&&dl.items===0&&dl.dirty,W+' delete empties the row and queues it');await p.evaluate(()=>closeDash());await p.clock.runFor(300);
 await p.evaluate(()=>{localStorage.setItem('hrx_sync_v1',JSON.stringify({url:'http://127.0.0.1:9/x',key:'k'}));athlete='fred';viewAthlete='will';renderBench()});await p.clock.runFor(300);await p.click('.dt-ask');await p.clock.runFor(500);
 const ro=await p.evaluate(()=>({n:document.querySelectorAll('#dashModal #askIn').length,t:document.querySelector('#dashModal').innerText.slice(0,200),v:viewing(),a:athlete}));ok(ro.n===0&&/Read only/.test(ro.t),W+' viewing Will from Fred: read only '+JSON.stringify(ro));
 ok(errs.length===0,W+' no errors '+errs.join(';'));await p.close()}
