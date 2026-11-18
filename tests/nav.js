@@ -9,7 +9,7 @@ const open=async(tz,when='2026-10-07T10:00:00')=>{const ctx=await b.newContext({
  await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1')});await p.clock.install({time:new Date(when)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('America/Toronto');
 const tabs=await p.evaluate(()=>[...document.querySelectorAll('.bottombar .tab')].map(t=>t.dataset.view+':'+(t.textContent.trim()||'(today)')));
-check('bar: Plan, Today, Coach in a floating pill (v127); no History, Guides or Progress',tabs,['plan:Plan','today:Today','bench:Progress']);
+check('bar (v156): Today, Plan, Progress, Health in an ink pill; no History or Guides tab',tabs,['today:Today','plan:Plan','bench:Progress','health:Health']);
 check('app opens on Today',await p.evaluate(()=>document.querySelector('.view.active').id),'today');
 check('Settings has no Guides row',await p.locator('#settingsModal #guidesBtn').count(),0);
 await p.click('.bottombar [data-view=bench]');await p.evaluate(()=>{const s=document.getElementById('dashStore');if(s)s.hidden=false});await p.clock.runFor(500);
