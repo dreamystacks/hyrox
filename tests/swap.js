@@ -30,7 +30,7 @@ check('Plan rows have no tick circles',await p.locator('#days .ex-st').count(),0
 check('today keeps a ring plus the lime fill because the sim was done today',await p.evaluate(()=>{const c=document.querySelector('.day-head.today .day-chip'),cs=getComputedStyle(c);return [cs.outlineStyle,c.classList.contains('st-trained')]}),['solid',true]);
 check('Start only on cards whose session is not logged this week (Fri missed; Mon, Tue, Thu, Sat done)',await p.evaluate(()=>[...document.querySelectorAll('.day-card')].filter(c=>c.querySelector('[data-start],[data-hockey]')).map(c=>c.dataset.day)),['Fri']);
 check('yellow chip still marks today (Sat)',await p.evaluate(()=>document.querySelector('.day-head.today').closest('.day-card').dataset.day),'Sat');
-await p.click('#nextWeek');await p.clock.runFor(400);check('next week: plan titles, no results',await p.locator('#days .day-res').count(),0);
+await p.evaluate(()=>document.getElementById('nextWeek').click());await p.clock.runFor(400);check('next week: plan titles, no results',await p.locator('#days .day-res').count(),0);
 await p.close();
 // Today, Monday evening: only Tue's session logged on Monday
 p=await open('2026-10-05T20:00:00',[SWAP_MON]);
