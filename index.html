@@ -1120,6 +1120,18 @@ html,body{overflow-anchor:none}
 .pe-h{margin:6px 0 10px;color:var(--text2);font-size:.92rem}.pe-err{color:var(--bad,#d4122e);font-size:.9rem;min-height:1.2em;margin:6px 0}.pe-acts{display:grid;gap:8px}
 #plan .day-card.dr.open .day-body,#peModal .sheet{background:var(--card)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 #peSave{text-transform:none;letter-spacing:0;font-size:1rem}
+
+/* v160 Today, Progress and Health in separate cards with small gaps, less grey text */
+#today.active,#health.active{display:flex;flex-direction:column;gap:6px}
+#today>*,#health>*{margin:0!important}
+#today .ts-wrap,#today .td-wk{background:var(--card);border-radius:20px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+#today .td-wk .wk3{margin-top:10px}
+#today .card{border-radius:20px}
+#today .td-greet{padding:6px 2px 8px}
+#today .td-date,#today .sb-sub,#today .kp-l,#today .wk3 em,#today .ts-cap,#today .td-sub,#today .ts-bars+div,#today .ts-wrap small{color:var(--text2)}
+#dash{margin:0}
+#bench.active{display:block}
+#health .card,#health .hl-card{border-radius:20px}
 </style></head><body data-pg="today">
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-studio-light-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
 <div id="workout" aria-live="polite"></div>

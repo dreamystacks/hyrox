@@ -15,7 +15,7 @@ ok(await p.locator('.ts-bars i').count()===18,vw+': one bar per day since Sep 28
 ok(await p.locator('.ts-bars i.now').count()===1,vw+': today is marked');
 const nd=await p.locator('.nd-card').innerText();ok(/Weigh-in due/.test(nd)&&/Legs lift \+ EMOM not logged/.test(nd),vw+': Needs you has weigh-in and the missed Monday: '+nd.replace(/\n/g,' | '));
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),vw+': no horizontal scroll');
-const th=await p.evaluate(()=>{const r=document.querySelector('.rt-tile').getBoundingClientRect(),q=document.querySelector('.ts-wrap').getBoundingClientRect();return Math.round(r.height+q.height)});ok(th<230,vw+': tile + strip stay compact ('+th+' px)');
+const th=await p.evaluate(()=>{const r=document.querySelector('.rt-tile').getBoundingClientRect(),q=document.querySelector('.ts-wrap').getBoundingClientRect();return Math.round(r.height+q.height)});ok(th<250,vw+': tile + strip stay compact ('+th+' px)');
 await p.screenshot({path:OUT+'/today85-'+vw+'.png'});
 await p.locator('[data-ndjump]').first().click();await p.clock.runFor(600);
 ok(await p.evaluate(()=>document.getElementById('plan').classList.contains('active')&&!!document.querySelector('#days .day-card.open[data-day=Mon]')),vw+': tapping the missed day opens Plan on that day');
