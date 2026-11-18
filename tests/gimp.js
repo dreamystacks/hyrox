@@ -28,6 +28,10 @@ await p.evaluate(()=>{$('simCmpModal').classList.remove('show');showView('plan')
 await p.evaluate(()=>{const b=document.createElement('button');b.dataset.gimp='8|5|2026-11-21';b.id='tb';document.body.appendChild(b)});await p.click('#tb');await p.clock.runFor(800);
 ok(await p.locator('#gimpModal.show').count()===0&&/No new Garmin workout/.test(await p.locator('#toast').innerText()),W+' imported activity not offered again');
 await p.evaluate(()=>window.__gmode='nokey');await p.click('#tb');await p.clock.runFor(800);ok(/No Garmin key for Fred/.test(await p.locator('#toast').innerText()),W+' no key message');
+// v153: after a log today the done card still offers the import, and so does the Plan day sheet
+ok(await p.locator('#today .td-done [data-gimp]').count()>=1,W+' done card keeps the Import from Garmin button');
+await p.evaluate(()=>showView('plan'));await p.clock.runFor(500);await p.locator('.day-card.dr[data-day=Fri]').first().click();await p.clock.runFor(500);
+ok(await p.locator('.day-card.open [data-gimp]').count()===1,W+' Plan day sheet has Import from Garmin');
 const ov=await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth);ok(!ov,W+' no overflow');
 ok(errs.length===0,W+' no errors '+errs.join(';'));await p.close()}
 await b.close();console.log(fail?'FAILED '+fail:'ALL PASS');process.exit(fail?1:0)})();
