@@ -22,7 +22,7 @@ ok(d.w7,'invalid override (Monday text without its EMOM) falls back to PLAN');ok
 ok(d.runs.length===8&&d.runs.every(k=>k===1),'sim segments: 8 runs of 1 km '+JSON.stringify(d.runs));
 ok(d.json.includes('full volume'),'JSON copy of PLAN carries the override');
 // Today Friday: Up next is Saturday with the badge
-const td=await p.locator('#today').innerText();ok(/Up next[\s\S]*Adjusted by coach/.test(td),'Up next shows Adjusted by coach for Saturday');
+const td=await p.locator('#today').innerText();ok(await p.locator('#today .td-next .adj-m').textContent()==='Coach','Up next shows the Coach tag for Saturday');
 // Plan row and sheet
 await p.evaluate(()=>{currentWeek=6;showView('plan')});await p.clock.runFor(400);
 ok(await p.locator('.day-card[data-day=Sat] .day-head .adj-m').count()===1&&await p.locator('.day-card[data-day=Mon] .day-head .adj-m').count()===0,'Plan Saturday row has the Coach pill, Monday does not');

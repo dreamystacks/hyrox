@@ -34,17 +34,17 @@ await p.evaluate(()=>document.getElementById('nextWeek').click());await p.clock.
 await p.close();
 // Today, Monday evening: only Tue's session logged on Monday
 p=await open('2026-10-05T20:00:00',[SWAP_MON]);
-check('Mon eve Done card names the session actually done',await p.locator('.td-done .td-label').innerText(),'DONE · TUE: RUN + ARMS');
-check("Mon eve Up next is Mon's displaced session",await next(p),"Up next · Mon's session | Legs lift + EMOM | Trap bar · Hack · EMOM 16");await p.close();
+check('Mon eve Done card names the session actually done',await p.locator('.td-done .td-label').innerText(),'Done · Tue: Run + Arms');
+check("Mon eve Up next is Mon's displaced session",await next(p),"Mon's session · Legs lift + EMOM | Trap bar · Hack · EMOM 16");await p.close();
 // Tuesday morning: default to the open Monday session, not the Tue session already done
 p=await open('2026-10-06T08:00:00',[SWAP_MON]);
 check('Tue am default session',await p.locator('.tp-name').innerText(),'Legs lift + EMOM');
-check('Tue am hint',await p.locator('.td-hint').innerText(),'Making up Mon. It is logged as today.');
-check('Tue am Up next skips done Tue and rest Wed',await next(p),'Up next · Thursday | Hockey | Hockey');await p.close();
+check('Tue am hint',await p.locator('.td-hint').innerText(),'Making up Mon');
+check('Tue am Up next skips done Tue and rest Wed',await next(p),'Thursday · Hockey');await p.close();
 // Tuesday evening: both logged
 p=await open('2026-10-06T20:00:00',[SWAP_MON,SWAP_TUE]);
-check('Tue eve Done card',await p.locator('.td-done .td-label').innerText(),'DONE · MON: LEGS LIFT + EMOM');
-check('Tue eve Up next',await next(p),'Up next · Thursday | Hockey | Hockey');await p.close();
+check('Tue eve Done card',await p.locator('.td-done .td-label').innerText(),'Done · Mon: Legs lift + EMOM');
+check('Tue eve Up next',await next(p),'Thursday · Hockey');await p.close();
 // Plain missed day (no swap): Today stays on Tuesday, no make up in Up next
 p=await open('2026-10-06T08:00:00',[]);
 check('plain miss default session',await p.locator('.tp-name').innerText(),'Run + Arms');
@@ -52,13 +52,13 @@ check('plain miss open chips (v140)',(await p.locator('.ts-open').innerText()).r
 check('v140 caption',await p.locator('.ts-cap').innerText(),'Today · Tuesday');
 await p.click('[data-pickday="0"]');await p.clock.runFor(300);
 check('v140 chip switches the session',await p.locator('.tp-name').innerText(),'Legs lift + EMOM');
-check('v140 making up hint',await p.locator('.td-hint').innerText(),'Making up Mon. It is logged as today.');
+check('v140 making up hint',await p.locator('.td-hint').innerText(),'Making up Mon');
 check('v140 back chip',(await p.locator('.ts-chip').first().innerText()).replace(/\s+/g,' ').trim(),'Today Run + Arms');
 await p.click('[data-pickday="1"]');await p.clock.runFor(300);
 check('v140 back to today',await p.locator('.tp-name').innerText(),'Run + Arms');
-check('plain miss Up next',await next(p),'Up next · Thursday | Hockey | Hockey');await p.close();
+check('plain miss Up next',await next(p),'Thursday · Hockey');await p.close();
 // Nothing swapped: Up next is tomorrow
 p=await open('2026-10-05T20:00:00',[L('m','2026-10-05','Mon: Lower + sled')]);
-check('normal Mon eve Up next',await next(p),'Up next · Tuesday | Run + Arms | 8 × 400 m · Arms');await p.close();
+check('normal Mon eve Up next',await next(p),'Tuesday · Run + Arms | 8 × 400 m · Arms');await p.close();
 check('no page errors',errs.join('|'),'');
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();

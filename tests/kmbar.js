@@ -7,7 +7,7 @@ const L=(id,date,week,session,distance)=>({id,athlete:'fred',date,week,session,d
 const open=async(t,logs,w=390)=>{const p=await b.newPage({viewport:{width:w,height:844}});p.on('pageerror',e=>errs.push(e.message));
  await p.addInitScript(([lg])=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(lg))},[logs]);
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
-const bar=p=>p.evaluate(sel=>{const el=document.querySelector(sel),fi=el.querySelector('.km-fill'),mk=el.querySelector('.km-mk'),r=el.getBoundingClientRect();return{n:el.closest('.wk3-i').querySelector('.wk3-n').textContent.replace(/\s+/g,''),fill:fi.style.width,cp:el.style.getPropertyValue('--cp'),mk:mk?Math.round((mk.getBoundingClientRect().left+1-r.left)/r.width*100):null,one:el.children.length,over:el.classList.contains('over'),bg:getComputedStyle(el).backgroundImage}},'#today .km2');
+const bar=p=>p.evaluate(sel=>{const el=document.querySelector(sel),fi=el.querySelector('.km-fill'),mk=el.querySelector('.km-mk'),r=el.getBoundingClientRect();return{n:el.closest('.wk3-i,.lr').querySelector('.wk3-n').textContent.replace(/\s+/g,''),fill:fi.style.width,cp:el.style.getPropertyValue('--cp'),mk:mk?Math.round((mk.getBoundingClientRect().left+1-r.left)/r.width*100):null,one:el.children.length,over:el.classList.contains('over'),bg:getComputedStyle(el).backgroundImage}},'#today .km2');
 ok(true,'');
 let p=await open('2026-10-24T12:00:00',[L('t','2026-10-21',4,'Tue: Intervals + arms A',2.4)]);
 const fx=await p.evaluate(()=>[sunKm(PLAN[3]),coreKm(PLAN[3]),sunKm(PLAN[24]),coreKm(PLAN[24]),sunKm(PLAN[10]),coreKm(PLAN[10]),sunKm(PLAN[0])]);
