@@ -21,8 +21,8 @@ check('saved on Thursday, Thu card now shows the hockey result with a lime chip'
 const mon=p.locator('.day-card[data-day=Mon]');await mon.locator('.day-head').click();
 check('Mon card: Start and a retro link',[await mon.locator('[data-start]').count(),await mon.locator('[data-retro]').innerText()],[1,'Log it as done']);
 await mon.locator('[data-retro]').click();await p.clock.runFor(300);
-check('retro link opens the log form on Monday with its session',await p.evaluate(()=>[document.querySelector('.view.active').id,date.value,session.value]),['log','2026-09-28','Mon: Lower + sled']);
-await p.click('#cancelEdit');await p.clock.runFor(300);
+check('retro link opens the finish sheet on Monday with its session',await p.evaluate(()=>[!$('finish').hidden,finPayload.date,finPayload.session]),[true,'2026-09-28','Mon: Lower + sled']);
+await p.click('#finBack');await p.clock.runFor(300);
 check('future days have no log buttons',await p.evaluate(()=>!!document.querySelector('.day-card[data-day=Sat] [data-retro],.day-card[data-day=Sat] [data-start]')),false);
 // swipe down closes the settings sheet
 await p.evaluate(()=>settingsModal.classList.add('show'));await p.clock.runFor(200);
