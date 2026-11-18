@@ -84,12 +84,12 @@ function gPullAthlete(who, key) {
     const hrv = gGet(who, tok, '/hrv-service/hrv/' + day);
     const sleepSec = gNum(sl, ['sleepTimeSeconds']);
     return [who, day,
-      gNum(s, ['restingHeartRate', 'restingHeartRateInBeatsPerMinute']),
+      gNum(s && s.heartRate, ['restingValue']) || gNum(s, ['restingHeartRate']),
       gNum(hrv, ['lastNightAvg']), gNum(hrv, ['weeklyAvg']), gStr(hrv, ['status']),
       gScore(sl), sleepSec ? Math.round(sleepSec / 360) / 10 : '',
       gMin(sl, 'deepSleepSeconds'), gMin(sl, 'remSleepSeconds'),
-      gNum(bat || s, ['bodyBatteryHighestValue', 'charged', 'highestBodyBattery']), gNum(bat || s, ['bodyBatteryLowestValue', 'drained', 'lowestBodyBattery']),
-      gNum(s, ['averageStressLevel', 'avgStressLevel', 'overallStressLevel']), gNum(s, ['totalSteps', 'steps']),
+      gNum(s && s.bodyBattery, ['maxValue']), gNum(s && s.bodyBattery, ['minValue']),
+      gNum(s && s.stress, ['avgLevel']), s && s.movement && s.movement.steps ? gNum(s.movement.steps, ['value']) : '',
       stamp];
   });
   gUpsert('Garmin_Daily', rows, r => r[0] + '|' + r[1]);
@@ -98,9 +98,7 @@ function gPullAthlete(who, key) {
   const arows = list.map(x => {
     const id = String(x.activityId || '');
     let laps = '';
-    const det = id ? gGet(who, tok, '/activity-service/activity/' + id) : null;
-    const L = gLaps(det);
-    if (L.length) laps = JSON.stringify(L);
+    if (id && (x.lapCount || 0) > 1) { try { const L = gFitLaps(who, tok, id); if (L.length) laps = JSON.stringify(L); } catch (e) { gRaw(who, 'fit', 'error', String(e && e.message || e)); } }
     const start = String(x.startTimeLocal || '');
     return [who, id, start.slice(0, 10), start, gStr(x, ['typeKey']), String(x.activityName || ''),
       x.duration ? Math.round(x.duration / 6) / 10 : '', x.distance ? Math.round(x.distance / 10) / 100 : '',
@@ -109,19 +107,48 @@ function gPullAthlete(who, key) {
   gUpsert('Garmin_Activities', arows, r => r[0] + '|' + r[1]);
 }
 
-// Laps: look for any array of lap or split objects with a duration in the activity details.
-function gLaps(det) {
-  let found = [];
-  (function walk(o, depth) {
-    if (!o || typeof o !== 'object' || depth > 6 || found.length) return;
-    Object.keys(o).forEach(k => {
-      const v = o[k];
-      if (!found.length && Array.isArray(v) && /lap|split/i.test(k) && v.length && typeof v[0] === 'object' && v[0] && ('duration' in v[0] || 'elapsedDuration' in v[0])) {
-        found = v.map(l => ({ s: Math.round(l.duration || l.elapsedDuration || 0), km: l.distance ? Math.round(l.distance) / 1000 : 0, hr: l.averageHR || l.averageHeartRate || 0 }));
-      } else if (v && typeof v === 'object') walk(v, depth + 1);
-    });
-  })(det, 0);
-  return found;
+// Laps: the activity details only hold summaries (checked on Fred's Nov 17 test), so read the lap messages from the original FIT file.
+function gFitLaps(who, tok, id) {
+  const r = UrlFetchApp.fetch(G_BASE + '/download-service/files/activity/' + id, { headers: { Accept: 'application/zip, application/octet-stream', Authorization: 'Bearer ' + tok }, muteHttpExceptions: true });
+  if (r.getResponseCode() >= 300) { gRaw(who, 'fit', 'error ' + r.getResponseCode(), r.getContentText().slice(0, 300)); return []; }
+  let blob = r.getBlob(), bytes = blob.getBytes();
+  if (bytes[0] === 0x50 && bytes[1] === 0x4B) { // ZIP
+    const files = Utilities.unzip(blob.setContentType('application/zip'));
+    const f = files.find(x => /\.fit$/i.test(x.getName())) || files[0];
+    bytes = f ? f.getBytes() : [];
+  }
+  return fitLaps(bytes);
+}
+
+// Minimal FIT reader: returns [{s: seconds, km, hr, max}] for each lap message (global 19). Tested against Garmin's FIT SDK sample files.
+function fitLaps(b) {
+  const u8 = i => b[i] & 255;
+  const hdr = u8(0), dataEnd = hdr + ((u8(4) | u8(5) << 8 | u8(6) << 16 | u8(7) << 24) >>> 0);
+  let p = hdr; const defs = {}, laps = [];
+  const rd = (off, size, le) => { let v = 0; if (le) { for (let i = size - 1; i >= 0; i--) v = v * 256 + u8(off + i); } else { for (let i = 0; i < size; i++) v = v * 256 + u8(off + i); } return v; };
+  function rdMsg(d, q) {
+    const o = {};
+    d.fields.forEach(f => { if (f.s <= 4) o[f.n] = rd(q, f.s, d.le); q += f.s; });
+    q += d.dev;
+    if (d.g === 19) {
+      const val = (n, bad) => (o[n] === undefined || o[n] === bad) ? 0 : o[n];
+      const t = val(7, 0xFFFFFFFF) || val(8, 0xFFFFFFFF), dist = val(9, 0xFFFFFFFF);
+      laps.push({ s: Math.round(t / 10) / 100, km: Math.round(dist / 100) / 1000, hr: val(15, 255), max: val(16, 255) });
+    }
+    return q;
+  }
+  while (p < dataEnd && p < b.length) {
+    const h = u8(p++);
+    if (h & 0x80) { const d = defs[(h >> 5) & 3]; if (!d) break; p = rdMsg(d, p); continue; }
+    const local = h & 15;
+    if (h & 0x40) {
+      const arch = u8(p + 1), gnum = rd(p + 2, 2, arch === 0), nf = u8(p + 4); p += 5;
+      const fields = []; for (let i = 0; i < nf; i++) { fields.push({ n: u8(p), s: u8(p + 1) }); p += 3; }
+      let dev = 0; if (h & 0x20) { const nd = u8(p++); for (let i = 0; i < nd; i++) { dev += u8(p + 1); p += 3; } }
+      defs[local] = { le: arch === 0, g: gnum, fields, dev };
+    } else { const d = defs[local]; if (!d) break; p = rdMsg(d, p); }
+  }
+  return laps;
 }
 
 // Generic lookups: Garmin nests these differently per endpoint, so search by field name.
