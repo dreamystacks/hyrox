@@ -200,3 +200,16 @@ function gRaw(who, endpoint, status, json) {
   const i = have.findIndex(r => r[0] === who && r[1] === endpoint);
   if (i >= 0) sh.getRange(i + 2, 1, 1, 5).setValues(vals); else sh.appendRow(vals[0]);
 }
+
+// v152: called by Code.gs doPost (action 'garmin') when the athlete taps Import from Garmin in the app.
+// Pulls fresh data for that athlete, then returns the last 3 days of activities (with laps) and today's daily row.
+function garminForApp(who) {
+  who = who.toLowerCase().replace(/[^a-z]/g, '');
+  const key = PropertiesService.getScriptProperties().getProperty('GARMIN_KEY_' + who);
+  if (!key) return { ok: false, error: 'no_garmin_key' };
+  try { gPullAthlete(who, key.trim()); } catch (err) { return { ok: false, error: 'garmin', detail: String(err && err.message || err).slice(0, 300) }; }
+  const ss = SpreadsheetApp.openById(SHEET_ID), since = gDay(new Date(Date.now() - 3 * 864e5));
+  const read = tab => { const sh = ss.getSheetByName(tab); if (!sh || sh.getLastRow() < 2) return []; const head = G_TABS[tab]; return sh.getRange(2, 1, sh.getLastRow() - 1, head.length).getDisplayValues().map(r => Object.fromEntries(head.map((h, i) => [h, r[i]]))).filter(r => r.athlete === who && r.date >= since); };
+  const acts = read('Garmin_Activities').map(r => ({ id: r.activity_id, date: r.date, start: r.start_local, type: r.type, name: r.name, min: +r.duration_min || 0, km: +r.distance_km || 0, hr: +r.avg_hr || 0, max: +r.max_hr || 0, cal: +r.calories || 0, laps: r.laps ? JSON.parse(r.laps) : [] })).sort((a, b) => b.start.localeCompare(a.start));
+  return { ok: true, activities: acts, daily: read('Garmin_Daily') };
+}

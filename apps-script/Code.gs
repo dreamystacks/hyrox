@@ -37,6 +37,8 @@ function doPost(e) {
   let body;
   try { body = JSON.parse(e.postData.contents); } catch (err) { return out({ ok: false, error: 'bad_json' }); }
   if (body.key !== SYNC_KEY) return out({ ok: false, error: 'bad_key' });
+  // v152: Import from Garmin button in the app pulls this athlete's Garmin data now (Garmin.gs) and returns recent activities.
+  if (body.action === 'garmin') return out(garminForApp(String(body.athlete || '')));
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
