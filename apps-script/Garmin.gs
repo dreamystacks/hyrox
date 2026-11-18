@@ -109,8 +109,14 @@ function gPullAthlete(who, key) {
 
 // Laps: the activity details only hold summaries (checked on Fred's Nov 17 test), so read the lap messages from the original FIT file.
 function gFitLaps(who, tok, id) {
-  const r = UrlFetchApp.fetch(G_BASE + '/download-service/files/activity/' + id, { headers: { Accept: 'application/zip, application/octet-stream', Authorization: 'Bearer ' + tok }, muteHttpExceptions: true });
-  if (r.getResponseCode() >= 300) { gRaw(who, 'fit', 'error ' + r.getResponseCode(), r.getContentText().slice(0, 300)); return []; }
+  // Garmin answered 406 to a shorter Accept list on Nov 17, so try the official client's exact header first, then looser ones.
+  let r = null;
+  for (const acc of ['application/zip, application/x-zip-compressed, application/octet-stream', '*/*', 'application/octet-stream', 'application/zip']) {
+    r = UrlFetchApp.fetch(G_BASE + '/download-service/files/activity/' + id, { headers: { Accept: acc, Authorization: 'Bearer ' + tok }, muteHttpExceptions: true });
+    if (r.getResponseCode() < 300) { gRaw(who, 'fit', 'ok (' + acc + ')', String(r.getBlob().getBytes().length) + ' bytes'); break; }
+    gRaw(who, 'fit', 'error ' + r.getResponseCode() + ' (' + acc + ')', r.getContentText().slice(0, 300));
+  }
+  if (!r || r.getResponseCode() >= 300) return [];
   let blob = r.getBlob(), bytes = blob.getBytes();
   if (bytes[0] === 0x50 && bytes[1] === 0x4B) { // ZIP
     const files = Utilities.unzip(blob.setContentType('application/zip'));
