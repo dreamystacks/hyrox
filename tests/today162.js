@@ -38,4 +38,7 @@ for(const vw of [390,360]){const p=await open(vw);
  const t=await p.locator('#today .td-list .lr').first().innerText();ok(/Legs lift \+ EMOM · Mon/.test(t)&&/To do/.test(t),'unlogged Monday is a To do row '+t.replace(/\n/g,' | '));
  await p.locator('[data-ndjump]').first().click();await p.clock.runFor(600);
  ok(await p.evaluate(()=>document.getElementById('plan').classList.contains('active')&&!!document.querySelector('#days .day-card.open[data-day=Mon]')),'tapping it opens Plan on that day');await p.close()}
+{const p=await open(390);const r=await p.evaluate(()=>{const it=sessionItems('Tue','4 x 1 km @ 10k pace of about 5:45/km, 90 s rest',PLAN[7])[0],x=exParts(it.title,it.detail||'');const card=document.querySelector('#today .td-session').getBoundingClientRect(),rows=[...document.querySelectorAll('#today .td-session .exercise .ex-st,#today .td-session .exercise .ibtn')].map(e=>e.getBoundingClientRect());return{name:x.name,chips:x.chips,inside:rows.every(q=>q.left>=card.left+8&&q.right<=card.right-8),g:(()=>{const g=document.querySelector('#today .td-gimp');return g?Math.round(g.getBoundingClientRect().width):0})(),cw:Math.round(card.width)}});
+ ok(!/of|about/i.test(r.name)&&r.chips.includes('5:45/km'),'coach text "of about 5:45/km" becomes a pace chip, not the name '+JSON.stringify(r.chips));
+ ok(r.inside,'tick circles and info buttons stay inside the card');await p.close()}
 await b.close();console.log(fails?fails+' failed':'all passed');process.exit(fails?1:0)})();
