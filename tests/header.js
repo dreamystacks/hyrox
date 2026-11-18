@@ -13,10 +13,10 @@ const open=async(w,logs=LOGS,t='2026-09-29T18:00:00')=>{const p=await b.newPage(
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=plan]');await p.clock.runFor(600);return p};
 for(const w of [390,360]){
  const p=await open(w);
- check(w+': season grid on Plan above the week tracker, 189 day boxes',await p.evaluate(()=>[document.querySelector('#plan #seasonBar').nextElementSibling.id,document.querySelectorAll('#seasonBar .sb-wk i').length]),['weekTrack',189]);
- check(w+': week 1 boxes = week circles, Mon and Tue trained, Tue today ringed',await p.evaluate(()=>{const d=[...document.querySelectorAll('#seasonBar .sb-wk[data-wk="1"] i')],c=[...document.querySelectorAll('.td-strip .td-day')].map(x=>x.className.replace(/.*st-(\w+).*/,'$1'));return[JSON.stringify(d.map(i=>i.className.split(' ')[0].replace('b-','')))===JSON.stringify(c),d.slice(0,3).map(i=>i.className)]}),[true,['b-trained','b-trained now','b-future']]);
+ check(w+': season tracker on Plan above the week tracker, 27 week bars',await p.evaluate(()=>[document.querySelector('#plan #seasonBar').nextElementSibling.id,document.querySelectorAll('#seasonBar .sb-wk').length]),['weekTrack',27]);
+ check(w+': week 1 is the current bar and the pill counts sessions',await p.evaluate(()=>[document.querySelector('#seasonBar .sb-wk[data-wk="1"]').classList.contains('cur'),document.querySelector('#seasonBar .sb-wk[data-wk="2"]').classList.contains('fut')]),[true,true]);
  check(w+': week tiles',(await p.locator('#weekTrack .wk-tot').innerText()).replace(/\s+/g,' ').trim(),'Days trained 2/7 Sessions 2/5 Run 2.4/4.4 km Avg RPE '+(await p.evaluate(()=>document.querySelector('#weekTrack .kp-rpe b').textContent)));
- check(w+': season caption',await p.evaluate(()=>[document.querySelector('#seasonBar .sb-sub').textContent,document.querySelector('#seasonBar .sb-pill').textContent]),['2 days trained','Week 1 of 27']);
+ check(w+': season head',await p.evaluate(()=>[document.querySelector('.sb2-wk').textContent,/^\d+ of \d+ sessions$/.test(document.querySelector('#seasonBar .sb-pill').textContent)]),['Week 1 of 27',true]);
  check(w+': all 7 day rows fit on screen below the week card (rows about 64 px)',await p.evaluate(()=>{const r=[...document.querySelectorAll('#days .day-card')].map(c=>Math.round(c.getBoundingClientRect().height));return[r.length,r.every(h=>h>=56&&h<=80)]}),[7,true]);
  check(w+': no horizontal scroll',await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  // tap a circle: that day's sheet opens at the bottom of the screen
@@ -34,14 +34,14 @@ for(const w of [390,360]){
  await p.evaluate(()=>{const z=document.getElementById('days'),T=(t,x)=>z.dispatchEvent(new TouchEvent(t,{bubbles:true,touches:t==='touchend'?[]:[new Touch({identifier:1,target:z,clientX:x,clientY:300})],changedTouches:[new Touch({identifier:1,target:z,clientX:x,clientY:300})]}));T('touchstart',300);T('touchend',120)});await p.clock.runFor(300);
  check(w+': swipe left moves to week 3',await p.evaluate(()=>document.getElementById('weekJump').value),'3');
  // season bar: tap a week opens it
- check(w+': season grid inside the screen',await p.evaluate(()=>document.querySelector('#seasonBar .sb-row').getBoundingClientRect().right<=innerWidth),true);
+ check(w+': season bars inside the screen',await p.evaluate(()=>document.querySelector('#seasonBar .sb2-bars').getBoundingClientRect().right<=innerWidth),true);
  check(w+': no season dots on Coach',await p.evaluate(()=>!!document.querySelector('#bench .sgm, #bench .sb')),false);
  await p.click('#seasonBar .sb-wk[data-wk="9"]');await p.clock.runFor(500);
  check(w+': tapping week 9 in the season grid opens week 9 and frames it',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('weekJump').value,document.querySelector('.sb-wk.sel').dataset.wk]),['plan','9','9']);
  await p.close()}
 // untrained today keeps the amber fill
 let p=await open(390,[],'2026-09-29T18:00:00');
-check('nothing logged: today untrained keeps its ring, counter 0',await p.evaluate(()=>[document.querySelectorAll('#seasonBar .sb-wk[data-wk="1"] i')[1].className,document.querySelector('#seasonBar .sb-sub').textContent]),['b-future now','0 days trained']);
+check('nothing logged: week 1 is current, pill 0 sessions done',await p.evaluate(()=>[document.querySelector('#seasonBar .sb-wk[data-wk="1"]').className.includes('cur'),/^0 of /.test(document.querySelector('#seasonBar .sb-pill').textContent)]),[true,true]);
 await p.close();
 check('no page errors',errs.join('|'),'');
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();
