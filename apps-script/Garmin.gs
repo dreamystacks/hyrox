@@ -25,6 +25,8 @@ const G_TABS = {
 };
 
 function garminSetup() {
+  // Google's granular consent lets a box be left unchecked; this reopens the permission window for Garmin when it is missing.
+  ScriptApp.requireScopes(ScriptApp.AuthMode.FULL, ['https://www.googleapis.com/auth/script.external_request', 'https://www.googleapis.com/auth/script.scriptapp']);
   const ss = SpreadsheetApp.openById(SHEET_ID);
   Object.keys(G_TABS).forEach(name => {
     let sh = ss.getSheetByName(name);
