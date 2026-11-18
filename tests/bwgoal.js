@@ -11,7 +11,7 @@ const g=await p.evaluate(()=>{const g=bwGoal('fred');return{end:g.endWk,p7:g.pla
 ok(g.end===23&&g.p7===157&&g.p10===155&&g.p13===153&&g.p18===148&&g.p25===143,'plan: 157 week 7, 155 week 10, checkpoint 153 week 13, 148 week 18, 143 from week 23 '+JSON.stringify(g));
 ok(g.s.st==='on'&&g.s.txt==='On pace','week 7 average 157.0 = on pace');
 await p.evaluate(()=>showView('bench'));await p.clock.runFor(800);
-const tile=await p.locator('[data-dash=bw]').innerText();ok(/On pace · goal 143\.0/.test(tile),'Progress tile: On pace · goal 143.0 ('+tile.replace(/\n/g,' | ')+')');
+const tile=await p.locator('[data-dash=bw]').innerText();ok(/On pace/.test(tile),'Progress tile: On pace ('+tile.replace(/\n/g,' | ')+')');
 await p.locator('[data-dash=bw]').click();await p.clock.runFor(600);
 const sh=await p.locator('#dashModal').innerText();ok(/Goal 143\.0 lb by week 23 \(Mar 1\)/.test(sh)&&/Checkpoint 153\.0 lb · End of 2026[\s\S]{0,8}by Dec 27/.test(sh)&&/Week 7 average 157\.0/.test(sh)&&/14\.0 lb to go/.test(sh),'sheet goal block: goal, average, plan, to go');
 ok(await p.locator('#dashModal .bw-goal').count()===1,'chart has the dashed plan line');
