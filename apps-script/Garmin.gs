@@ -179,16 +179,50 @@ function gFindDay(o, day) {
   return arr.find(x => x && String(x.calendarDate || x.date || '').slice(0, 10) === day) || null;
 }
 
+// v181: the date cell came back as a Date object, so String(Date) never matched the 'yyyy-MM-dd' key and every
+// sync appended a new row (Garmin_Daily had 9 rows for Nov 18). Keys are now normalised, rows are written as text,
+// and existing duplicates are removed (the row with the latest updated_at wins).
+function gCell(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, G_TZ, 'yyyy-MM-dd');
+  return v === undefined || v === null ? '' : String(v);
+}
+
 function gUpsert(tab, rows, keyOf) {
   if (!rows.length) return;
-  const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(tab), head = G_TABS[tab];
+  const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(tab), head = G_TABS[tab], ui = head.indexOf('updated_at');
+  gDedupe(sh, head, keyOf, ui);
   const n = sh.getLastRow(), have = n > 1 ? sh.getRange(2, 1, n - 1, head.length).getValues() : [];
-  const at = {}; have.forEach((r, i) => at[keyOf(r.map(String))] = i + 2);
+  const at = {}; have.forEach((r, i) => at[keyOf(r.map(gCell))] = i + 2);
   rows.forEach(r => {
-    const vals = [r.map(v => v === undefined || v === null ? '' : String(v))];
-    const row = at[keyOf(vals[0])];
-    if (row) sh.getRange(row, 1, 1, head.length).setValues(vals);
-    else { sh.appendRow(vals[0]); }
+    const vals = [r.map(gCell)];
+    const k = keyOf(vals[0]);
+    let row = at[k];
+    if (!row) { row = sh.getLastRow() + 1; at[k] = row; }
+    const rg = sh.getRange(row, 1, 1, head.length);
+    rg.setNumberFormat('@');
+    rg.setValues(vals);
+  });
+}
+
+function gDedupe(sh, head, keyOf, ui) {
+  const n = sh.getLastRow();
+  if (n < 3) return;
+  const have = sh.getRange(2, 1, n - 1, head.length).getValues().map(r => r.map(gCell));
+  const best = {}, drop = [];
+  have.forEach((r, i) => {
+    const k = keyOf(r), j = best[k];
+    if (j === undefined) { best[k] = i; return; }
+    if (String(r[ui]) >= String(have[j][ui])) { drop.push(j); best[k] = i; } else drop.push(i);
+  });
+  drop.sort((a, b) => b - a).forEach(i => sh.deleteRow(i + 2));
+}
+
+// Run once by hand from the editor to clean both tabs now.
+function garminDedupeNow() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  [['Garmin_Daily', r => r[0] + '|' + r[1]], ['Garmin_Activities', r => r[0] + '|' + r[1]]].forEach(([tab, keyOf]) => {
+    const sh = ss.getSheetByName(tab);
+    if (sh) gDedupe(sh, G_TABS[tab], keyOf, G_TABS[tab].indexOf('updated_at'));
   });
 }
 
