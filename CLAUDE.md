@@ -25,6 +25,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
 | `coach.json`, `coach-history/` | Written weekly by the AI coach scheduled task. Don't edit by hand. |
 | `coach/PROMPT.md` | Copy of the coach task prompt (the live one sits in the scheduled task). |
 | `apps-script/Garmin.gs` | Second file in the same Apps Script project (v151): pulls the Garmin Personal API twice a day into the Garmin_Daily, Garmin_Activities and Garmin_Raw tabs. The key lives only in Script Properties (`GARMIN_KEY_<athlete>`), never in the repo. No web app redeploy needed. |
+| `apps-script/Health.gs` | Third file in the same Apps Script project (v180): `healthIn` takes Apple Health data POSTed by an iOS Shortcut (`action:'health'`, routed in Code.gs doPost) and writes every field raw into `Health_Raw` (athlete, received_at, field, items, value). Stage 1 is a diagnostic for Will's Apple Watch; stage 2 parses into `Health_Daily`. Needs a web app redeploy (new version, same URL). |
 | `apps-script/Code.gs` | Google Apps Script backend (key redacted; the real key is in the deployed script only). |
 | `plan/HYROX_Brisbane_2027_Plan.xlsx` | Fred's source plan. Keep in sync with `PLAN`. |
 | `tests/smoke.js` | Playwright smoke test. |

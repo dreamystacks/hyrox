@@ -39,6 +39,8 @@ function doPost(e) {
   if (body.key !== SYNC_KEY) return out({ ok: false, error: 'bad_key' });
   // v152: Import from Garmin button in the app pulls this athlete's Garmin data now (Garmin.gs) and returns recent activities.
   if (body.action === 'garmin') return out(garminForApp(String(body.athlete || '')));
+  // v180: Apple Health data sent by an iOS Shortcut (Health.gs).
+  if (body.action === 'health') return out(healthIn(body));
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {
