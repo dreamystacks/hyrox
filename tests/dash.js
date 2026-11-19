@@ -13,7 +13,7 @@ for(const w of [390,360]){const p=await b.newPage({viewport:{width:w,height:844}
  ok(JSON.stringify(d.t)==='["proj","bw","trends","trends","splits","coach","ask","tests","trends"]',w+': E layout order: projection, 3 stats, splits, list '+d.t);
  ok(d.big===d.want,w+': hero shows the rough projection '+d.big);
  ok(await p.evaluate(()=>{const t=[...document.querySelectorAll('#dash .pg-st .dt b')].map(b=>Math.round(b.getBoundingClientRect().top));return t.length===3&&Math.max(...t)-Math.min(...t)<=1}),w+': the three stat values sit on one line');
- ok(d.bars===9,w+': 9 split bars');
+ ok(d.bars===await p.evaluate(()=>1+roughProj('fred').rows.filter(r=>!r.none).length),w+': one bar per measured split '+d.bars);
  ok(d.hidden&&d.store,w+': old sections live in the hidden store');
  ok(/^160\.1\s*lb$/.test(d.bw),w+': body weight tile '+d.bw);
  ok(d.lever==='Runs',w+': biggest lever is Runs');
