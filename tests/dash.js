@@ -12,6 +12,7 @@ for(const w of [390,360]){const p=await b.newPage({viewport:{width:w,height:844}
  const d=await p.evaluate(()=>{const P=roughProj('fred'),t=[...document.querySelectorAll('#dash [data-dash]')].map(x=>x.dataset.dash);return{t,big:document.getElementById('dashBig').textContent,want:fmtSec(Math.round(P.total)),bars:document.querySelectorAll('#dash .db-c i').length,hidden:document.getElementById('dashStore').hidden,store:['standWrap','projWrap','splitWrap','trendWrap','bwWrap','tlWrap'].every(id=>document.getElementById('dashStore').contains(document.getElementById(id))),bw:document.querySelector('[data-dash=bw] .dt-m').textContent.trim(),lever:(document.querySelector('#dash .pg-lev b')||{}).textContent}});
  ok(JSON.stringify(d.t)==='["proj","bw","trends","trends","splits","coach","ask","tests","trends"]',w+': E layout order: projection, 3 stats, splits, list '+d.t);
  ok(d.big===d.want,w+': hero shows the rough projection '+d.big);
+ ok(await p.evaluate(()=>{const t=[...document.querySelectorAll('#dash .pg-st .dt b')].map(b=>Math.round(b.getBoundingClientRect().top));return t.length===3&&Math.max(...t)-Math.min(...t)<=1}),w+': the three stat values sit on one line');
  ok(d.bars===9,w+': 9 split bars');
  ok(d.hidden&&d.store,w+': old sections live in the hidden store');
  ok(/^160\.1\s*lb$/.test(d.bw),w+': body weight tile '+d.bw);
