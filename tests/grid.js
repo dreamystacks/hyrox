@@ -19,7 +19,7 @@ ok(await p.locator('.week-nav').isHidden()&&await p.locator('.td-strip').count()
 const h=await p.evaluate(()=>({w:document.querySelector('.pv-w').textContent,ph:document.querySelector('.pv-ph').textContent,bg:getComputedStyle(document.getElementById('seasonBar')).backgroundColor}));
 ok(h.w==='Week 8 / 27'&&h.ph==='Base phase'&&/rgba\(0, 0, 0, 0\)|transparent/.test(h.bg),'header on the ground: Week 8 / 27, Base phase '+JSON.stringify(h));
 const sum=await p.evaluate(()=>{const S=seasonSum(seasonWeeks('fred'));return{S,t:document.querySelector('.pv-sum').textContent}});
-ok(sum.S.pl===35&&sum.S.dn===9&&sum.S.miss===26&&/26%/.test(sum.t)&&/9 of 35 done/.test(sum.t)&&/26 missed/.test(sum.t),'summary counts only ended weeks: 9 of 35, 26%, 26 missed '+sum.t);
+ok(sum.S.pl===35&&sum.S.dn===9&&sum.S.miss===26&&/26%/.test(sum.t)&&!/of 35/.test(sum.t)&&/26 missed/.test(sum.t),'summary counts only ended weeks: 9 of 35, 26%, 26 missed '+sum.t);
 const cols=await p.evaluate(()=>[...document.querySelectorAll('.pv-stk .sb-wk')].map(c=>[c.querySelectorAll('.sd').length,c.querySelectorAll('.sm').length,c.querySelectorAll('.su').length,c.className.replace('sb-wk ','')]));
 ok(cols.length===27,'27 week columns');
 ok(JSON.stringify(cols[5].slice(0,3))==='[5,0,0]'&&JSON.stringify(cols[6].slice(0,3))==='[4,1,0]','week 6 five done, week 7 four done and one missed '+JSON.stringify(cols.slice(5,7)));
