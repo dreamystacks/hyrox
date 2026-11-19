@@ -26,7 +26,7 @@ ok(!(await p.evaluate(()=>getLogs().some(x=>/ankle|mobility/i.test(x.session))))
 ok(!p.errs.length,'no page errors Friday '+JSON.stringify(p.errs));await p.close();
 // Wednesday: full 9
 p=await open('2026-09-30T09:00:00');
-ok(await p.locator('#mobCard.open').count()===1,'Wednesday opens by default');ok(await p.locator('#mobCard .mob-row').count()===9,'Wednesday shows 9 moves');
+ok(await p.locator('#mobCard.open').count()===0,'Wednesday starts collapsed too (v178)');await p.click('[data-mobtoggle]');ok(await p.locator('#mobCard .mob-row').count()===9,'Wednesday shows 9 moves');
 ok(await p.locator('#mobCard .mob-s').count()===3,'3 stars on Wednesday');
 ok((await p.locator('#mobCard .mob-ti small').textContent()).includes('12 min'),'Wednesday header says 12 min');
 await p.locator('#mobCard').scrollIntoViewIfNeeded();await p.screenshot({path:OUT+'/mob-wed.png',fullPage:true});
