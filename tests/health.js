@@ -17,7 +17,7 @@ ok(p.calls>=1&&p.last.action==='garmin'&&p.last.athlete==='fred','Today asks the
 const r=await p.evaluate(()=>readiness('fred'));
 ok(r&&r.score>=70&&r.verdict==='As planned'&&r.r.rhr===47&&r.r.sleepH===6.2,'duplicate rows for a date keep the latest update; good night gives As planned '+(r&&r.score));
 const t=await p.evaluate(()=>document.querySelector('#today .rdy').innerText.replace(/\s+/g,' '));
-ok(/Morning readiness/.test(t)&&/\b\d+ Readiness As planned/.test(t)&&/HRV 53 ms/.test(t)&&/Sleep 6:12/.test(t)&&/Resting HR 47 bpm/.test(t),'Today readiness shows score, verdict, HRV, sleep and resting HR '+t.slice(0,160));
+ok(!/Morning readiness/.test(t)&&/\b\d+ Readiness As planned/.test(t)&&/HRV 53 ms/.test(t)&&/Sleep 6:12/.test(t)&&/Resting HR 47 bpm/.test(t),'Today readiness shows score, verdict, HRV, sleep and resting HR '+t.slice(0,160));
 const n0=p.calls;await p.evaluate(()=>{renderToday();renderToday()});await p.clock.runFor(3000);ok(p.calls===n0,'no new Garmin call within 3 hours');
 await p.evaluate(()=>showView('health'));await p.clock.runFor(800);
 const h=await p.evaluate(()=>[...document.querySelectorAll('#health .hl-list .lr b')].map(b=>b.textContent));
@@ -27,6 +27,15 @@ await p.click('#hlRefresh');await p.clock.runFor(1500);ok(p.calls===n0+1,'Refres
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no overflow at 390');ok(!p.errs.length,'no page errors '+p.errs.join('|'));await p.close();
 p=await open(BAD);const rb=await p.evaluate(()=>readiness('fred'));ok(rb&&rb.lv==='bad'&&rb.verdict==='Recovery day'&&/zone 2 or mobility/.test(rb.text),'bad night gives Recovery day '+(rb&&rb.score));
 ok(/Recovery day/.test(await p.locator('#today .rdy').innerText()),'Today shows Recovery day');await p.close();
+{const p2=await open(BAD);await p2.evaluate(()=>store(k('pick'),{date:'2026-11-18',idx:1}));await p2.evaluate(()=>renderToday());await p2.clock.runFor(300);
+ const before=await p2.evaluate(()=>PLAN[7].tue.match(/(\d+)\s*x\s*1 km/)[1]);
+ ok(await p2.locator('#today [data-lighten]').count()===1,'low readiness offers Lighten today on the session card');
+ await p2.click('#today [data-lighten]');await p2.clock.runFor(500);
+ const after=await p2.evaluate(()=>[PLAN[7].tue.match(/(\d+)\s*x\s*1 km/)[1],JSON.parse(load(checkKey(),{})['lt-8']).tue,!!document.querySelector('#today [data-unlighten]'),Object.keys(load('hrx_dirty_v1',{})).some(x=>x.startsWith('state|fred'))]);
+ ok(+after[0]===+before-1&&after[1]>0&&after[2]&&after[3],'Lighten removes one interval rep, is stored as lt-8 and queued for sync, Undo shows '+before+' -> '+after[0]);
+ await p2.click('#today [data-unlighten]');await p2.clock.runFor(500);ok(await p2.evaluate(()=>PLAN[7].tue.match(/(\d+)\s*x\s*1 km/)[1])===before,'Undo restores the session');
+ ok(await p2.evaluate(()=>[lightenText('Trap bar DL 4 x 5 @ RPE 8. EMOM 16 min: ...','mon'),lightenText('Easy run 35 to 45 min in zone 2 (about 7 km)','sun'),lightenText('Half sim, 75%: 4 x (1 km + stations)','sat')].join(' | '))==='Trap bar DL 3 x 5 @ RPE 8. EMOM 12 min: ... | Easy run 25 to 35 min in zone 2 (about 5 km) | Half sim, 75%: 3 x (1 km + stations)','lighten rules for Monday, Sunday and Saturday');
+ ok(!p2.errs.length,'no page errors '+p2.errs.join('|'));await p2.close()}
 p=await open(GOOD,{nokey:true});ok(/No Garmin key/.test(await p.locator('#today .rdy').innerText()),'no key: Today says there is no Garmin key yet');
 const c1=p.calls;await p.evaluate(()=>{gdTried={};renderToday()});await p.clock.runFor(3000);ok(p.calls===c1,'no key: no retry for a day');await p.close();
 p=await open(GOOD,{nosync:true});ok(p.calls===0&&/Set up sync/.test(await p.locator('#today .rdy').innerText()),'no sync: no call and a set up sync note');await p.close();
