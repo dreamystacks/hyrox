@@ -13,4 +13,12 @@ const r=await p.evaluate(()=>{const L=getLogs().filter(x=>x.date==='2026-11-18'&
 ok(r.n===1&&!r.fin,'no second log and no finish sheet');
 ok(/Runs: 5:30 \/ 5:35 \/ 5:40 \/ 5:38/.test(r.notes)&&/Garmin: 777/.test(r.notes)&&/Rep HR: 160 \/ 166 \/ 168 \/ 171/.test(r.notes)&&/Loads \(lb\)/.test(r.notes),'the rep laps become the Runs line, Garmin and Rep HR lines are added, loads kept');
 ok(r.dist===4&&r.pace==='5:36','distance 4 km and pace 5:36 '+r.dist+' '+r.pace);
+// second case: the app already has reps and distance, the import asks which to keep
+await p.evaluate(()=>{const L=getLogs().find(x=>x.id==='t1');putLog(Object.assign({},L,{notes:'Workout 52:00\nRuns: 5:20 / 5:25 / 5:30 / 5:28\nLoads (lb): Lateral raises 20 (4/4)',distance:4.2,pace:'5:15'}));localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(getLogs().map(x=>x.id==='t1'?Object.assign({},x,{notes:x.notes.split('\nGarmin:')[0].replace(/\nRep HR.*|\nGarmin added.*|\nWatch reps.*/g,'')}):x)));renderToday()});await p.clock.runFor(400);
+await p.locator('#today [data-gimp]').first().click();await p.clock.runFor(800);await p.locator('#gimpModal .gi-row').first().click();await p.clock.runFor(600);
+const q=await p.evaluate(()=>[document.getElementById('pickModal').classList.contains('show'),[...document.querySelectorAll('#pickList .lr')].map(x=>x.innerText.replace(/\s+/g,' '))]);
+ok(q[0]&&/Keep the app 5:20/.test(q[1][0])&&/4.2 km/.test(q[1][0])&&/Use Garmin 5:30/.test(q[1][1]),'with app reps, the import asks Keep the app or Use Garmin and shows both '+JSON.stringify(q[1]));
+await p.locator('#pickList .lr',{hasText:'Use Garmin'}).click();await p.clock.runFor(500);
+const g=await p.evaluate(()=>{const x=getLogs().find(x=>x.id==='t1');return[x.notes,x.distance,x.pace]});
+ok(/^Runs: 5:30 \/ 5:35/m.test(g[0])&&/App reps: 5:20 \/ 5:25 \/ 5:30 \/ 5:28 · 4.2 km · 5:15\/km/.test(g[0])&&g[1]===4&&g[2]==='5:36','Use Garmin replaces the Runs line, distance and pace, and keeps the app reps for comparison');
 ok(!errs.length,'no page errors '+errs.join('|'));await b.close();console.log(fail?fail+' FAILED':'ALL OK');process.exit(fail?1:0)})();
