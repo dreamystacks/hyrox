@@ -1364,6 +1364,12 @@ html,body{overflow-anchor:none}
 .bottombar{padding:5px!important}
 .bottombar .tab,.bottombar .tab-main{height:47px!important;font-size:.61rem!important}.bottombar .tab svg{width:20px!important;height:20px!important}
 .tb-c{height:47px;font-size:.61rem}.tb-c svg{width:20px;height:20px}.tb-lens-in{padding:5px}
+/* v177 stat tiles: bare coloured icons next to the label, value under it, less empty space */
+.rc2 .rc-st{gap:4px;padding:10px 12px 11px}
+.rc2 .rc-st .rc-sl{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:650;color:var(--text)}
+.rc2 .rc-st .rc-i,.rc2 .rc-sh .rc-i{background:none!important;width:auto!important;height:auto!important;border-radius:0!important;color:var(--h)!important}
+.rc2 .rc-st .rc-i svg{width:18px!important;height:18px!important}.rc2 .rc-sh .rc-i svg{width:20px!important;height:20px!important}
+.rc2 .rc-sv2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.rc2 .rc-st b{font-size:28px}
 </style></head><body data-pg="today">
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-studio-light-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
 <div id="workout" aria-live="polite"></div>
@@ -1817,7 +1823,7 @@ function reportCard(x,o){o=o||{};const nt=String(x.notes||''),when=new Date(x.da
  if(/^Plan: edited by athlete/m.test(nt))tags.push(tagH('mu','Edited by you'));else if(/^Plan: coach adjusted/m.test(nt))tags.push(`<i class="tg rc-coach">Coach adjusted</i>`);if(/^Plan: lightened/m.test(nt))tags.push(tagH('amb','Lightened'));
  const sim=(nt.match(/Sim week \d+ · total ([\d:]+)/)||[])[1],rpeT=x.rpe?(+x.rpe>=9?['miss','Max']:+x.rpe>=8?['amb','Hard']:+x.rpe>=6?['ok','Solid']:['mu','Easy']):null;
  const st=[sim?['sim',sim,'Sim total']:null,x.duration?['time',x.duration+' min','Time']:null,x.rpe?['rpe',String(x.rpe),'Effort',rpeT]:null,x.distance?['km',numTxt(Math.round(x.distance*10)/10)+' km','Distance']:null,x.pace?['pace',x.pace,'Pace /km']:null].filter(Boolean).slice(0,4);
- const stH=st.length?`<div class="rc-stats n${st.length}">${st.map(([k,v,l,t])=>`<div class="rc-st">${rcI(k==='sim'?'flag':k,RC_HUE[k])}<b>${esc(v)}</b><span>${l}${t?' '+tagH(t[0],t[1]):''}</span></div>`).join('')}</div>`:'';
+ const stH=st.length?`<div class="rc-stats n${st.length}">${st.map(([k,v,l,t])=>`<div class="rc-st"><span class="rc-sl">${rcI(k==='sim'?'flag':k,RC_HUE[k])}${l}</span><span class="rc-sv2"><b>${esc(v)}</b>${t?tagH(t[0],t[1]):''}</span></div>`).join('')}</div>`:'';
  // runs
  const runs=((nt.match(/^Runs: (.*)$/m)||[])[1]||'').split(' / ').map(t=>t.trim()).filter(Boolean),bpm=runBpm(x),rs=runs.map(secOf);let runH='';
  if(runs.length){const mx=Math.max(...rs),mn=Math.min(...rs),best=rs.indexOf(mn),hs=bpm.filter(Boolean),avg=rs.reduce((a,b)=>a+b,0)/rs.length;
