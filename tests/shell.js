@@ -19,7 +19,7 @@ for(const [w,h] of [[390,844],[360,640]]){
  check(w+': bar is ink, active tab fills with the accent (mint default)',[bar.barBg==='rgb(28, 28, 31)',bar.actBg==='rgb(16, 176, 122)',bar.acc],[true,true,'#10b07a']);
  check(w+': bar floats above the bottom edge',bar.bottomGap>=10,true);
  await p.click('.bottombar [data-view=health]');await p.clock.runFor(400);
- check(w+': Health opens with title, weight tile and the Garmin note',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('pgTitle').textContent,!!document.getElementById('hlBw'),document.querySelector('.hl-soon-t').textContent]),['health','Health',true,'Recovery from your watch']);
+ check(w+': Health opens with title, weight tile and the Garmin note',await p.evaluate(()=>[document.querySelector('.view.active').id,document.getElementById('pgTitle').textContent,!!document.getElementById('hlBw'),document.querySelector('#health .hl-list .lr b').textContent]),['health','Health',true,'Recovery from your watch']);
  await p.click('#hlBw');await p.clock.runFor(500);
  check(w+': the weight tile opens the Body weight sheet over Health',await p.evaluate(()=>[document.getElementById('dashModal').classList.contains('show'),document.getElementById('dashTitle').textContent,document.querySelector('.view.active').id]),[true,'Body weight','health']);
  await p.evaluate(()=>closeDash());

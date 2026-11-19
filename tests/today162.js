@@ -14,7 +14,7 @@ for(const vw of [390,360]){const p=await open(vw);
  const g=await p.evaluate(()=>({t:document.querySelector('.tg-t').textContent,d:document.querySelector('#today .td-date').textContent,kids:[...document.querySelectorAll('#today>*')].map(e=>e.className.split(' ').slice(0,2).join(' '))}));
  ok(/Fred/.test(g.t)&&g.d==='Wednesday, Nov 18 · Week 8 · Base',vw+': greeting and one date line with week and phase '+g.d);
  ok(/^rdy/.test(g.kids[1])&&/td-bw/.test(g.kids[2])&&/td-session/.test(g.kids[3])&&g.kids.some(k=>/td-list/.test(k)),vw+': order greeting, readiness, weigh in, session, list '+g.kids.join(' > '));
- ok(/Arrives with your Garmin data/.test(await p.locator('.rdy').innerText()),vw+': readiness placeholder until watch data');
+ ok(/Arrives with your Garmin data|Set up sync/.test(await p.locator('.rdy').innerText()),vw+': readiness placeholder until watch data');
  ok(await p.locator('.rt-tile,.ts-wrap,.nd-card,.td-wk').count()===0,vw+': old race tile, season strip, Needs you and week block are gone');
  const c=await p.evaluate(()=>{const s=document.querySelector('#today .td-session');return{name:s.querySelector('.tp-name').textContent,tags:[...s.querySelectorAll('.ts-tags>*')].map(x=>x.textContent),chg:!!s.querySelector('.ts-chg[data-chg]'),start:!!s.querySelector('.start-btn'),edit:!!s.querySelector('[data-tpe]'),rest:!!s.querySelector('[data-restday]'),rows:s.querySelectorAll('.exercise').length}});
  ok(c.name==='Run + Arms'&&c.tags[0]==='Making up Tue'&&/\d+ min/.test(c.tags[1]||'')&&c.chg,vw+': making up Tuesday tag, duration tag, Change '+JSON.stringify(c.tags));
