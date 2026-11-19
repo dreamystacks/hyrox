@@ -34,7 +34,7 @@ await p.evaluate(()=>document.getElementById('nextWeek').click());await p.clock.
 await p.close();
 // Today, Monday evening: only Tue's session logged on Monday
 p=await open('2026-10-05T20:00:00',[SWAP_MON]);
-check('Mon eve Done card names the session actually done',await p.locator('.td-done .td-label').innerText(),'Done · Tue: Run + Arms');
+check('Mon eve Done card names the session actually done',await p.locator('.td-done .rc-name').innerText(),'Run + Arms');
 check("Mon eve Up next is Mon's displaced session",await next(p),"Mon's session · Legs lift + EMOM | Trap bar · Hack · EMOM 16");await p.close();
 // Tuesday morning: default to the open Monday session, not the Tue session already done
 p=await open('2026-10-06T08:00:00',[SWAP_MON]);
@@ -43,7 +43,7 @@ check('Tue am hint',await p.locator('.td-hint').innerText(),'Making up Mon');
 check('Tue am Up next skips done Tue and rest Wed',await next(p),'Thursday · Hockey');await p.close();
 // Tuesday evening: both logged
 p=await open('2026-10-06T20:00:00',[SWAP_MON,SWAP_TUE]);
-check('Tue eve Done card',await p.locator('.td-done .td-label').innerText(),'Done · Mon: Legs lift + EMOM');
+check('Tue eve Done card',await p.locator('.td-done .rc-name').innerText(),'Legs lift + EMOM');
 check('Tue eve Up next',await next(p),'Thursday · Hockey');await p.close();
 // Plain missed day (no swap): Today stays on Tuesday, no make up in Up next
 p=await open('2026-10-06T08:00:00',[]);

@@ -13,9 +13,9 @@ const RAW=/Laps:|Rep HR:|Watch reps:|App reps:|Garmin added|Garmin: \d/;
 let p=await open([APP,DUP],[]);
 let r=await p.evaluate(()=>({n:getLogs().filter(x=>x.date==='2026-11-18').length,dup:allLogs('fred').find(x=>x.id==='1795053656886').deleted,dirty:JSON.stringify(load('hrx_dirty_v1',{})).includes('1795053656886')||window._posts.some(b=>b.includes('1795053656886')&&b.includes('"deleted":true'))}));
 ok(r.n===1&&r.dup===true&&r.dirty,'the duplicate Nov 18 Garmin log is tombstoned and queued for sync '+JSON.stringify(r));
-r=await p.evaluate(()=>{const c=document.querySelector('#today .td-done');return{t:c.textContent,chips:[...c.querySelectorAll('.td-runs .rc')].map(e=>e.textContent),notes:[...c.querySelectorAll('.td-dnotes p')].map(e=>e.textContent)}});
+r=await p.evaluate(()=>{const c=document.querySelector('#today .td-done');return{t:c.textContent,chips:[...c.querySelectorAll('.rc-run')].map(e=>e.querySelector('.rc-tm').textContent+(e.querySelector('.rc-bpm').textContent?' '+e.querySelector('.rc-bpm').textContent.replace('♥','').trim():'')),notes:[...c.querySelectorAll('.td-dnotes p')].map(e=>e.textContent)}});
 ok(!/Laps:|Rep HR:|Watch reps:|Garmin added/.test(r.t),'Today done card hides Laps, Rep HR, Watch reps and the Garmin added line');
-ok(JSON.stringify(r.chips)==='["5:31","5:39","5:44","5:35"]','4 app reps vs 3 watch reps, all within 10%: no bpm is guessed '+JSON.stringify(r.chips));
+ok(JSON.stringify(r.chips)==='["5:31 156","5:39 169","5:44 167","5:35 167"]','v175: app reps put on the watch timeline (rep 1 anchored on the 5:26 lap, 90 s rest): one bpm per rep '+JSON.stringify(r.chips));
 ok(r.notes.some(t=>/Keep same weight/.test(t)),'the athlete note still shows');
 ok(await p.evaluate(()=>/Laps:|Rep HR:|Watch reps:/.test(allLogs('fred').find(x=>x.id==='1795053352438').notes)),'the raw lines stay in the stored notes for the coach');
 await p.click('.bottombar [data-view=plan]');await p.clock.runFor(500);
@@ -39,6 +39,18 @@ ok(JSON.stringify(r.uniq)==='[150,null]','different counts: a single clear match
 ok(JSON.stringify(r.amb)==='[null,null]','different counts and two candidates: none');
 ok(JSON.stringify(r.watch)==='[156,169,167]','watch times kept: one bpm per rep');
 ok(JSON.stringify(r.off)==='[null,null]'&&JSON.stringify(r.none)==='[null,null]','counts that disagree or no Rep HR: none');
+r=await p.evaluate(()=>{const L='Laps: 1:00 (110) / 5:00 (150) / 1:30 (140) / 5:10 (160) / 2:00 (130)';return{rest:runBpm({date:'2026-11-18',session:'Tue: Run + arms A',notes:'Runs: 5:00 / 5:10\n'+L}),starts:runBpm({date:'2026-11-18',session:'Tue: Run + arms A',notes:'Runs: 5:00 / 5:10\nRep starts: 0:00 / 6:30\n'+L}),gap:runBpm({date:'2026-11-18',session:'Tue: Run + arms A',notes:'Runs: 5:00 / 5:10\nRep starts: 0:00 / 12:00\n'+L}),noanchor:runBpm({date:'2026-11-18',session:'Tue: Run + arms A',notes:'Runs: 3:00 / 3:10\n'+L})}});
+ok(JSON.stringify(r.rest)==='[150,160]','time alignment with the planned 90 s rest '+JSON.stringify(r.rest));
+ok(JSON.stringify(r.starts)==='[150,160]','time alignment with the logged Rep starts line');
+ok(JSON.stringify(r.gap)==='[150,null]','a rep outside the watch recording gets none '+JSON.stringify(r.gap));
+ok(JSON.stringify(r.noanchor)==='[null,null]','no watch lap within 10% of rep 1: none');
+await p.evaluate(()=>startWorkout(8,1,'2026-11-18'));await p.clock.runFor(600);
+await p.click('.dk-b');await p.clock.runFor(331000);await p.click('.dk-b');await p.clock.runFor(1000);
+r=await p.evaluate(()=>{const y=woState();return{rst:JSON.stringify(y.rst||{}),times:JSON.stringify(y.times||{})}});
+await p.evaluate(()=>{const y=woState(),k=Object.keys(y.times)[0];y.times[k]=[331000,339000];y.rst[k]=[y.rst[k][0],y.rst[k][0]+421000];y.rep=null;woSave(y)});
+await p.evaluate(()=>finishWorkout());await p.clock.runFor(300);r=await p.evaluate(()=>finPayload.notes);
+ok(/Rep starts: 0:00 \/ 7:01/.test(r)&&/Runs: 5:31 \/ 5:39/.test(r),'finishing an interval workout writes the Rep starts line '+(r.match(/Rep starts: [^\n]*/)||[''])[0]);
+await p.evaluate(()=>closeFinish());
 // 3. finish sheet chips
 await p.evaluate(()=>openFinish({date:'2026-11-18',session:'Tue: Run + arms A',duration:29,notes:'Workout 28:58 · imported from Garmin\nRuns: 5:26 / 5:48 / 5:40\nRep HR: 156 / 169 / 167'}));
 r=await p.evaluate(()=>[...document.querySelectorAll('#finRuns .rc')].map(e=>e.textContent));
@@ -61,8 +73,8 @@ r=await p.evaluate(()=>({n:getLogs().filter(x=>x.date==='2026-11-18').length,fin
 ok(r.n===1&&!r.fin&&!r.pick,'a stale pick of the same activity does nothing (idempotent) '+JSON.stringify(r));
 await p.locator('#today [data-gimp]').first().click();await p.clock.runFor(800);
 ok(await p.evaluate(()=>!$('gimpModal').classList.contains('show')&&getLogs().filter(x=>x.date==='2026-11-18').length===1),'a second Import lists nothing new');
-r=await p.evaluate(()=>[...document.querySelectorAll('#today .td-done .td-runs .rc')].map(e=>e.textContent).join('|'));
-ok(r==='5:31|5:39|5:44|5:35','done card after the merge: app reps, no guessed bpm');
+r=await p.evaluate(()=>[...document.querySelectorAll('#today .td-done .rc-run')].map(e=>e.querySelector('.rc-tm').textContent+(e.querySelector('.rc-bpm').textContent?' '+e.querySelector('.rc-bpm').textContent.replace('♥','').trim():'')).join('|'));
+ok(r==='5:31 156|5:39 169|5:44 167|5:35','done card after the merge: bpm by time, none for rep 4, which the watch did not cover '+r);
 await p.close();
 // 5. a different activity on a day whose session is already logged with another Garmin activity still attaches, never a new log
 const APP2=Object.assign({},APP0,{notes:APP0.notes+'\nGarmin: 111 · Strength'});
@@ -71,8 +83,8 @@ await p.locator('#today [data-gimp]').first().click();await p.clock.runFor(800);
 if(await p.evaluate(()=>$('pickModal').classList.contains('show'))){await p.click('#pickList [data-pk="1"]');await p.clock.runFor(400)}
 r=await p.evaluate(()=>{const L=getLogs().filter(x=>x.date==='2026-11-18');return{n:L.length,both:/Garmin: 111/.test(L[0].notes)&&/Garmin: 222/.test(L[0].notes),runs:(L[0].notes.match(/^Runs: (.*)$/m)||[])[1],fin:!$('finish').hidden}});
 ok(r.n===1&&r.both&&!r.fin,'session already carries another Garmin activity: the new one attaches, no second log '+JSON.stringify(r));
-r=await p.evaluate(()=>[...document.querySelectorAll('#today .td-done .td-runs .rc')].map(e=>e.textContent).join('|'));
-ok(r==='5:26 · 156 bpm|5:48 · 169 bpm|5:40 · 167 bpm','Use Garmin: watch reps with one bpm each '+r);
+r=await p.evaluate(()=>[...document.querySelectorAll('#today .td-done .rc-run')].map(e=>e.querySelector('.rc-tm').textContent+' '+e.querySelector('.rc-bpm').textContent.replace('♥','').trim()).join('|'));
+ok(r==='5:26 156|5:48 169|5:40 167','Use Garmin: watch reps with one bpm each '+r);
 // 6. finish sheet race: if the session got logged while the sheet was open, Save adds nothing
 await p.evaluate(()=>openFinish({gid:'333',date:'2026-11-18',session:'Tue: Run + arms A',duration:29,rpe:8,notes:'Runs: 5:26'}));await p.click('#finSave');await p.clock.runFor(300);
 ok(await p.evaluate(()=>getLogs().filter(x=>x.date==='2026-11-18').length===1),'finish sheet from an import never saves a second log for a logged session');
