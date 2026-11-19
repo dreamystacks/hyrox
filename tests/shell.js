@@ -15,7 +15,7 @@ for(const [w,h] of [[390,844],[360,640]]){
  const g=await p.evaluate(()=>document.querySelector('.tg-t').textContent);
  check(w+': evening greeting names Fred',/^(Hi Fred, late workout\?|Evening Fred, finish the day strong|Fred, one more session in you\?)$/.test(g),true);
  check(w+': greeting sets by hour',await p.evaluate(()=>[greetSet(8,'Will')[0],greetSet(14,'Will')[0],greetSet(20,'Will')[0]]),["Good morning Will, let's kill it today",'Hi Will, ready to roll?','Hi Will, late workout?']);
- const bar=await p.evaluate(()=>{const bb=document.querySelector('.bottombar'),a=document.querySelector('.bottombar .tab.active'),cs=getComputedStyle(a),R=getComputedStyle(document.documentElement);return{barBg:getComputedStyle(bb).backgroundColor,txt:R.getPropertyValue('--text').trim(),actBg:cs.backgroundColor,acc:R.getPropertyValue('--acc').trim(),h:Math.round(bb.getBoundingClientRect().height),bottomGap:Math.round(innerHeight-bb.getBoundingClientRect().bottom)}});
+ const bar=await p.evaluate(()=>{const bb=document.querySelector('.bottombar'),a=document.querySelector('.bottombar .tb-ind'),cs=getComputedStyle(a),R=getComputedStyle(document.documentElement);return{barBg:getComputedStyle(bb).backgroundColor,txt:R.getPropertyValue('--text').trim(),actBg:cs.backgroundColor,acc:R.getPropertyValue('--acc').trim(),h:Math.round(bb.getBoundingClientRect().height),bottomGap:Math.round(innerHeight-bb.getBoundingClientRect().bottom)}});
  check(w+': bar is ink, active tab fills with the accent (mint default)',[bar.barBg==='rgb(28, 28, 31)',bar.actBg==='rgb(16, 176, 122)',bar.acc],[true,true,'#10b07a']);
  check(w+': bar floats above the bottom edge',bar.bottomGap>=10,true);
  await p.click('.bottombar [data-view=health]');await p.clock.runFor(400);
@@ -29,7 +29,7 @@ for(const [w,h] of [[390,844],[360,640]]){
 // accents and tinted ground
 const ACS={mint:['#e8f3ef','#07100e'],ocean:['#e8eff9','#070d17'],violet:['#eeeafb','#0d0916'],coral:['#fbeded','#160a0b'],amber:['#faf1e0','#140e05'],crimson:['#f6dcdf','#170507'],orange:['#fbe4d3','#160a03'],lime:['#e9f3cf','#0b1203'],pink:['#f9dcec','#16050f'],graphite:['#e3e5e7','#0a0b0c']};
 for(const mode of ['light','dark'])for(const k of Object.keys(ACS)){const p=await open(390,844,{acc:k,mode});
- const r=await p.evaluate(()=>{const R=getComputedStyle(document.documentElement);return{bg:R.getPropertyValue('--bg').trim(),on:R.getPropertyValue('--on-acc').trim(),act:getComputedStyle(document.querySelector('.bottombar .tab.active')).backgroundColor,ac:R.getPropertyValue('--acc').trim()}});
+ const r=await p.evaluate(()=>{const R=getComputedStyle(document.documentElement);return{bg:R.getPropertyValue('--bg').trim(),on:R.getPropertyValue('--on-acc').trim(),act:getComputedStyle(document.querySelector('.bottombar .tb-ind')).backgroundColor,ac:R.getPropertyValue('--acc').trim()}});
  const hex=c=>'#'+c.match(/\d+/g).slice(0,3).map(n=>(+n).toString(16).padStart(2,'0')).join('');
  check(mode+' '+k+': ground tint and capsule follow the accent',[r.bg,hex(r.act)===r.ac.toLowerCase()],[ACS[k][mode==='dark'?1:0],true]);await p.context().close()}
 // legacy stored value falls back to mint

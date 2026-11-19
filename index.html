@@ -1309,6 +1309,28 @@ html,body{overflow-anchor:none}
 @keyframes spgrow{from{transform:scaleX(0)}to{transform:none}}
 #dash .pg-splits .sp-r>b{font-size:15px;font-weight:700}
 .sp-none{display:block;padding:12px 16px;border-top:1px solid var(--line);font-size:14px;line-height:1.4;color:var(--text2)}.sp-none b{color:var(--text);font-weight:600;margin-right:4px}
+/* v173 glass tab bar */
+.bottombar{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overflow:visible!important}
+.bottombar .tab{position:relative;z-index:2;background:transparent!important;transition:color .25s}
+.bottombar .tab.active{background:transparent!important}
+.tb-ind{position:absolute;left:0;top:6px;height:52px;z-index:1;border-radius:999px;background:var(--acc);transition:transform .5s cubic-bezier(.3,1.35,.45,1),width .3s,opacity .2s;pointer-events:none}
+.tb-ind.still{transition:none}
+.bottombar.tb-hold .tab.active{color:color-mix(in srgb,var(--bg) 62%,transparent)!important}.bottombar.tb-hold .tab.active svg{stroke:currentColor!important}
+.bottombar.tb-hold .tb-ind{opacity:0;transition:transform .5s cubic-bezier(.3,1.35,.45,1),opacity .12s}
+.tb-lens{position:absolute;left:0;top:-9px;bottom:-9px;z-index:3;border-radius:999px;overflow:hidden;pointer-events:none;transform-origin:center;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--text) 72%,#fff) 0%,var(--text) 45%,color-mix(in srgb,var(--text) 88%,#000) 100%);
+ -webkit-backdrop-filter:blur(3px) saturate(1.8);backdrop-filter:blur(3px) saturate(1.8);
+ box-shadow:inset 0 0 0 1px #ffffff55,inset 0 1.5px 1px #ffffffaa,inset 0 -2px 5px #ffffff26,inset 3px 0 6px #ff5fb43a,inset -3px 0 6px #4fb4ff3a,0 10px 28px #0000004d,0 2px 6px #00000033;
+ transition:transform .38s cubic-bezier(.3,1.4,.5,1),opacity .22s,width .2s;opacity:1}
+.bottombar.tb-drag .tb-lens{transition:transform .06s linear,opacity .2s}
+.tb-lens.still{transition:none!important}
+.tb-lens.out{opacity:0;transform:translateX(var(--lx,0)) scale(.8)!important;transition:opacity .22s,transform .3s}
+.tb-lens:after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 60% at 50% 0,#ffffff3a,transparent 60%);pointer-events:none}
+.tb-lens-in{position:absolute;top:9px;height:calc(100% - 18px);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:6px;box-sizing:border-box;transform:scale(1.14)}
+.tb-c{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:52px;font-size:.66rem;font-weight:600;color:color-mix(in srgb,var(--bg) 85%,transparent)}
+.tb-c svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tb-c.on{color:var(--acc)}
+@media (prefers-reduced-motion: reduce){.tb-ind,.tb-lens{transition:opacity .15s!important}}
 </style></head><body data-pg="today">
 <div id="splash" aria-hidden="true"><div class="sp-glow"></div><img id="spLogo" src="icon-studio-light-192.png" alt=""><div class="sp-name">HYROX</div><div class="sp-sub">Spring 2027</div></div>
 <div id="workout" aria-live="polite"></div>
@@ -1827,8 +1849,25 @@ function migrateChecks(a){if(!a)return;const key=nsKey(a,'checks'),s=load(key,nu
   o[`w${wk}-${m[2]}-${nj}${m[4]}`]=s[kk]});
  store(key,o);const t=new Date().toISOString();store(nsKey(a,'checksT'),t);markDirty('state',a,'',t)}
 function checkKey(){return k('checks')}function restoreChecks(){let s={};s=load(checkKey(),{});document.querySelectorAll('[data-done]').forEach(e=>e.classList.toggle('on',!!s[e.dataset.done]));document.querySelectorAll('[data-check]').forEach(c=>{c.checked=!!s[c.dataset.check];c.onchange=()=>{s=load(checkKey(),{});s[c.dataset.check]=c.checked;store(checkKey(),s);const t=new Date().toISOString();store(k('checksT'),t);markDirty('state',athlete,'',t);scheduleSync()}})}
-const PG_T={today:'',plan:'Plan',bench:'Progress',health:'Health'};document.addEventListener('click',e=>{if(e.target.closest('#tbBook'))showView('guides')});function showView(id){if(id==='bench'&&document.body.dataset.pg!=='bench')dashAnimDone=false;if(id!=='plan'&&window.daySheetClose)daySheetClose();if(id!=='bench'&&typeof closeDash==='function'&&dashOpen)closeDash();{const t=$('pgTitle');if(t){t.textContent=PG_T[id]||'';document.body.dataset.pg=id}}if(id==='today')renderToday();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===(id==='log'?'plan':id==='guides'?'today':id)));if(id==='plan')renderPlan();if(id==='guides')renderGuides();if(id==='bench')renderBench();if(id==='health')renderHealth();scrollTo(0,0);if(window.realignBar)[0,120,500].forEach(d=>setTimeout(window.realignBar,d));if(window.kickBar)setTimeout(window.kickBar,60)}
+const PG_T={today:'',plan:'Plan',bench:'Progress',health:'Health'};document.addEventListener('click',e=>{if(e.target.closest('#tbBook'))showView('guides')});function showView(id){if(id==='bench'&&document.body.dataset.pg!=='bench')dashAnimDone=false;if(id!=='plan'&&window.daySheetClose)daySheetClose();if(id!=='bench'&&typeof closeDash==='function'&&dashOpen)closeDash();{const t=$('pgTitle');if(t){t.textContent=PG_T[id]||'';document.body.dataset.pg=id}}if(id==='today')renderToday();document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===(id==='log'?'plan':id==='guides'?'today':id)));if(id==='plan')renderPlan();if(id==='guides')renderGuides();if(id==='bench')renderBench();if(id==='health')renderHealth();scrollTo(0,0);if(window.realignBar)[0,120,500].forEach(d=>setTimeout(window.realignBar,d));if(window.kickBar)setTimeout(window.kickBar,60);if(window.tbSync)tbSync()}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>showView(t.dataset.view));
+// v173 glass tab bar (Fred, Nov 18, from theScore on iOS 26): a sliding accent capsule, and a glass lens that pops up under the finger, follows a drag across the bar with a little stretch, magnifies the tabs and snaps to the nearest one on release
+(function(){const nav=document.querySelector('.bottombar');if(!nav)return;const tabs=[...nav.querySelectorAll('.tab')];
+ const ind=document.createElement('i');ind.className='tb-ind';ind.setAttribute('aria-hidden','true');nav.prepend(ind);
+ const lens=document.createElement('span');lens.className='tb-lens';lens.setAttribute('aria-hidden','true');const inn=document.createElement('span');inn.className='tb-lens-in';inn.innerHTML=tabs.map(t=>`<span class="tb-c" data-v="${t.dataset.view}">${t.innerHTML}</span>`).join('');lens.appendChild(inn);nav.appendChild(lens);
+ const cells=[...inn.children],RM=matchMedia('(prefers-reduced-motion: reduce)');
+ const geo=()=>{const r=nav.getBoundingClientRect();return{r,t:tabs.map(t=>{const b=t.getBoundingClientRect();return{x:b.left-r.left,w:b.width,c:b.left-r.left+b.width/2,y:b.top-r.top,h:b.height}})}};
+ const at=x=>{const g=geo();let k=0,d=1e9;g.t.forEach((t,i)=>{const e=Math.abs(t.c-x);if(e<d){d=e;k=i}});return k};
+ let lastAct=-1;window.tbSync=function(instant){const i=tabs.findIndex(t=>t.classList.contains('active'));if(i<0)return;const g=geo(),t=g.t[i];if(!t||!t.w)return;if(instant||lastAct<0)ind.classList.add('still');ind.style.width=t.w+'px';ind.style.height=t.h+'px';ind.style.top=t.y+'px';ind.style.transform=`translateX(${t.x}px)`;if(instant||lastAct<0){ind.offsetWidth;ind.classList.remove('still')}lastAct=i};
+ let lw=0;function place(cx,vx){const g=geo(),w=g.t[0].w*1.22;lw=w;const minC=w/2-6,maxC=g.r.width-w/2+6,c=Math.max(minC,Math.min(maxC,cx)),L=c-w/2,st=Math.min(.16,Math.abs(vx||0)*.035);lens.style.width=w+'px';lens.style.setProperty('--lx',L+'px');lens.style.transform=`translateX(${L}px) scale(${1+st},${1-st*.6})`;inn.style.width=g.r.width+'px';inn.style.left=(-L)+'px';inn.style.transformOrigin=`${c}px 50%`;const k=at(c);cells.forEach((e,i)=>e.classList.toggle('on',i===k));return k}
+ let st=null,sup=false;
+ nav.addEventListener('pointerdown',e=>{if(e.button>0||!e.isPrimary)return;const x=e.clientX-nav.getBoundingClientRect().left;st={x0:e.clientX,x,lx:x,t:performance.now(),drag:false,id:e.pointerId};try{nav.setPointerCapture(e.pointerId)}catch{}lens.classList.remove('out');lens.classList.add('still');place(x,0);lens.offsetWidth;lens.classList.remove('still');nav.classList.add('tb-hold')});
+ nav.addEventListener('pointermove',e=>{if(!st||e.pointerId!==st.id)return;const r=nav.getBoundingClientRect(),x=e.clientX-r.left;if(!st.drag&&Math.abs(e.clientX-st.x0)>6){st.drag=true;nav.classList.add('tb-drag')}if(st.drag){const now=performance.now(),vx=(x-st.lx)/Math.max(8,now-st.t);st.lx=x;st.t=now;place(x,vx)}});
+ const end=e=>{if(!st||e.pointerId!==st.id)return;const drag=st.drag,x=st.lx;st=null;nav.classList.remove('tb-drag');const k=at(x),g=geo();place(g.t[k].c,0);sup=true;setTimeout(()=>sup=false,400);showView(tabs[k].dataset.view);setTimeout(()=>{lens.classList.add('out');nav.classList.remove('tb-hold')},drag?140:200)};
+ nav.addEventListener('pointerup',end);nav.addEventListener('pointercancel',e=>{if(st&&e.pointerId===st.id){st=null;nav.classList.remove('tb-drag','tb-hold');lens.classList.add('out')}});
+ nav.addEventListener('click',e=>{if(sup){sup=false;e.stopImmediatePropagation();e.preventDefault()}},true);
+ lens.classList.add('out');addEventListener('resize',()=>tbSync(true));setTimeout(()=>tbSync(true),0);setTimeout(()=>tbSync(true),400)})();
+
 $('weekJumpBtn').onclick=e=>{const wj=$('weekJump');openPicker('Go to week','',[...wj.options].map(o=>({t:o.textContent,tag:o.value===wj.value?tagH('ok','Shown'):'',fn:()=>{wj.value=o.value;wj.dispatchEvent(new Event('change'))}})),e.currentTarget)};$('closePick').onclick=()=>$('pickModal').classList.remove('show');$('pickModal').onclick=e=>{if(e.target.id==='pickModal')$('pickModal').classList.remove('show')};$('closeWk').onclick=()=>$('wkModal').classList.remove('show');$('closeInfo').onclick=()=>$('infoModal').classList.remove('show');$('wkModal').onclick=e=>{if(e.target.id==='wkModal')$('wkModal').classList.remove('show')};$('infoModal').onclick=e=>{if(e.target.id==='infoModal')$('infoModal').classList.remove('show')};PLAN.forEach(w=>weekJump.add(new Option(`Week ${w.week} · ${w.phase} · ${new Date(w.date+'T12:00:00').toLocaleDateString('en',{month:'short',day:'numeric'})}`,w.week)));weekJump.onchange=()=>{currentWeek=+weekJump.value;renderPlan()};prevWeek.onclick=()=>{currentWeek=Math.max(1,currentWeek-1);renderPlan()};nextWeek.onclick=()=>{currentWeek=Math.min(27,currentWeek+1);renderPlan()};
 function openGuide(k){modalBody.innerHTML=guideHTML(k);modal.classList.add('show')}closeModal.onclick=()=>modal.classList.remove('show');modal.onclick=e=>{if(e.target===modal)modal.classList.remove('show')};
 function renderGuides(filter=''){guideGrid.innerHTML=Object.keys(GUIDES).filter(k=>!RETIRED_GUIDES.includes(k)).filter(k=>GUIDES[k].name.toLowerCase().includes(filter.toLowerCase())).map(guideHTML).join('')||'<div class="empty">No matching guide.</div>'}guideSearch.oninput=()=>renderGuides(guideSearch.value);
