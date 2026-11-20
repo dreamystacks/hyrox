@@ -19,7 +19,9 @@ const G_TOKEN_PATH = '/personalapitoken-service/personal-api/personal-api-key/to
 const G_TZ = 'America/Toronto';
 const G_DAYS = 3;
 const G_TABS = {
-  Garmin_Daily: ['athlete', 'date', 'resting_hr', 'hrv_last_night', 'hrv_weekly_avg', 'hrv_status', 'sleep_score', 'sleep_hours', 'deep_min', 'rem_min', 'body_battery_high', 'body_battery_low', 'stress_avg', 'steps', 'updated_at'],
+  Garmin_Daily: ['athlete', 'date', 'resting_hr', 'hrv_last_night', 'hrv_weekly_avg', 'hrv_status', 'sleep_score', 'sleep_hours', 'deep_min', 'rem_min', 'body_battery_high', 'body_battery_low', 'stress_avg', 'steps', 'updated_at',
+    // v188 (Fred, Nov 20: TDEE from Garmin's burn): appended after updated_at so older rows keep their columns
+    'kcal_total', 'active_kcal', 'kcal_resting', 'intensity_mod', 'intensity_vig', 'resp_rate', 'sleep_need_min'],
   Garmin_Activities: ['athlete', 'activity_id', 'date', 'start_local', 'type', 'name', 'duration_min', 'distance_km', 'avg_hr', 'max_hr', 'calories', 'laps', 'updated_at'],
   Garmin_Raw: ['athlete', 'endpoint', 'fetched_at', 'status', 'json']
 };
@@ -76,23 +78,7 @@ function gPullAthlete(who, key) {
   const tok = gToken(who, key), now = new Date(), stamp = now.toISOString();
   const days = []; for (let i = G_DAYS - 1; i >= 0; i--) days.push(gDay(new Date(now.getTime() - i * 864e5)));
   const a = days[0], b = days[days.length - 1];
-  const sum = gGet(who, tok, '/usersummary-service/v2/dailysummaries', { startDate: a, endDate: b });
-  const bb = gGet(who, tok, '/wellness-service/wellness/bodyBattery/reports/daily', { startDate: a, endDate: b });
-  const rows = days.map(day => {
-    const s = gFindDay(sum, day), bat = gFindDay(bb, day);
-    const sl = gGet(who, tok, '/sleep-service/sleep/dailySleep', { date: day });
-    const hrv = gGet(who, tok, '/hrv-service/hrv/' + day);
-    const sleepSec = gNum(sl, ['sleepTimeSeconds']);
-    return [who, day,
-      gNum(s && s.heartRate, ['restingValue']) || gNum(s, ['restingHeartRate']),
-      gNum(hrv, ['lastNightAvg']), gNum(hrv, ['weeklyAvg']), gStr(hrv, ['status']),
-      gScore(sl), sleepSec ? Math.round(sleepSec / 360) / 10 : '',
-      gMin(sl, 'deepSleepSeconds'), gMin(sl, 'remSleepSeconds'),
-      gNum(s && s.bodyBattery, ['maxValue']), gNum(s && s.bodyBattery, ['minValue']),
-      gNum(s && s.stress, ['avgLevel']), s && s.movement && s.movement.steps ? gNum(s.movement.steps, ['value']) : '',
-      stamp];
-  });
-  gUpsert('Garmin_Daily', rows, r => r[0] + '|' + r[1]);
+  gUpsert('Garmin_Daily', gDailyRows(who, tok, days, stamp), r => r[0] + '|' + r[1]);
   const acts = gGet(who, tok, '/activitylist-service/activities/search/activities', { start: 0, limit: 20, startDate: a, endDate: b });
   const list = Array.isArray(acts) ? acts : (acts && (acts.activityList || acts.activities || acts.data)) || [];
   const arows = list.map(x => {
@@ -105,6 +91,76 @@ function gPullAthlete(who, key) {
       gNum(x, ['averageHR', 'averageHeartRate']), gNum(x, ['maxHR', 'maxHeartRate']), gNum(x, ['calories']), laps, stamp];
   }).filter(r => r[1]);
   gUpsert('Garmin_Activities', arows, r => r[0] + '|' + r[1]);
+}
+
+// One Garmin_Daily row per day. Daily summaries come as a range, sleep and HRV per day.
+function gDailyRows(who, tok, days, stamp) {
+  const sum = gGet(who, tok, '/usersummary-service/v2/dailysummaries', { startDate: days[0], endDate: days[days.length - 1] });
+  return days.map(day => {
+    const s = gFindDay(sum, day);
+    const sl = gGet(who, tok, '/sleep-service/sleep/dailySleep', { date: day });
+    const hrv = gGet(who, tok, '/hrv-service/hrv/' + day);
+    const sleepSec = gNum(sl, ['sleepTimeSeconds']), cal = (s && s.calories) || {}, im = (s && s.intensityMinutes) || {};
+    const need = sl && (sl.dailySleepDTO || sl).sleepNeed;
+    return [who, day,
+      gNum(s && s.heartRate, ['restingValue']) || gNum(s, ['restingHeartRate']),
+      gNum(hrv, ['lastNightAvg']), gNum(hrv, ['weeklyAvg']), gStr(hrv, ['status']),
+      gScore(sl), sleepSec ? Math.round(sleepSec / 360) / 10 : '',
+      gMin(sl, 'deepSleepSeconds'), gMin(sl, 'remSleepSeconds'),
+      gNum(s && s.bodyBattery, ['maxValue']), gNum(s && s.bodyBattery, ['minValue']),
+      gNum(s && s.stress, ['avgLevel']), s && s.movement && s.movement.steps ? gNum(s.movement.steps, ['value']) : '',
+      stamp,
+      gNum(cal, ['burnedTotal']), gNum(cal, ['burnedActive']), gNum(cal, ['burnedResting']),
+      gNum(im, ['moderate']), gNum(im, ['vigorous']),
+      gNum(s && s.respiration, ['avgValue']), need && typeof need.actual === 'number' ? need.actual : ''];
+  });
+}
+
+// v188: run once by hand (select garminBackfill, Run). Pulls the last G_BACK days for every athlete with a key,
+// in 30 day blocks, and fills Garmin_Daily (calories, sleep, HRV...). Existing values are kept when Garmin sends nothing.
+const G_BACK = 90;
+function garminBackfill() {
+  gHead('Garmin_Daily');
+  const props = PropertiesService.getScriptProperties().getProperties(), now = new Date(), stamp = now.toISOString();
+  G_QUIET = true;
+  try {
+    Object.keys(props).filter(k => /^GARMIN_KEY_/.test(k)).forEach(k => {
+      const who = k.slice(11).toLowerCase(), tok = gToken(who, props[k].trim());
+      for (let end = 0; end < G_BACK; end += 30) {
+        const days = []; for (let i = Math.min(G_BACK, end + 30) - 1; i >= end; i--) days.push(gDay(new Date(now.getTime() - i * 864e5)));
+        gUpsert('Garmin_Daily', gDailyRows(who, tok, days, stamp), r => r[0] + '|' + r[1], true);
+      }
+    });
+  } finally { G_QUIET = false; }
+}
+
+// v188: run once by hand. Calls every other endpoint of the official client and keeps each answer in Garmin_Raw as "probe ..."
+function garminProbe() {
+  const props = PropertiesService.getScriptProperties().getProperties(), d = n => gDay(new Date(Date.now() - n * 864e5));
+  Object.keys(props).filter(k => /^GARMIN_KEY_/.test(k)).forEach(k => {
+    const who = k.slice(11).toLowerCase(), tok = gToken(who, props[k].trim());
+    const list = [
+      ['profile', '/userprofile-service/userprofile/settings'],
+      ['vo2max', '/metrics-service/metrics/maxmet/daily/' + d(60) + '/' + d(0)],
+      ['fitness age', '/fitnessage-service/fitnessage/v2/' + d(0)],
+      ['hr zones', '/biometric-service/heartRateZones/v2'],
+      ['food logs', '/nutrition-service/food/logs/' + d(1)],
+      ['weight', '/weight-service/weight/range/' + d(90) + '/' + d(0), { includeAll: true }],
+      ['weight goal', '/goal-service/goal/user/effective/weightgoal/' + d(0) + '/' + d(0)],
+      ['hydration', '/usersummary-service/stats/hydration/daily/' + d(7) + '/' + d(0)],
+      ['wellness activity', '/wellnessactivity-service/activity/summary/range/' + d(7) + '/' + d(0)],
+      ['sleep range', '/sleep-service/sleep/dailySleepSummariesByDate', { startDate: d(3), endDate: d(0) }],
+      ['hrv range', '/hrv-service/hrv/daily/' + d(7) + '/' + d(0)],
+      ['daily hr', '/wellness-service/wellness/dailyHeartRate', { date: d(1) }]
+    ];
+    G_QUIET = true;
+    list.forEach(([name, path, params]) => {
+      const q = params ? '?' + Object.keys(params).map(p => p + '=' + encodeURIComponent(params[p])).join('&') : '';
+      const r = UrlFetchApp.fetch(G_BASE + path + q, { headers: { Accept: 'application/json', Authorization: 'Bearer ' + tok }, muteHttpExceptions: true });
+      G_QUIET = false; gRaw(who, 'probe ' + name, String(r.getResponseCode()), r.getContentText()); G_QUIET = true;
+    });
+    G_QUIET = false;
+  });
 }
 
 // Laps: the activity details only hold summaries (checked on Fred's Nov 17 test), so read the lap messages from the original FIT file.
@@ -187,8 +243,9 @@ function gCell(v) {
   return v === undefined || v === null ? '' : String(v);
 }
 
-function gUpsert(tab, rows, keyOf) {
+function gUpsert(tab, rows, keyOf, merge) {
   if (!rows.length) return;
+  gHead(tab);
   const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(tab), head = G_TABS[tab], ui = head.indexOf('updated_at');
   gDedupe(sh, head, keyOf, ui);
   const n = sh.getLastRow(), have = n > 1 ? sh.getRange(2, 1, n - 1, head.length).getValues() : [];
@@ -197,11 +254,20 @@ function gUpsert(tab, rows, keyOf) {
     const vals = [r.map(gCell)];
     const k = keyOf(vals[0]);
     let row = at[k];
+    if (merge && row && have[row - 2]) { const old = have[row - 2].map(gCell); vals[0] = vals[0].map((v, i) => v === '' ? (old[i] || '') : v); }
     if (!row) { row = sh.getLastRow() + 1; at[k] = row; }
     const rg = sh.getRange(row, 1, 1, head.length);
     rg.setNumberFormat('@');
     rg.setValues(vals);
   });
+}
+
+// v188: keeps the header row in step with G_TABS (new columns are appended at the end).
+function gHead(tab) {
+  const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName(tab), head = G_TABS[tab];
+  if (!sh) return;
+  const cur = sh.getRange(1, 1, 1, head.length).getValues()[0].map(String);
+  if (cur.join('|') !== head.join('|')) sh.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold');
 }
 
 function gDedupe(sh, head, keyOf, ui) {
@@ -226,7 +292,9 @@ function garminDedupeNow() {
   });
 }
 
+let G_QUIET = false; // v188: the backfill makes hundreds of calls, so it skips the Garmin_Raw log
 function gRaw(who, endpoint, status, json) {
+  if (G_QUIET) return;
   const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Garmin_Raw');
   if (!sh) return;
   const vals = [[who, endpoint, new Date().toISOString(), status, String(json || '').slice(0, 45000)]];
