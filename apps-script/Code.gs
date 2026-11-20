@@ -50,6 +50,8 @@ function doPost(e) {
   if (body.action === 'garmin') return out(garminForApp(String(body.athlete || '')));
   // v180: Apple Health data sent by an iOS Shortcut (Health.gs).
   if (body.action === 'health') return out(healthIn(body));
+  // v183
+  if (body.action === 'health_get') return out(healthGet(body));
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
   try {

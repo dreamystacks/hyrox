@@ -240,7 +240,11 @@ function gRaw(who, endpoint, status, json) {
 function garminForApp(who) {
   who = who.toLowerCase().replace(/[^a-z]/g, '');
   const key = PropertiesService.getScriptProperties().getProperty('GARMIN_KEY_' + who);
-  if (!key) return { ok: false, error: 'no_garmin_key' };
+  if (!key) {
+    // v183: athletes on an Apple Watch get their Health_Daily rows (filled by the HYROX Santé shortcut)
+    const hd = typeof healthDaily === 'function' ? healthDaily(who, 21) : [];
+    return hd.length ? { ok: true, source: 'apple', activities: [], daily: hd } : { ok: false, error: 'no_garmin_key' };
+  }
   try { gPullAthlete(who, key.trim()); } catch (err) { return { ok: false, error: 'garmin', detail: String(err && err.message || err).slice(0, 300) }; }
   const ss = SpreadsheetApp.openById(SHEET_ID), since = gDay(new Date(Date.now() - 7 * 864e5)); // v155 (Fred, Nov 17): a forgotten sim can be imported up to 7 days later
   const read = tab => { const sh = ss.getSheetByName(tab); if (!sh || sh.getLastRow() < 2) return []; const head = G_TABS[tab]; return sh.getRange(2, 1, sh.getLastRow() - 1, head.length).getDisplayValues().map(r => Object.fromEntries(head.map((h, i) => [h, r[i]]))).filter(r => r.athlete === who && r.date >= since); };
