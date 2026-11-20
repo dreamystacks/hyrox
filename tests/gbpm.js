@@ -81,8 +81,8 @@ const APP2=Object.assign({},APP0,{notes:APP0.notes+'\nGarmin: 111 · Strength'})
 p=await open([APP2],[Object.assign({},ACT,{id:'222'})]);
 await p.locator('#today [data-gimp]').first().click();await p.clock.runFor(800);await p.locator('#gimpModal .gi-row').first().click();await p.clock.runFor(400);
 if(await p.evaluate(()=>$('pickModal').classList.contains('show'))){await p.click('#pickList [data-pk="1"]');await p.clock.runFor(400)}
-r=await p.evaluate(()=>{const L=getLogs().filter(x=>x.date==='2026-11-18');return{n:L.length,both:/Garmin: 111/.test(L[0].notes)&&/Garmin: 222/.test(L[0].notes),runs:(L[0].notes.match(/^Runs: (.*)$/m)||[])[1],fin:!$('finish').hidden}});
-ok(r.n===1&&r.both&&!r.fin,'session already carries another Garmin activity: the new one attaches, no second log '+JSON.stringify(r));
+r=await p.evaluate(()=>{const L=getLogs().filter(x=>x.date==='2026-11-18');return{n:L.length,both:/^Garmin: (111\+222|222\+111) · /m.test(L[0].notes)&&(L[0].notes.match(/^Garmin: /mg)||[]).length===1,runs:(L[0].notes.match(/^Runs: (.*)$/m)||[])[1],fin:!$('finish').hidden}});
+ok(r.n===1&&r.both&&!r.fin,'session already carries another Garmin activity: the new one merges into the same Garmin line (v187), no second log '+JSON.stringify(r));
 r=await p.evaluate(()=>[...document.querySelectorAll('#today .td-done .rc-run')].map(e=>e.querySelector('.rc-tm').textContent+' '+e.querySelector('.rc-bpm').textContent.replace('♥','').trim()).join('|'));
 ok(r==='5:26 156|5:48 169|5:40 167','Use Garmin: watch reps with one bpm each '+r);
 // 6. finish sheet race: if the session got logged while the sheet was open, Save adds nothing
