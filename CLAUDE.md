@@ -92,6 +92,7 @@ Live at https://dreamystacks.github.io/hyrox/. It's installed on the athletes' i
   - Tabs: `Logs`, `Benchmarks` (athlete, test, week, time, updated_at), `State` (checks JSON).
   - Each athlete's phone stores the URL and key after setup (setup link `#sync=...`).
   - **Never commit the sync key or the /exec URL.**
+  - **One shared key (Fred, Nov 19):** the same key sits on every phone and in Will's Shortcuts, and it reads and writes the whole Sheet (all athletes, Garmin and Health tabs; the `garmin` action takes any athlete name). Fred accepted this because nothing in the Sheet is confidential to him; per athlete keys were proposed and declined for now. Rule: never put sensitive data in the HYROX Sheet (no IDs, money, addresses, medical notes beyond training metrics). Revisit per athlete keys if that changes.
 - **Sync:** changes go into a dirty queue (`hrx_dirty_v1`, keys `type|athlete|id`) and are POSTed as `text/plain` JSON. The response is the full dataset, which `merge()` folds in. Last writer wins on `updatedAt`, and deletes are tombstones (`deleted:true`).
 - **Changing Code.gs requires Fred to redeploy in Apps Script, which costs friction.** So prefer storing new data inside existing tabs. Example: body weight is stored as Benchmarks rows with `test="bw"`, where `week` is `"3"` for the Monday weigh-in and `"3b"` for Thursday, and `time` is `"82.4 kg"`. Locally that's bench keys `bw_3` and `bw_3b`.
 
