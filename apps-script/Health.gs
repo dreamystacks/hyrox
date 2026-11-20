@@ -33,3 +33,33 @@ function healthIn(body) {
   if (rows.length) sh.getRange(sh.getLastRow() + 1, 1, rows.length, 5).setValues(rows);
   return { ok: true, athlete: who, received_at: at, counts: counts };
 }
+
+// v182: escape control characters (raw line breaks, tabs) that sit inside JSON strings, leave the rest alone.
+function jsonCtrlFix(s) {
+  let out = '', inStr = false, esc = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) {
+      if (esc) { esc = false; out += c; continue; }
+      if (c === '\\') { esc = true; out += c; continue; }
+      if (c === '"') { inStr = false; out += c; continue; }
+      if (c === '\n') { out += '\\n'; continue; }
+      if (c === '\r') { continue; }
+      if (c === '\t') { out += '\\t'; continue; }
+      if (c < ' ') { continue; }
+      out += c;
+    } else {
+      if (c === '"') inStr = true;
+      out += c;
+    }
+  }
+  return out;
+}
+
+// v182: a body that still does not parse is kept whole in Health_Raw (field _raw) so the format can be read and fixed.
+function healthRawDump(raw) {
+  const who = ((raw.match(/athlete"?\s*[:=]\s*"?([a-z]+)/i) || [])[1] || 'unknown').toLowerCase();
+  const key = (raw.match(/"?key"?\s*[:=]\s*"?([^"&,\s]+)/) || [])[1] || '';
+  const safe = key ? raw.split(key).join('[key]') : raw;
+  return healthIn({ athlete: who, _raw: safe.slice(0, 49000) });
+}

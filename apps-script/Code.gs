@@ -35,7 +35,14 @@ function doGet(e) {
 
 function doPost(e) {
   let body;
-  try { body = JSON.parse(e.postData.contents); } catch (err) { return out({ ok: false, error: 'bad_json' }); }
+  const raw = (e && e.postData && e.postData.contents) || '';
+  try { body = JSON.parse(raw); } catch (err) {
+    // v182: iOS Shortcuts built by "Describe a shortcut" can put raw line breaks inside JSON strings; escape them and retry.
+    try { body = JSON.parse(jsonCtrlFix(raw)); } catch (err2) {
+      if (/health/.test(raw) && raw.indexOf(SYNC_KEY) >= 0) return out(healthRawDump(raw));
+      return out({ ok: false, error: 'bad_json' });
+    }
+  }
   if (body.key !== SYNC_KEY) return out({ ok: false, error: 'bad_key' });
   // v152: Import from Garmin button in the app pulls this athlete's Garmin data now (Garmin.gs) and returns recent activities.
   if (body.action === 'garmin') return out(garminForApp(String(body.athlete || '')));
