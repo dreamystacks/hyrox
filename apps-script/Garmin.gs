@@ -113,7 +113,7 @@ function gDailyRows(who, tok, days, stamp) {
       gNum(cal, ['burnedTotal']), gNum(cal, ['burnedActive']), gNum(cal, ['burnedResting']),
       gNum(im, ['moderate']), gNum(im, ['vigorous']),
       gNum(s && s.respiration, ['avgValue']), need && typeof need.actual === 'number' ? need.actual : ''];
-  });
+  }).filter(r => r.some((v, i) => i > 1 && i !== 14 && v !== '' && v !== null)); // days before the watch was worn come back empty
 }
 
 // v188: run once by hand (select garminBackfill, Run). Pulls the last G_BACK days for every athlete with a key,
