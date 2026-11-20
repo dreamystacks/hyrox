@@ -1849,8 +1849,8 @@ function reportCard(x,o){o=o||{};const nt=String(x.notes||''),when=new Date(x.da
  if(x.session==='Rest day')return wrap('rc-rest',`<div class="rc-h">${rcI('moon','#7c5cff')}<div class="rc-t"><b class="rc-name">Rest day</b><span class="rc-tags">${tagH('ok','Done')}<i class="tg mu">${esc(when)}</i></span></div></div><p class="rc-msg">Recovery counts. Sleep, eat, walk.</p>${ntH}${act}`);
  const [ik,ih]=rcKind(x),tags=[tagH('ok','Done'),`<i class="tg mu">${esc(when)}</i>`];
  if(/^Plan: edited by athlete/m.test(nt))tags.push(tagH('mu','Edited by you'));else if(/^Plan: coach adjusted/m.test(nt))tags.push(`<i class="tg rc-coach">Coach adjusted</i>`);if(/^Plan: lightened/m.test(nt))tags.push(tagH('amb','Lightened'));
- const sim=(nt.match(/Sim week \d+ · total ([\d:]+)/)||[])[1],rpeT=x.rpe?(+x.rpe>=9?['miss','Max']:+x.rpe>=8?['amb','Hard']:+x.rpe>=6?['ok','Solid']:['mu','Easy']):null;
- const st=[sim?['sim',sim,'Sim total']:null,x.duration?['time',x.duration+' min','Time']:null,x.rpe?['rpe',String(x.rpe),'Effort',rpeT]:null,x.distance?['km',numTxt(Math.round(x.distance*10)/10)+' km','Distance']:null,x.pace?['pace',x.pace,'Pace /km']:null].filter(Boolean).slice(0,4);
+ const gHR=((nt.match(/avg HR (\d+)/)||[])[1])||'',gMX=((nt.match(/max HR (\d+)/)||[])[1])||'',gKC=((nt.match(/(\d+) kcal/)||[])[1])||'',sim=(nt.match(/Sim week \d+ · total ([\d:]+)/)||[])[1],rpeT=x.rpe?(+x.rpe>=9?['miss','Max']:+x.rpe>=8?['amb','Hard']:+x.rpe>=6?['ok','Solid']:['mu','Easy']):null;
+ const st=[sim?['sim',sim,'Sim total']:null,x.duration?['time',x.duration+' min','Time']:null,x.rpe?['rpe',String(x.rpe),'Effort',rpeT]:null,x.distance?['km',numTxt(Math.round(x.distance*10)/10)+' km','Distance']:null,x.pace?['pace',x.pace,'Pace /km']:null,gHR?['hr',gHR+' bpm','Avg HR']:null,gMX?['hr',gMX+' bpm','Max HR']:null,gKC?['st',gKC+' kcal','Calories']:null].filter(Boolean).slice(0,4);
  const stH=st.length?`<div class="rc-stats n${st.length}">${st.map(([k,v,l,t])=>`<div class="rc-st"><span class="rc-sl">${rcI(k==='sim'?'flag':k,RC_HUE[k])}${l}</span><span class="rc-sv2"><b>${esc(v)}</b>${t?tagH(t[0],t[1]):''}</span></div>`).join('')}</div>`:'';
  // runs
  const runs=((nt.match(/^Runs: (.*)$/m)||[])[1]||'').split(' / ').map(t=>t.trim()).filter(Boolean),bpm=runBpm(x),rs=runs.map(secOf);let runH='';
@@ -2954,7 +2954,7 @@ function gimpUse(a){if(!a||gimpDone().has(String(a.id))){toastMsg('Already impor
  if(runs.length)lines.push('Runs: '+runs.map(v=>fmt(v)).join(' / '));
  if(runKm){dist=Math.min(25,Math.round(runKm*10)/10);const p5=Math.round(runMs/runKm/5000)*5;if(p5>=180&&p5<=540)pace=Math.floor(p5/60)+':'+String(p5%60).padStart(2,'0')}
  else if(a.km&&a.min){const ps=Math.round(a.min*60/a.km);if(ps>=180&&ps<=540)pace=Math.floor(ps/60)+':'+String(ps%60).padStart(2,'0')}
- const ln=laneNote(its);lines.push(`Garmin: ${a.id} · ${a.name||a.type}${a.hr?` · avg HR ${a.hr}`:''}${a.max?` · max HR ${a.max}`:''}`);
+ const ln=laneNote(its);lines.push(`Garmin: ${a.id} · ${a.name||a.type}${a.hr?` · avg HR ${a.hr}`:''}${a.max?` · max HR ${a.max}`:''}${a.cal?` · ${Math.round(a.cal)} kcal`:''}`);
  // v168 (Fred, Nov 18): interval days pick the rep laps; if the session is already logged that day, the Garmin data is added to that log instead of a second one
  if(day==='Tue'){const m=String(raw).match(/(\d+)\s*[x×]\s*([\d.]+)\s*(km|m)\b/i);if(m){const n=+m[1],rk=m[3].toLowerCase()==='km'?+m[2]:+m[2]/1000,ok=l=>(l.km>0?Math.abs(l.km-rk)<=rk*.2:true)&&l.s>=150*rk&&l.s<=720*rk,reps=laps.filter(ok).slice(0,n);
   if(reps.length>=2){const rr=reps.map(l=>l.s*1000),rs=rr.reduce((x,y)=>x+y,0);lines.splice(1,0,'Runs: '+rr.map(v=>fmt(v)).join(' / '));dist=Math.round(reps.length*rk*100)/100;const p5=Math.round(rs/1000/(reps.length*rk));if(p5>=150&&p5<=600)pace=Math.floor(p5/60)+':'+String(p5%60).padStart(2,'0');const hh=reps.map(l=>l.hr||0);if(hh.some(Boolean))hrl.push('Rep HR: '+hh.join(' / '))}}}
