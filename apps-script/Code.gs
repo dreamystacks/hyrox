@@ -39,8 +39,10 @@ function doPost(e) {
   try { body = JSON.parse(raw); } catch (err) {
     // v182: iOS Shortcuts built by "Describe a shortcut" can put raw line breaks inside JSON strings; escape them and retry.
     try { body = JSON.parse(jsonCtrlFix(raw)); } catch (err2) {
-      if (/health/.test(raw) && raw.indexOf(SYNC_KEY) >= 0) return out(healthRawDump(raw));
-      return out({ ok: false, error: 'bad_json' });
+      // Keep what arrived (key masked) so the format can be read and fixed.
+      const info = JSON.stringify({ type: e && e.postData && e.postData.type, len: raw.length, params: e && e.parameter, raw: raw.slice(0, 40000) }).split(SYNC_KEY).join('[key]');
+      healthIn({ athlete: '_badjson', _raw: info });
+      return out({ ok: false, error: 'bad_json', kept: true });
     }
   }
   if (body.key !== SYNC_KEY) return out({ ok: false, error: 'bad_key' });
