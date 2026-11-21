@@ -9,7 +9,7 @@ await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');loc
    return new Response(JSON.stringify({ok:true,activities:[{id:'999',date:'2026-11-21',start:'2026-11-21 10:00:00',type:'indoor_running',name:'HYROX',min:30,km:0,hr:158,max:182,cal:500,laps}],daily:[]}))}
   return new Response(JSON.stringify({ok:true,logs:[],bench:[],state:[]}))}});
 await p.clock.install({time:new Date('2026-11-21T12:00:00')});await p.goto('file://'+__dirname+'/../index.html');await p.clock.runFor(5000);
-const btn=p.locator('#today [data-gimp]');ok(await btn.count()===1&&/Import from Garmin/.test(await btn.innerText()),W+' Today has the Import from Garmin button');
+const btn=p.locator('#today [data-gimp]');ok(await btn.count()===1&&/Import from Garmin/.test(await btn.textContent()),W+' Today has the Import from Garmin button');
 await btn.click();await p.clock.runFor(800);
 const post=await p.evaluate(()=>window.__posts.find(x=>x.action==='garmin'));ok(post&&post.athlete==='fred'&&post.key==='k',W+' posts action garmin with key and athlete');
 ok(await p.locator('#gimpModal.show .gi-row').count()===1&&/HYROX/.test(await p.locator('#gimpModal').innerText()),W+' picker lists the watch workout');
