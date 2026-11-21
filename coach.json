@@ -29,8 +29,8 @@
         },
         {
           "week": 8,
-          "day": "Tue",
-          "text": "Tuesday was a rest day and Garmin had your body battery at only 46 today: make up the 4 x 1 km at 5:45 on Wednesday only if you feel fresh, otherwise skip it and let Sunday's zone 2 run carry the km; never the day before Saturday's sim."
+          "day": "Sat",
+          "text": "Garmin had you under 6 h of sleep two nights running (5.7 h, then 5.3 h) with resting HR up to 51 from 47: if the app offers Lighten today on Saturday, take it (3 rounds instead of 4), and either way cap run 1 at 5:50 and keep the runs even rather than chasing a faster sim."
         }
       ],
       "loads": {
@@ -154,5 +154,5 @@
       }
     }
   },
-  "nightly": "2026-11-18T02:50:00Z"
+  "nightly": "2026-11-21T02:50:00Z"
 }
