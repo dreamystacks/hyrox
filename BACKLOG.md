@@ -4,7 +4,6 @@ Single source of truth for app work. Fred writes app feedback in his training no
 
 ## Open
 
-- [ ] Plan edits: move a session to another weekday, this week only (Fred, Nov 20)
 
 ## Open (Fred to do)
 - [ ] Import the next lifting session and check the ♥ per set (web app version 11 has the v193 Garmin.gs, deployed Nov 20; heart rate streams confirmed in Garmin_Activities)
@@ -13,6 +12,7 @@ Single source of truth for app work. Fred writes app feedback in his training no
 - [ ] Will: Apple Watch shortcut loop (waiting on details from Fred)
 
 ## Done
+- [x] Move a session to another free day, this week only (v196)
 - [x] Zone 2 is 115 to 134 bpm from Garmin's zones (v195); screen stays awake through a workout (Fred confirmed Nov 20); dropped: Wednesday check-in, ankle test, guided mobility
 - [x] Keyboard bounce and stuck empty space in workout mode (v189); tab bar stuck mid screen after a workout (v190)
 - [x] EMOM heart rate per move from the watch minute laps, notes folded (v191); calories split per watch activity (v192)
