@@ -4,7 +4,7 @@ const {chromium}=require('playwright'),path=require('path');let f=0;const ok=(c,
 await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_gcal_v2',JSON.stringify({'1':230,'2':204}));localStorage.setItem('hrx_fred_gmin_v2',JSON.stringify({'1':46}))});
 await p.clock.install({time:new Date('2026-11-20T20:05:00')});await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.clock.runFor(4500);
 const laps=[113.39,60.08,60.06,60.07,60.06,60.05,60.05,60.04,60.04,60.05,60.05,60.06,60.06,60.07,60.06,60.05,8.62],hr=[116,122,147,156,147,141,152,159,157,147,154,162,145,143,153,154,146],fm=v=>Math.floor(v/60)+':'+String(Math.round(v%60)).padStart(2,'0');
-const notes=['Workout 1:05:00','Loads (lb): Cable face pull 75 (3/3) · Wall ball 14 (2/2) · Wall ball 14 (25s)','Note: Hammer curl: Keep same weight','Laps: '+laps.map((l,i)=>fm(l)+' ('+hr[i]+')').join(' / '),'Garmin: 1+2 · Strength + EMOM · avg HR 112 · max HR 169 · 434 kcal · 63 min'].join('\n');
+const notes=['Workout 1:05:00','Loads (lb): Cable face pull 75 (3/3) · Wall ball 14 (2/2) · Wall ball 14 (25s)','Note: Hammer curl: Keep same weight','EMOM rest left: 20s','Laps: '+laps.map((l,i)=>fm(l)+' ('+hr[i]+')').join(' / '),'Garmin: 1+2 · Strength + EMOM · avg HR 112 · max HR 169 · 434 kcal · 63 min'].join('\n');
 const e=await p.evaluate(n=>{const x={id:9,date:'2026-11-20',session:'Fri: Upper + erg + arms B',duration:65,rpe:7,notes:n,savedAt:'2026-11-20T20:00:00'};putLog(x);refreshViews();return emomHR(x)},notes);
 ok(e&&e.mins===16,'16 minutes found, first lap counted as minute 1');ok(e&&e.avg===147,'EMOM avg 147: '+(e&&e.avg));ok(e&&e.per.length===4&&e.per[0].avg===141&&e.per[3].peak===162,'per move avg and peak: '+JSON.stringify(e&&e.per));ok(e&&e.lifts===99,'lifts avg 99 without the EMOM: '+(e&&e.lifts));
 await p.clock.runFor(500);
@@ -14,5 +14,8 @@ ok(await p.evaluate(()=>!document.querySelector('#today .rc-nd').open),'notes fo
 await p.click('#today .rc-nd summary');ok(await p.evaluate(()=>document.querySelector('#today .rc-nd').open),'notes open on tap');
 const cs=await p.evaluate(()=>calSplit(getLogs().find(z=>z.id===9)));ok(cs&&cs.tot===434&&cs.parts[0].n==='Lifts'&&cs.parts[0].min===46&&cs.parts[1].n==='EMOM'&&cs.parts[1].min===16,'v192 calories split: '+JSON.stringify(cs));
 ok(/Lifts.*230 kcal.*5 \/ min.*EMOM.*204 kcal.*12\.8 \/ min/.test(await p.locator('#today .rc-sec').filter({hasText:'Calories'}).first().textContent()),'v192 Calories section with per minute rate');
+const emTxt=await p.locator('#today .rc-sec').filter({hasText:'EMOM heart rate'}).first().textContent();
+ok(/Rest left each minute: 20 s left/.test(emTxt),'v194 overall rest left shown');ok(/Wall balls 20⏱ 25 s left/.test(emTxt),'v194 per move rest left from the Loads line: '+emTxt.slice(0,160));
+ok(await p.evaluate(()=>NOTE_HIDE.test('EMOM rest left: 20s')),'v194 rest left line hidden from Notes');
 const no=await p.evaluate(()=>emomHR({date:'2026-11-20',session:'Fri: Upper + erg + arms B',notes:'Laps: 5:00 (140) / 5:00 (150)'}));ok(no===null,'no EMOM block without minute laps');
 ok(!errs.length,'no page errors '+errs.join('|'));console.log(f?f+' FAILED':'ALL OK');await b.close();process.exit(f?1:0)})();
