@@ -7,10 +7,21 @@ Single source of truth for app work. Fred writes app feedback in his training no
 - [ ] Monday ankle test (knee to wall distance, cm) stored like body weight in Benchmarks rows, only if Fred wants to track the mobility routine
 - [ ] Guided mobility mode (auto timer through the daily 3), only if the tick list is not enough
 
+- [ ] EMOM rest left per minute (one tap at the end of each minute), only if Fred wants it (v194 records one value per move)
+- [ ] Zone 2 range: the app uses 130 to 140 bpm, Garmin's zones (max HR 191, LTHR 171) put zone 2 at about 115 to 134; pick one
+- [ ] Plan edits: move a session to another weekday (v159 only edits this week's text)
+
+## Open (Fred to do)
+- [ ] Redeploy the web app with the v193 Garmin.gs (per set heart rate), then import the next lifting session and check the ♥ per set
+
 ## Open (device checks)
+- [ ] Confirm on iPhone after v189 and v190: no bounce when tapping a reps box, tab bar back at the bottom after a workout
 - [ ] Confirm on iPhone: screen stays awake through a whole workout, the lock screen and island Next button works, EMOM beeps keep going with the screen locked
 
 ## Done
+- [x] Keyboard bounce and stuck empty space in workout mode (v189); tab bar stuck mid screen after a workout (v190)
+- [x] EMOM heart rate per move from the watch minute laps, notes folded (v191); calories split per watch activity (v192)
+- [x] Heart rate per set: set tick times plus the watch heart rate stream (v193, needs the redeploy); EMOM rest left in the report (v194)
 - [x] Adaptive coach: weekly per athlete plan changes from coach.json, badges on every surface, Settings toggle (v123)
 - [x] Timer stays visible while typing notes (workout screen follows the visual viewport)
 - [x] Bar weight input for barbell lifts (per side + bar = total)
