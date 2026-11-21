@@ -1,0 +1,16 @@
+// v191: EMOM heart rate from the watch's minute laps (first lap holds the get ready time), per move avg and peak, lifts average with the EMOM taken out, notes folded by default and open on tap. node tests/emhr.js
+const {chromium}=require('playwright'),path=require('path');let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
+(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1')});
+await p.clock.install({time:new Date('2026-11-20T20:05:00')});await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.clock.runFor(4500);
+const laps=[113.39,60.08,60.06,60.07,60.06,60.05,60.05,60.04,60.04,60.05,60.05,60.06,60.06,60.07,60.06,60.05,8.62],hr=[116,122,147,156,147,141,152,159,157,147,154,162,145,143,153,154,146],fm=v=>Math.floor(v/60)+':'+String(Math.round(v%60)).padStart(2,'0');
+const notes=['Workout 1:05:00','Loads (lb): Cable face pull 75 (3/3) · Wall ball 14 (2/2) · Wall ball 14 (25s)','Note: Hammer curl: Keep same weight','Laps: '+laps.map((l,i)=>fm(l)+' ('+hr[i]+')').join(' / '),'Garmin: 1+2 · Strength + EMOM · avg HR 112 · max HR 169 · 434 kcal · 63 min'].join('\n');
+const e=await p.evaluate(n=>{const x={id:9,date:'2026-11-20',session:'Fri: Upper + erg + arms B',duration:65,rpe:7,notes:n,savedAt:'2026-11-20T20:00:00'};putLog(x);refreshViews();return emomHR(x)},notes);
+ok(e&&e.mins===16,'16 minutes found, first lap counted as minute 1');ok(e&&e.avg===147,'EMOM avg 147: '+(e&&e.avg));ok(e&&e.per.length===4&&e.per[0].avg===141&&e.per[3].peak===162,'per move avg and peak: '+JSON.stringify(e&&e.per));ok(e&&e.lifts===99,'lifts avg 99 without the EMOM: '+(e&&e.lifts));
+await p.clock.runFor(500);
+ok(await p.locator('#today .rc-mins span').count()===16,'16 minute bars on the Today card');
+ok(/♥ avg 99/.test(await p.locator('#today .rc-sec').filter({hasText:'Weights'}).first().textContent()),'Weights header shows lifts avg HR');
+ok(await p.evaluate(()=>!document.querySelector('#today .rc-nd').open),'notes folded by default');
+await p.click('#today .rc-nd summary');ok(await p.evaluate(()=>document.querySelector('#today .rc-nd').open),'notes open on tap');
+const no=await p.evaluate(()=>emomHR({date:'2026-11-20',session:'Fri: Upper + erg + arms B',notes:'Laps: 5:00 (140) / 5:00 (150)'}));ok(no===null,'no EMOM block without minute laps');
+ok(!errs.length,'no page errors '+errs.join('|'));console.log(f?f+' FAILED':'ALL OK');await b.close();process.exit(f?1:0)})();
