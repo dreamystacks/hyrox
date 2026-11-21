@@ -1,7 +1,7 @@
 // v191: EMOM heart rate from the watch's minute laps (first lap holds the get ready time), per move avg and peak, lifts average with the EMOM taken out, notes folded by default and open on tap. node tests/emhr.js
 const {chromium}=require('playwright'),path=require('path');let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
 (async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const p=await b.newPage({viewport:{width:390,height:844}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
-await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1')});
+await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_gcal_v2',JSON.stringify({'1':230,'2':204}));localStorage.setItem('hrx_fred_gmin_v2',JSON.stringify({'1':46}))});
 await p.clock.install({time:new Date('2026-11-20T20:05:00')});await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.clock.runFor(4500);
 const laps=[113.39,60.08,60.06,60.07,60.06,60.05,60.05,60.04,60.04,60.05,60.05,60.06,60.06,60.07,60.06,60.05,8.62],hr=[116,122,147,156,147,141,152,159,157,147,154,162,145,143,153,154,146],fm=v=>Math.floor(v/60)+':'+String(Math.round(v%60)).padStart(2,'0');
 const notes=['Workout 1:05:00','Loads (lb): Cable face pull 75 (3/3) · Wall ball 14 (2/2) · Wall ball 14 (25s)','Note: Hammer curl: Keep same weight','Laps: '+laps.map((l,i)=>fm(l)+' ('+hr[i]+')').join(' / '),'Garmin: 1+2 · Strength + EMOM · avg HR 112 · max HR 169 · 434 kcal · 63 min'].join('\n');
@@ -12,5 +12,7 @@ ok(await p.locator('#today .rc-mins span').count()===16,'16 minute bars on the T
 ok(/♥ avg 99/.test(await p.locator('#today .rc-sec').filter({hasText:'Weights'}).first().textContent()),'Weights header shows lifts avg HR');
 ok(await p.evaluate(()=>!document.querySelector('#today .rc-nd').open),'notes folded by default');
 await p.click('#today .rc-nd summary');ok(await p.evaluate(()=>document.querySelector('#today .rc-nd').open),'notes open on tap');
+const cs=await p.evaluate(()=>calSplit(getLogs().find(z=>z.id===9)));ok(cs&&cs.tot===434&&cs.parts[0].n==='Lifts'&&cs.parts[0].min===46&&cs.parts[1].n==='EMOM'&&cs.parts[1].min===16,'v192 calories split: '+JSON.stringify(cs));
+ok(/Lifts.*230 kcal.*5 \/ min.*EMOM.*204 kcal.*12\.8 \/ min/.test(await p.locator('#today .rc-sec').filter({hasText:'Calories'}).first().textContent()),'v192 Calories section with per minute rate');
 const no=await p.evaluate(()=>emomHR({date:'2026-11-20',session:'Fri: Upper + erg + arms B',notes:'Laps: 5:00 (140) / 5:00 (150)'}));ok(no===null,'no EMOM block without minute laps');
 ok(!errs.length,'no page errors '+errs.join('|'));console.log(f?f+' FAILED':'ALL OK');await b.close();process.exit(f?1:0)})();
