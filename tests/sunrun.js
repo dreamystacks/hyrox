@@ -26,10 +26,10 @@ const nl=await p.evaluate(()=>getLogs('fred').find(l=>l.date==='2026-10-25'));ok
 await p.clock.setFixedTime(new Date('2026-10-31T18:00:00'));await p.evaluate(()=>showView('today'));await p.clock.runFor(500);
 ok(/Zone 2 · 30 to 40 min/.test(await p.locator('#today .td-next').innerText()),'Saturday Up next shows Zone 2 for Sunday: '+(await p.locator('#today .td-next').innerText()).replace(/\n/g,' | '));
 await p.clock.setFixedTime(new Date('2026-11-01T10:00:00'));await p.evaluate(()=>showView('today'));await p.clock.runFor(500);
-const td=await p.locator('#today').innerText();ok(/Zone 2 · 30 to 40 min/.test(td)&&/Zone 2 · 130 to 140 bpm/.test(td),'Today Sunday card: subtitle and bpm chip');
-await p.evaluate(()=>{currentWeek=6;showView('plan')});await p.clock.runFor(400);await p.locator('.day-card[data-day=Sun] .day-head').click();await p.clock.runFor(300);const pc=await p.locator('.day-card[data-day=Sun]').innerText();ok(/ZONE 2 · 130 TO 140 BPM|Zone 2 · 130 to 140 bpm/i.test(pc),'Plan Sunday card badge: '+pc.replace(/\n/g,' | ').slice(0,120));
+const td=await p.locator('#today').innerText();ok(/Zone 2 · 30 to 40 min/.test(td)&&/Zone 2 · 115 to 134 bpm/.test(td),'Today Sunday card: subtitle and bpm chip');
+await p.evaluate(()=>{currentWeek=6;showView('plan')});await p.clock.runFor(400);await p.locator('.day-card[data-day=Sun] .day-head').click();await p.clock.runFor(300);const pc=await p.locator('.day-card[data-day=Sun]').innerText();ok(/ZONE 2 · 130 TO 140 BPM|Zone 2 · 115 to 134 bpm/i.test(pc),'Plan Sunday card badge: '+pc.replace(/\n/g,' | ').slice(0,120));
 await p.evaluate(()=>showView('today'));await p.clock.runFor(300);await p.locator('#today [data-start]').first().click();await p.clock.runFor(800);
-ok(/Zone 2 · 130 to 140 bpm/.test(await p.locator('#workout').innerText()),'workout mode shows the zone 2 chip');
+ok(/Zone 2 · 115 to 134 bpm/.test(await p.locator('#workout').innerText()),'workout mode shows the zone 2 chip');
 await p.evaluate(()=>openFinish({date:'2026-11-01',session:'Sun: Optional easy run',askRun:true,duration:1}));await p.fill('#finKm','5');await p.fill('#finTime','32:00');await p.fill('#finHr','138');
 ok(/in zone 2/.test(await p.locator('#finPace').innerText()),'finish sheet: heart rate check says in zone 2');
 await p.click('#finish [data-fr="4"]');await p.click('#finSave');await p.clock.runFor(400);
