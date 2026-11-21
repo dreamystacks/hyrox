@@ -17,8 +17,12 @@ await p.focus('#session');await shrink(31);
 check('Log form, session select focused: bar still pushed down',await bar(),'translateY(31px)');
 await p.focus('#date');await shrink(32);
 check('Log form, date input focused: bar still pushed down',await bar(),'translateY(32px)');
-await p.focus('#notesRoll summary').catch(()=>{});await p.evaluate(()=>{document.getElementById('notesRoll').open=true});await p.focus('#notes');await shrink(33);
+await p.focus('#notesRoll summary').catch(()=>{});await p.evaluate(()=>{document.getElementById('notesRoll').open=true});await p.focus('#notes');await shrink(420-844);
 check('Log form, notes textarea focused (keyboard up): bar left alone',await bar(),'');
+// v190: a box still focused after the keyboard went down is not typing: the bar is realigned and the box blurred
+await p.focus('#notes');await shrink(33);await p.waitForTimeout(400);
+check('v190 stale focus, keyboard down: bar pushed down',await bar(),'translateY(33px)');
+check('v190 stale focus blurred',await p.evaluate(()=>document.activeElement.id||document.activeElement.tagName),'BODY');
 await p.evaluate(()=>document.activeElement.blur());await shrink(34);await p.waitForTimeout(450);
 check('keyboard closed: bar back at the bottom',await bar(),'translateY(34px)');
 await p.selectOption('#session','Other');await p.waitForTimeout(1200);
