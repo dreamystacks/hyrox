@@ -1791,7 +1791,8 @@ function simParse(x){const n=String(x.notes||''),runs=((n.match(/Runs: ([^\n]+)/
 // race equivalent station times and per km run pace instead of raw seconds.
 function simFmt(x){const wk=weekOf(x.date),W=PLAN[(wk||1)-1]||{},raw=W.sat||'',half=/half volume/i.test(raw)&&!/full volume/i.test(raw),f={},ld={};STATIONS.forEach(([name],i)=>{const R=RACE_DIST[i],done=projLane(x.notes,name)||(half?R/2:R);f[name]=R/done});parseLoads(x).forEach(l=>{if(/^sled(push|pull)$/.test(l.ek)&&l.kg)ld[l.ek]=Math.round(toUnit(l.kg,l.u,'lb'))});return{f,ld,half,pct:simPct(W)}}
 function simSame(a,b){const why=[];if(!b)return{same:true,scale:false,why};const ks=a.st.map(q=>q[0]),fa=a.fm,fb=b.fm;let scale=false;
- if(ks.length!==b.st.length||!ks.every(k=>b.st.some(q=>q[0]===k)))why.push('different stations');
+ if(ks.length!==b.st.length||!ks.every(k=>b.st.some(q=>q[0]===k))){why.push('different stations');scale=true} // v207: totals of different sims never compared raw (Fred, Nov 22: 51.6% faster vs a 8 station sim)
+ if(a.runs.length&&b.runs.length&&a.runs.length!==b.runs.length){scale=true;if(!why.includes('different stations'))why.push(`${b.runs.length} runs vs ${a.runs.length}`)}
  if(a.st.some(([n])=>b.st.some(q=>q[0]===n)&&Math.abs(fa.f[n]/fb.f[n]-1)>.03)){scale=true;why.push(fa.half!==fb.half?(fa.half?'half volume vs full':'full volume vs half'):'different distances')}
  if(a.runs.length&&b.runs.length&&Math.abs(a.km-b.km)>.01){scale=true;why.push(`${b.km<1?b.km*1000+' m':b.km+' km'} runs vs ${a.km<1?a.km*1000+' m':a.km+' km'}`)}
  [['sledpush','sled push'],['sledpull','sled pull']].forEach(([k,nm])=>{if(fa.ld[k]&&fb.ld[k]&&Math.abs(fa.ld[k]-fb.ld[k])>5)why.push(`${nm} ${fb.ld[k]} to ${fa.ld[k]} lb`)});
@@ -1832,7 +1833,7 @@ function simStory(a,b,who){const W=1080,H=1920,c=document.createElement('canvas'
  if(dd!=null){const base=cmp.scale?pb.total:b.tot,pct=Math.abs(dd/base*100).toFixed(1);pill(cmp.scale?`${dTxt(dd)}  ·  projected vs last sim`:`${dTxt(dd)}  ·  ${pct}% ${dd<=0?'faster':'slower'}`,L,cy+312,dd,28)}else T('First sim on record',28,L,cy+312,{w:600,c:MU});
  let nl=0;if(!cmp.same){x.font=`500 22px ${U}`;const ws=`Not the same sim: ${cmp.why.join(', ')}.${cmp.scale?' Changes scaled to race distance.':''}`.split(' '),ls=[];let l='';ws.forEach(t=>{const nn=l?l+' '+t:t;if(x.measureText(nn).width>R-L&&l){ls.push(l);l=t}else l=nn});if(l)ls.push(l);ls.slice(0,2).forEach((q,i)=>T(q,22,L,cy+472+i*30,{w:500,c:MU}));nl=Math.min(2,ls.length)}
  // run curve: this sim solid with a fill, last sim dashed; higher = faster
- let y=cy+(cmp.same?480:500+nl*30);const rn=a.runs,ro=b?b.runs.map(t=>t*a.km/b.km):[];
+ let y=cy+(cmp.same?480:500+nl*30);const rn=a.runs,ro=b?b.runs.slice(0,Math.max(a.runs.length,2)).map(t=>t*a.km/b.km):[];
  if(rn.length>=2){const chH=cmp.same?180:165,pX=L+10,pW=R-L-20,all=[...rn,...ro],lo=Math.min(...all),hi=Math.max(...all),pad=Math.max(8,(hi-lo)*.25),Y=t=>y+30+(t-(lo-pad))/((hi+pad)-(lo-pad))*(chH-60),X=i=>pX+(rn.length===1?pW/2:i*pW/(Math.max(rn.length,ro.length)-1));
   const line=rn.length&&ro.length&&rn.reduce((s,t)=>s+t,0)/rn.length>ro.slice(0,rn.length).reduce((s,t)=>s+t,0)/Math.min(rn.length,ro.length)?DN:UP;
   T('RUN SPLITS',22,L,y,{w:700,c:MU,ls:3});x.font=`600 22px ${U}`;const lw2=ro.length?x.measureText('last sim').width:0,lx2=R-lw2,lx1=ro.length?lx2-44-x.measureText('this sim').width-36:R-x.measureText('this sim').width;if(ro.length){x.setLineDash([6,6]);x.strokeStyle='#ffffff88';x.lineWidth=4;x.beginPath();x.moveTo(lx2-38,y-8);x.lineTo(lx2-8,y-8);x.stroke();x.setLineDash([]);T('last sim',22,lx2,y,{w:600,c:MU})}x.fillStyle=line;x.fillRect(lx1-38,y-11,30,6);T('this sim',22,lx1,y,{w:600})
