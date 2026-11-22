@@ -1347,7 +1347,7 @@ html,body{overflow-anchor:none}
 .rc-tags{display:flex;flex-wrap:wrap;gap:6px}.rc-coach{background:color-mix(in srgb,#7c5cff 16%,transparent);color:color-mix(in srgb,#7c5cff 75%,var(--text))}
 .rc-i{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--h) 18%,transparent);color:var(--h)}.rc-i svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .rc-h>.rc-i{width:48px;height:48px;border-radius:16px}.rc-h>.rc-i svg{width:26px;height:26px}
-.rc-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.rc-stats.n3{grid-template-columns:repeat(3,1fr)}.rc-stats.n1{grid-template-columns:1fr}.rc-stats.n5 .rc-st:last-child{grid-column:span 2}
+.rc-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.rc-stats.n3{grid-template-columns:repeat(3,1fr)}.rc-stats.n1{grid-template-columns:1fr}.rc-stats.n5 .rc-st:last-child,.rc-stats.n7 .rc-st:last-child{grid-column:span 2}
 .rc-st{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;background:color-mix(in srgb,var(--text) 5%,transparent)}
 .rc-st b{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}.rc-st span{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px;font-weight:650;color:var(--text)}
 .rc-st .rc-i{width:30px;height:30px;border-radius:10px}.rc-st .rc-i svg{width:17px;height:17px}
@@ -1926,7 +1926,7 @@ function reportCard(x,o){o=o||{};const nt=String(x.notes||''),when=new Date(x.da
  const [ik,ih]=rcKind(x),tags=[tagH('ok','Done'),`<i class="tg mu">${esc(when)}</i>`];
  if(/^Plan: edited by athlete/m.test(nt))tags.push(tagH('mu','Edited by you'));else if(/^Plan: coach adjusted/m.test(nt))tags.push(`<i class="tg rc-coach">Coach adjusted</i>`);if(/^Plan: lightened/m.test(nt))tags.push(tagH('amb','Lightened'));
  const gHR=((nt.match(/avg HR (\d+)/)||[])[1])||'',gMX=((nt.match(/max HR (\d+)/)||[])[1])||'',gKC=((nt.match(/(\d+) kcal/)||[])[1])||gCal(nt)||'',sim=(nt.match(/Sim week \d+ · total ([\d:]+)/)||[])[1],rpeT=x.rpe?(+x.rpe>=9?['miss','Max']:+x.rpe>=8?['amb','Hard']:+x.rpe>=6?['ok','Solid']:['mu','Easy']):null;
- const st=[sim?['sim',sim,'Sim total']:null,x.duration?['time',x.duration+' min','Time']:null,x.rpe?['rpe',String(x.rpe),'Effort',rpeT]:null,x.distance?['km',numTxt(Math.round(x.distance*10)/10)+' km','Distance']:null,x.pace?['pace',x.pace,'Pace /km']:null,gHR?['hr',gHR+' bpm','Avg HR']:null,gKC?['st',gKC+' kcal','Calories']:null,gMX?['hr',gMX+' bpm','Max HR']:null].filter(Boolean).slice(0,6);
+ const st=[sim?['sim',sim,'Sim total']:null,x.duration?['time',x.duration+' min','Time']:null,x.rpe?['rpe',String(x.rpe),'Effort',rpeT]:null,x.distance?['km',numTxt(Math.round(x.distance*10)/10)+' km','Distance']:null,x.pace?['pace',x.pace,'Pace /km']:null,gHR?['hr',gHR+' bpm','Avg HR']:null,gKC?['st',gKC+' kcal','Calories']:null,gMX?['hr',gMX+' bpm','Max HR']:null].filter(Boolean).slice(0,8);
  const stH=st.length?`<div class="rc-stats n${st.length}">${st.map(([k,v,l,t])=>`<div class="rc-st"><span class="rc-sl">${rcI(k==='sim'?'flag':k,RC_HUE[k])}${l}</span><span class="rc-sv2"><b>${esc(v)}</b>${t?tagH(t[0],t[1]):''}</span></div>`).join('')}</div>`:'';
  // runs
  const runs=((nt.match(/^Runs: (.*)$/m)||[])[1]||'').split(' / ').map(t=>t.trim()).filter(Boolean),bpm=runBpm(x),rs=runs.map(secOf);let runH='';

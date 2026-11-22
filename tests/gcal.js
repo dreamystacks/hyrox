@@ -16,6 +16,6 @@ const t=await p.evaluate(()=>{const c=document.querySelector('#today .rc2');retu
 ok(t&&/Calories 692 kcal/.test(t.txt)&&/Avg HR 140 bpm/.test(t.txt)&&/Max HR 180 bpm/.test(t.txt),'hockey card shows Garmin calories from the activity cache: '+(t&&t.txt.slice(0,160)));
 ok(t&&t.n===5&&/n5/.test(t.cls),'five stat tiles '+(t&&t.n));
 ok(await p.evaluate(()=>{const s=[...document.querySelectorAll('#today .rc2 .rc-st')];const a=s[3].getBoundingClientRect(),z=s[4].getBoundingClientRect();return z.width>a.width*1.8}),'the fifth tile spans the row');
-const r=await p.evaluate(()=>reportCard(getLogs().find(x=>x.id==='1795100000000'),{mine:true}));ok(/392 kcal/.test(r)&&(r.match(/class="rc-st"/g)||[]).length===6,'run card keeps the kcal from its Garmin line (before Max HR when tiles run out), 6 tiles');
+const r=await p.evaluate(()=>reportCard(getLogs().find(x=>x.id==='1795100000000'),{mine:true}));ok(/392 kcal/.test(r)&&(r.match(/class="rc-st"/g)||[]).length>=7&&/Max HR/.test(r),'run card keeps the kcal and Max HR (v208: up to 8 tiles)');
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no overflow');
 ok(!errs.length,'no page errors '+errs.join(' | '));await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
