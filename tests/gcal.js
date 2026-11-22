@@ -14,8 +14,8 @@ ok(calls>=1,'empty calorie cache makes the app ask the garmin action even inside
 await p.evaluate(()=>refreshViews());await p.clock.runFor(300);
 const t=await p.evaluate(()=>{const c=document.querySelector('#today .rc2');return c&&{txt:c.innerText.replace(/\s+/g,' '),n:c.querySelectorAll('.rc-st').length,cls:c.querySelector('.rc-stats').className}});
 ok(t&&/Calories 692 kcal/.test(t.txt)&&/Avg HR 140 bpm/.test(t.txt)&&/Max HR 180 bpm/.test(t.txt),'hockey card shows Garmin calories from the activity cache: '+(t&&t.txt.slice(0,160)));
-ok(t&&t.n===5&&/n5/.test(t.cls),'five stat tiles '+(t&&t.n));
-ok(await p.evaluate(()=>{const s=[...document.querySelectorAll('#today .rc2 .rc-st')];const a=s[3].getBoundingClientRect(),z=s[4].getBoundingClientRect();return z.width>a.width*1.8}),'the fifth tile spans the row');
+ok(t&&t.n===5&&/Times.*Heart rate.*Energy/.test(t.txt),'five stat tiles in Times, Heart rate, Energy (v210) '+(t&&t.n));
+ok(await p.evaluate(()=>{const s=[...document.querySelectorAll('#today .rc2 .rc-st')];const a=s[1].getBoundingClientRect(),z=s[0].getBoundingClientRect();return z.width>a.width*1.8}),'a lone tile in its group spans the row');
 const r=await p.evaluate(()=>reportCard(getLogs().find(x=>x.id==='1795100000000'),{mine:true}));ok(/392 kcal/.test(r)&&(r.match(/class="rc-st"/g)||[]).length>=7&&/Max HR/.test(r),'run card keeps the kcal and Max HR (v208: up to 8 tiles)');
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no overflow');
 ok(!errs.length,'no page errors '+errs.join(' | '));await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
