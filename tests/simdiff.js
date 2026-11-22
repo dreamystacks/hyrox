@@ -7,8 +7,12 @@ const B={id:'1794081206085',athlete:'fred',date:'2026-11-07',week:6,session:'Sat
 await p.addInitScript(([a,c])=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_fred_logs_v2',JSON.stringify([a,c]))},[A,B]);
 await p.goto('file:///home/claude/hyrox/index.html');await p.waitForTimeout(4000);
 const r=await p.evaluate(([a,c])=>{const x=simParse(a),y=simParse(c);return simSame(x,y)},[A,B]);
-ok(r.scale&&r.why.includes('different stations'),'different stations means scaled compare');
+ok(r.mix&&!r.scale&&/8 stations vs 4/.test(r.why.join()),'different stations: compared on what both share, not scaled');
 await p.click('#today [data-simcmp]');await p.waitForTimeout(1200);
 const t=await p.evaluate(()=>document.querySelector('#simCmpModal').innerText);
-ok(!/% faster|% slower/.test(t),'no raw percent in the sheet');ok(/different stations/.test(t),'sheet says different stations');
+ok(!/% faster|% slower/.test(t),'no raw percent in the sheet');ok(/on what both sims share/.test(t)&&/Totals are not compared/.test(t),'sheet says what is compared');ok(!/Sim total/.test(t.split('Race projection')[0]),'no total row');
+const O={...A,id:'1792865850278',date:'2026-10-24',week:4,stations:'SkiErg 2:12 · Sled push 1:20 · Sled pull 2:07 · Burpee broad jumps 2:19',notes:'Sim week 4 · total 32:25\nRuns: 5:22 / 5:58 / 6:20 / 6:44\nLoads (lb): Sled push 250 (1/1) · Sled pull 170 (1/1)'};
+await p.evaluate(o=>{const L=getLogs();L.push(o);localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(L))},O);
+const pv=await p.evaluate(()=>simPrev(getLogs().find(x=>x.id==='1795400000000'),'fred').id);ok(pv==='1792865850278','picks the older sim with the exact same stations over the newer 8 station one');
+const h=await p.evaluate(()=>{const a=getLogs().find(x=>x.id==='1795400000000');openSimCmp(a,'fred');return 1});await p.waitForTimeout(1200);const t2=await p.evaluate(()=>document.querySelector('#simCmpModal .sv').innerText);ok(/Slower than Oct 24/.test(t2)&&/Sim total/.test(t2)&&/was 32:25/.test(t2)&&/1:47/.test(t2),'verdict: slower than Oct 24 by 1:47');ok(/\+30 lb heavier/.test(t2),'sled weight change shown');
 await b.close();console.log(bad?bad+' FAILED':'ALL OK');process.exit(bad?1:0)})();

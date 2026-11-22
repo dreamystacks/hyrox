@@ -48,7 +48,7 @@ await p.close();
  ok(r.proj>0&&r.projOld>0&&r.proj!==r.projOld,'projection as of each sim date '+[r.proj,r.projOld]);
  await p.click('#today [data-simcmp]');await p.clock.runFor(800);
  ok(/Race projection \d+:\d\d:\d\d · [+−]\d+:\d\d vs the 1:25:00 goal/.test(await p.locator('#simCmpBody .sc-proj').innerText()),'report shows race projection vs goal');
- ok(/different distances, sled push 290 to 250 lb\. Station and run changes are scaled/.test(await p.locator('#simCmpBody .sc-fmt').innerText()),'report explains the scaling');
+ ok(/different distances, sled push 290 to 250 lb\. Times scaled to race distance/.test(await p.locator('#simCmpBody .sc-fmt').innerText()),'report explains the scaling');
  await p.close();
  p=await open('2026-10-24T14:30:00',[W3,W4]); ok(!(await p.evaluate(()=>{const L=getLogs('fred');return simSame(simParse(L.find(x=>x.id==='b')),simParse(L.find(x=>x.id==='a'))).scale})),'same format is not scaled');await p.close()}
 // no button on non sim days
