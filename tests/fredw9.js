@@ -5,12 +5,13 @@ let ok=true;const f=(c,m)=>{if(!c){ok=false;console.log('FAIL',m)}else console.l
 await p.clock.install({time:new Date('2026-11-25T12:00:00-05:00')});
 await p.goto('file://'+path.resolve(__dirname,'../index.html'));
 const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.click('[data-who=fred]');await p.clock.runFor(5000);
-const r=await p.evaluate(()=>{const w=PLAN[8];return {live:w.fri,items:sessionItems('Fri',w.fri,w).map(x=>x.title),fa:PLAN_ATH.fred[9],wi:PLAN_ATH.will[9]||null,base:PLAN0[8].fri}});
+const cj0=require('../coach.json');const r=await p.evaluate(()=>{const w=PLAN[8];return {live:w.fri,items:sessionItems('Fri',w.fri,w).map(x=>x.title),fa:PLAN_ATH.fred[9],wi:PLAN_ATH.will[9]||null,base:PLAN0[8].fri}});
 f(r.fa&&!/Finisher/.test(r.fa.fri),'Fred week 9 Friday has no finisher');
 f(r.fa&&/Wall ball technique 2 x 10/.test(r.fa.fri),'technique sets kept');
 f(r.fa&&/OHP 3 x 5/.test(r.fa.fri)&&/hammer curls/.test(r.fa.fri),'lifts and arms kept');
 f(r.fa&&/Staff party/.test(r.fa.notes),'notes explain the moves');
-f(!r.wi,'Will week 9 untouched');
+f(r.wi&&!/Finisher/.test(r.wi.fri)&&!/technique/.test(r.wi.fri)&&/hammer curls/.test(r.wi.fri)&&/Staff party/.test(r.wi.notes),'Will week 9 same moves, no technique sets (v212)');
+f(!(cj0.athletes.will.plan['9']||{}).fri,'Will coach Friday override removed');
 f(!/Finisher/.test(r.live)&&!r.items.some(t=>/EMOM/i.test(t)),'live Friday plan for Fred has no EMOM item: '+r.items.join(' | '));
 f(!errs.length,'no page errors '+errs.join(';'));
 f(/Finisher: EMOM/.test(r.base),'base plan keeps the finisher');
