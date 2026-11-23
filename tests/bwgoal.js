@@ -13,7 +13,7 @@ ok(g.s.st==='on'&&g.s.txt==='On pace','week 7 average 157.0 = on pace');
 await p.evaluate(()=>showView('bench'));await p.clock.runFor(800);
 const tile=await p.locator('[data-dash=bw]').innerText();ok(/On pace/.test(tile),'Progress tile: On pace ('+tile.replace(/\n/g,' | ')+')');
 await p.locator('[data-dash=bw]').click();await p.clock.runFor(600);
-const sh=await p.locator('#dashModal').innerText();ok(/Goal 143\.0 lb by week 23 \(Mar 1\)/.test(sh)&&/Checkpoint 153\.0 lb · End of 2026[\s\S]{0,8}by Dec 27/.test(sh)&&/Week 7 average 157\.0/.test(sh)&&/14\.0 lb to go/.test(sh),'sheet goal block: goal, average, plan, to go');
+const sh=await p.locator('#dashModal').innerText();ok(/Goal 143\.0 lb\s*by Mar 1 · week 23/.test(sh)&&/Next checkpoint\s*153\.0 lb by Dec 27/.test(sh)&&/Week 7 average\s*157\.0/.test(sh)&&/To go\s*14\.0/.test(sh),'v213 sheet goal block: goal, checkpoint, weekly average, to go '+sh.slice(0,300).replace(/\s+/g,' '));
 ok(await p.locator('#dashModal .bw-goal').count()===1,'chart has the dashed plan line');
 ok(await p.evaluate(()=>document.documentElement.scrollWidth<=390),'no overflow at 390');
 await p.screenshot({path:(process.env.SHOTS||'/tmp')+'/bwgoal.png'});await p.close();

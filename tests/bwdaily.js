@@ -14,7 +14,7 @@ ok(!/Weigh in today/.test(await p.locator('#today').innerText()),'row gone once 
 const L=await p.evaluate(()=>{const L=bwList('fred');return{n:L.length,last:L[L.length-1],avg:bwWeekAvg(L).pop().kg/LB}});
 ok(L.n===2&&L.last.dow===1&&Math.abs(L.avg-156.7)<.05,'list has Tuesday, week 8 average 156.7');
 await p.evaluate(()=>showView('bench'));await p.clock.runFor(800);await p.locator('[data-dash=bw]').click();await p.clock.runFor(600);
-const sh=await p.locator('#dashModal').innerText();ok(/Week 8 · Tue/.test(sh)&&/wk 8 Tue/i.test(sh),'history row Week 8 · Tue, input labelled wk 8 Tue');
+const sh=await p.locator('#dashModal').innerText();ok(await p.evaluate(()=>{const d=[...document.querySelectorAll('#bwWrap .bwh-w')].find(x=>/Week 8/.test(x.textContent));return !!d&&/Tue/.test(d.querySelector('.bwh-days').textContent)})&&/Log a weigh-in\s*Tue, Nov 17/.test(sh),'v213: week 8 row holds the Tue weigh-in, input labelled Tue, Nov 17');
 await p.close();
 p=await open('2026-11-16T07:00:00',{});td=await p.locator('#today').innerText();ok(/Weigh-in due[\s\S]*Monday check/.test(td),'Monday: weigh-in due');await p.close();
 p=await open('2026-11-22T07:00:00',{bw_8:{v:'157.0 lb'},bw_8b:{v:'156.0 lb'},bw_8d6:{v:'156.6 lb'}});ok(/Weigh in today/.test(await p.locator('#today').innerText())===false,'Sunday already logged: no row');

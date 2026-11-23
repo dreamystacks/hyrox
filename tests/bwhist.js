@@ -10,17 +10,17 @@ const open=async w=>{const p=await b.newPage({viewport:{width:w,height:844}});p.
  await p.clock.install({time:new Date('2026-10-29T09:00:00')});await p.goto(URL);await p.clock.runFor(5000);await p.click('.bottombar [data-view=bench]');await p.evaluate(()=>{const s=document.getElementById('dashStore');if(s)s.hidden=false});await p.clock.runFor(600);
  await p.evaluate(()=>document.querySelector('.tr[data-tr=bw]').click());await p.clock.runFor(300);return p};
 for(const w of [390,360]){const p=await open(w);
- const r=await p.evaluate(()=>{const rt=x=>[x.querySelector('.bwh-d b'),x.querySelector('.bwh-d i'),x.querySelector('.bwh-v'),x.querySelector('.bwh-c')].map(e=>e.textContent.replace(/\s+/g,' ').trim()).join(' ');const h=document.querySelector('#bwWrap .bwh');return h&&{head:h.querySelector('.bwh-h').textContent,rows:[...h.querySelectorAll(':scope > .bwh-r')].map(rt),more:h.querySelector('.bwh-more summary')&&h.querySelector('.bwh-more summary').textContent,hidden:h.querySelectorAll('.bwh-more .bwh-r').length}});
- ok(r&&r.head==='Weigh-ins8 logged',w+': history under the chart '+(r&&r.head));
- ok(r.rows[0]==='Mon, Oct 26 Week 5 · Mon 160.1 lb +0.5','newest first with date, week, value and change: '+r.rows[0]);
- ok(r.rows[1]==='Mon, Oct 19 Week 4 · Mon 159.6 lb −0.8','drop shown with a minus: '+r.rows[1]);
- ok(r.rows.length===6&&r.more==='Show all 8'&&r.hidden===2,'6 shown, the rest behind Show all '+[r.rows.length,r.more,r.hidden]);
- await p.click('#bwWrap .bwh-more summary');ok(await p.evaluate(()=>{const x=[...document.querySelectorAll('#bwWrap .bwh-r')].pop();return[x.querySelector('.bwh-d b').textContent,x.querySelector('.bwh-c').textContent].join(' ')})==='Mon, Sep 28 first','oldest is marked first');
- ok(await p.evaluate(()=>{const w=document.getElementById('bwWrap').getBoundingClientRect();return document.documentElement.scrollWidth<=innerWidth&&[...document.querySelectorAll('.bwh-r')].every(r=>r.getBoundingClientRect().right<=w.right+1)}),w+': no overflow');
+ const r=await p.evaluate(()=>{const rt=x=>[x.querySelector('.bwh-d b'),x.querySelector('.bwh-d i'),x.querySelector('.bwh-v'),x.querySelector('.bwh-c')].map(e=>e.textContent.replace(/\s+/g,' ').trim()).join(' ');const h=document.querySelector('#bwWrap .bwh');return h&&{head:h.querySelector('.bwh-h').textContent,rows:[...h.querySelectorAll(':scope > .bwh-w > summary')].map(rt),more:h.querySelector('.bwh-more summary')&&h.querySelector('.bwh-more summary').textContent,hidden:h.querySelectorAll('.bwh-more .bwh-w').length}});
+ ok(r&&r.head==='By week8 weigh-ins',w+': history under the chart '+(r&&r.head));
+ ok(r.rows[0]==='Week 5 Oct 26 to 1 · 1 weigh-in 160.1 lb +0.5','v213: one row per week, newest first, avg and change vs prior week: '+r.rows[0]);
+ ok(r.rows[1]==='Week 4 Oct 19 to 25 · 1 weigh-in 159.6 lb −0.5','drop shown with a minus: '+r.rows[1]);
+ ok(r.rows.length===5&&!r.more&&r.hidden===0,'5 weeks, no Show all under 7 '+[r.rows.length,r.more,r.hidden]);
+ok(await p.evaluate(()=>{const x=[...document.querySelectorAll('#bwWrap .bwh-w > summary')].pop();return[x.querySelector('.bwh-d b').textContent,x.querySelector('.bwh-c').textContent].join(' ')})==='Week 1 first','oldest week is marked first');ok(await p.evaluate(()=>{const d=[...document.querySelectorAll('#bwWrap .bwh-w')].pop();d.open=true;return d.querySelector('.bwh-days').textContent.replace(/\s/g,'')})==='Mon157.4Thu158.0','tap a week shows its days');
+ ok(await p.evaluate(()=>{const w=document.getElementById('bwWrap').getBoundingClientRect();return document.documentElement.scrollWidth<=innerWidth&&[...document.querySelectorAll('.bwh-w > summary')].every(r=>r.getBoundingClientRect().right<=w.right+1)}),w+': no overflow');
  if(w===390)await p.locator('#bwWrap').screenshot({path:(process.env.SHOTS||'/tmp')+'/bwhist.png'});
  await p.close()}
 // another athlete: read only, history still shows
 {const p=await open(390);await p.evaluate(()=>{viewAs='will';renderBench();document.querySelector('.tr[data-tr=bw]')&&document.querySelector('.tr[data-tr=bw]').click()}).catch(()=>{});
  const r=await p.evaluate(()=>{renderBW('will');const h=document.querySelector('#bwWrap .bwh');return[h&&h.querySelector('.bwh-h').textContent,!!document.getElementById('bwInput')]});
- ok(r[0]==='Weigh-ins1 logged','another athlete shows their own history');await p.close()}
+ ok(r[0]==='By week1 weigh-in','another athlete shows their own history');await p.close()}
 ok(!errs.length,'no page errors '+errs.join(' | '));await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
