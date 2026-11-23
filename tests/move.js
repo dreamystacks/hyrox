@@ -1,7 +1,7 @@
 // v196: move a session to another day, this week only (synced checks "mv-<week>"). Plan sheet button, picker of free days, source row Moved, destination row with the session and Moved from, Today default and hint on the day, Up next, finish note, states (no Missed on the source), Move it back. node tests/move.js
 const {chromium}=require('playwright'),path=require('path');let f=0;const ok=(c,m)=>{if(!c){f++;console.log('FAIL',m)}else console.log('ok  ',m)};
 (async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM||'/opt/pw-browsers/chromium'});const errs=[];
-const open=async t=>{const p=await b.newPage({viewport:{width:390,height:844}});p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1')});await p.clock.install({time:new Date(t)});await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.clock.runFor(4500);return p};
+const open=async t=>{const p=await b.newPage({viewport:{width:390,height:844}});p.on('pageerror',e=>errs.push(e.message));await p.addInitScript(()=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');if(!localStorage.getItem('hrx_fred_checks_v2'))localStorage.setItem('hrx_fred_checks_v2',JSON.stringify({'mv-9':''}))/* v214: clear Fred's default week 9 moves */});await p.clock.install({time:new Date(t)});await p.goto('file://'+path.resolve(__dirname,'../index.html'));await p.clock.runFor(4500);return p};
 let p=await open('2026-11-23T09:00:00');// Monday week 9
 await p.evaluate(()=>{showView('plan')});await p.clock.runFor(400);
 await p.locator('.day-card[data-day=Fri] .day-head').click();await p.clock.runFor(400);

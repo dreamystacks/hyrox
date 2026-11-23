@@ -1836,7 +1836,7 @@ let currentWeek=Math.max(1,Math.min(27,Math.floor((new Date()-new Date('2026-09-
 const dayDefs=[['Mon','Heavy lower + legs & grip EMOM','mon',0],['Tue','Run + arms A','tue',1],['Wed','Rest',null,2],['Thu','Hockey · hard conditioning',null,3],['Fri','Heavy upper + arms + engine EMOM','fri',4],['Sat','HYROX sim','sat',5],['Sun','Rest / optional easy','sun',6]];
 // ---------- display helpers (display only: log values and checklist keys unchanged) ----------
 // v131: a Friday whose finisher is a station volume block is not an EMOM day
-function dayLabel(day,label,w){return day==='Fri'&&/Station volume:/.test(w&&w.fri||'')?String(label).replace('Upper + EMOM','Upper + station volume'):label}
+function dayLabel(day,label,w){const t=w&&w.fri||'';return day!=='Fri'?label:/Station volume:/.test(t)?String(label).replace('Upper + EMOM','Upper + station volume'):(!/EMOM/i.test(t)&&/Then arms block/i.test(t))?String(label).replace('Upper + EMOM','Upper + arms'):label}// v214: a Friday with no EMOM (week 9, Fred and Will) reads Upper + arms
 const DAY_NAME={Mon:'Legs lift + EMOM',Tue:'Run + Arms',Wed:'Rest',Thu:'Hockey',Fri:'Upper + EMOM',Sat:'Sim',Sun:'Easy run'};
 dayDefs.forEach(d=>{d[1]=DAY_NAME[d[0]]||d[1]});
 function cap(x){x=String(x||'').trim();return x.charAt(0).toUpperCase()+x.slice(1)}
@@ -2724,7 +2724,9 @@ let peCur=null;
 function peRefresh(){try{renderPlan();renderToday()}catch{}}
 function openPE(wk,day){const k=ADJ_DAY[day];if(!k||viewing()!==athlete)return;const w=PLAN[wk-1],names={Mon:'Monday',Tue:'Tuesday',Fri:'Friday',Sat:'Saturday',Sun:'Sunday'};peCur={wk,day,k};$('peTitle').textContent=`Week ${wk} · ${names[day]}`;$('peText').value=w[k]||'';$('peErr').textContent='';$('peReset').style.display=userEdit(wk,k)?'':'none';daySheetClose();sheetFrom($('peModal').querySelector('.sheet'));$('peModal').classList.add('show')}
 // v196 (Fred, Nov 20): move a session to another day, this week only. Synced checks key "mv-<week>" = JSON {srcDay: destDay}; the log keeps the source session name on the destination date (same as a make up), so every count and the coach already read it.
-function mvMap(wk,who){who=who||planWho();let raw;try{raw=localStorage.getItem(nsKey(who,'checks'))}catch{return{}}if(!raw||raw.indexOf('"mv-')<0)return{};let o;try{o=JSON.parse(raw)}catch{return{}}let v=o['mv-'+wk];if(!v)return{};if(typeof v==='string'){try{v=JSON.parse(v)}catch{return{}}}return v&&typeof v==='object'?v:{}}
+// v214 (Fred, Nov 23: "push it to the app"): week 9 moves set for Fred and Will by default (Friday's upper session on Wednesday, the sim on Friday); a stored mv-9 (even empty after Move it back) wins.
+const MV_DEF={fred:{9:{Fri:'Wed',Sat:'Fri'}},will:{9:{Fri:'Wed',Sat:'Fri'}}};
+function mvMap(wk,who){who=who||planWho();const def=(MV_DEF[who]||{})[wk];let raw;try{raw=localStorage.getItem(nsKey(who,'checks'))}catch{return def?{...def}:{}}if(!raw||raw.indexOf('"mv-'+wk+'"')<0)return def?{...def}:{};let o;try{o=JSON.parse(raw)}catch{return def?{...def}:{}}if(!('mv-'+wk in o))return def?{...def}:{};let v=o['mv-'+wk];if(!v)return{};if(typeof v==='string'){try{v=JSON.parse(v)}catch{return{}}}return v&&typeof v==='object'?v:{}}
 function mvTo(wk,day,who){return mvMap(wk,who)[day]||null}
 function mvFrom(wk,day,who){const m=mvMap(wk,who);return Object.keys(m).find(k=>m[k]===day)||null}
 function mvStore(wk,src,dst){const m=Object.assign({},mvMap(wk,athlete));if(dst)m[src]=dst;else delete m[src];setCheck('mv-'+wk,Object.keys(m).length?JSON.stringify(m):'')}
