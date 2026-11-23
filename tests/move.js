@@ -7,7 +7,7 @@ await p.evaluate(()=>{showView('plan')});await p.clock.runFor(400);
 await p.locator('.day-card[data-day=Fri] .day-head').click();await p.clock.runFor(400);
 ok(await p.locator('.day-card[data-day=Fri] [data-mvday]').count()===1,'Friday sheet offers Move to another day');
 await p.locator('.day-card[data-day=Fri] [data-mvday]').click();await p.clock.runFor(400);
-const opts=await p.locator('#pickList .lr b').allInnerTexts();ok(opts.some(t=>/Wednesday/.test(t))&&!opts.some(t=>/Tuesday|Saturday|Thursday/.test(t)),'picker lists free days only: '+opts.join(' / '));
+const opts=await p.locator('#pickList .lr b').allInnerTexts();ok(opts.some(t=>/Wednesday/.test(t))&&!opts.some(t=>/Tuesday|Saturday/.test(t)),'picker lists free days only (v214: week 9 Thursday is a free rest day): '+opts.join(' / '));
 await p.locator('#pickList .lr',{hasText:'Wednesday'}).click();await p.clock.runFor(600);
 ok(await p.evaluate(()=>JSON.stringify(mvMap(9,'fred')))==='{"Fri":"Wed"}','stored as mv-9 {"Fri":"Wed"}');
 await p.evaluate(()=>{document.querySelectorAll('.day-card.open').forEach(c=>c.classList.remove('open'));renderPlan()});await p.clock.runFor(300);
