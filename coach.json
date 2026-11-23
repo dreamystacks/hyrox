@@ -30,7 +30,7 @@
         {
           "week": 9,
           "day": "Sat",
-          "text": "First full sim at 85%: cap run 1 at 5:50, keep every 1 km within 15 s of it, and jog the first 200 m after burpee broad jumps and lunges before building back."
+          "text": "Full sim at 85% on Friday: start run 1 at 6:00, not faster (Sunday's half sim went 5:49 to 6:38, a 49 s fade), keep every 1 km within 15 s of it, and jog the first 200 m after burpee broad jumps and lunges before building back."
         }
       ],
       "loads": {
@@ -106,7 +106,7 @@
         {
           "week": 9,
           "day": "Mon",
-          "text": "First lunges back after the knee: DB walking lunges 10 kg per hand for 2 x 20 m, RowErg in the EMOM instead of sandbag lunges; switch to step ups if the knee goes above 2/10."
+          "text": "Still sick on Sunday: EMOM is 12 min (3 rounds) this Monday and lunges stay 10 kg for 2 x 20 m; if you still feel feverish or the knee goes above 2/10, stop and switch to step ups or skip the EMOM."
         },
         {
           "week": 9,
@@ -158,8 +158,8 @@
         },
         "9": {
           "mon": {
-            "text": "Back squat 3 x 5. DB walking lunges 10 kg per hand 2 x 20 m. Cable crunch 3x10. EMOM 16 min (4 rounds, shorter: full sim Saturday): 1) sled push 25 m race weight 2) RowErg 200 m 3) farmers 60 m, 2 x 24 kg (race weight, grip) 4) sled pull 12.5 m race weight",
-            "why": "Knee 2, 0, 0 this week after 7 and 6: lunges come back light and only once, and your farmers carry was 53 lb with 5 s left, so race weight before 32 kg."
+            "text": "Back squat 3 x 5. DB walking lunges 10 kg per hand 2 x 20 m. Cable crunch 3x10. EMOM 12 min (3 rounds, shorter: still sick and full sim this week): 1) sled push 25 m race weight 2) RowErg 200 m 3) farmers 60 m, 2 x 24 kg (race weight, grip) 4) sled pull 12.5 m race weight",
+            "why": "Nov 22 sim: still sick after two weeks without cardio, runs 7:07 to 9:14, RPE 8, knee 3: one round less so you reach the full sim fresh. Lunges stay light (10 kg, 2 x 20 m)."
           },
           "tue": {
             "text": "5 x 1 km @ race pace of about 6:15/km, 90 s rest\nLegs: 10 burpees (no jump) before rep 2, 10 step ups per leg before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
@@ -170,5 +170,5 @@
       }
     }
   },
-  "nightly": "2026-11-21T02:50:00Z"
+  "nightly": "2026-11-23T02:50:00Z"
 }
