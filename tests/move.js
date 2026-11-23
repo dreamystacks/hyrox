@@ -12,7 +12,7 @@ await p.locator('#pickList .lr',{hasText:'Wednesday'}).click();await p.clock.run
 ok(await p.evaluate(()=>JSON.stringify(mvMap(9,'fred')))==='{"Fri":"Wed"}','stored as mv-9 {"Fri":"Wed"}');
 await p.evaluate(()=>{document.querySelectorAll('.day-card.open').forEach(c=>c.classList.remove('open'));renderPlan()});await p.clock.runFor(300);
 const fri=await p.locator('.day-card[data-day=Fri] .day-head').innerText(),wed=await p.locator('.day-card[data-day=Wed] .day-head').innerText();
-ok(/Moved to Wed this week/.test(fri)&&/Moved/.test(fri),'Friday row: Moved to Wed · '+fri.replace(/\n/g,' | '));
+ok(/Rest day/.test(fri)&&/Moved to Wed: Upper/.test(fri)&&/Rest/.test(fri),'v216 Friday row: Rest day, Moved to Wed: session · '+fri.replace(/\n/g,' | '));
 ok(/Upper/.test(wed)&&/Moved from Fri/.test(wed)&&/Upcoming/.test(wed),'Wednesday row: the session, Moved from Fri, Upcoming · '+wed.replace(/\n/g,' | '));
 await p.evaluate(()=>showView('today'));await p.clock.runFor(300);
 await p.close();
@@ -28,7 +28,7 @@ await p.close();
 p=await open('2026-11-27T09:00:00');// Friday, moved session not done yet on Wed
 await p.evaluate(()=>{mvStore(9,'Fri','Wed');refreshViews();showView('plan')});await p.clock.runFor(400);
 const wedS=await p.locator('.day-card[data-day=Wed] .day-head').innerText(),friS=await p.locator('.day-card[data-day=Fri] .day-head').innerText();
-ok(/To do/.test(wedS),'missed destination this week shows To do: '+wedS.replace(/\n/g,' | '));ok(/Moved/.test(friS)&&!/To do|Today/.test(friS),'source stays Moved on its own day');
+ok(/To do/.test(wedS),'missed destination this week shows To do: '+wedS.replace(/\n/g,' | '));ok(/Rest/.test(friS)&&!/To do|Today/.test(friS),'v216 source reads Rest on its own day');
 const stt=await p.evaluate(()=>seasonStates('fred')[8].map(d=>d.day+':'+d.st).join(','));ok(/Fri:rest/.test(stt)&&/Wed:missed/.test(stt),'season states: '+stt);
 await p.locator('.day-card[data-day=Fri] .day-head').click();await p.clock.runFor(300);await p.locator('.day-card[data-day=Fri] [data-mvundo]').click();await p.clock.runFor(400);
 ok(await p.evaluate(()=>JSON.stringify(mvMap(9,'fred')))==='{}','Move it back clears the move');
