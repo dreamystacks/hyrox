@@ -39,7 +39,7 @@ const cc=await p.locator('#coachWrap').innerText();ok(/Plan changes from the coa
 await p.close();
 // Saturday: Today card, workout, finish note
 p=await open('2026-11-07T08:00:00');
-const t7=await p.locator('#today .td-session').innerText();ok(/Adjusted by coach/.test(t7)&&/1 km/.test(await p.locator('#today .td-session').textContent()),'Today Saturday card: badge and 1 km runs');
+const t7=await p.locator('#today .td-session').innerText();ok(/Coach changed today/.test(t7)&&/1 km/.test(await p.locator('#today .td-session').textContent()),'Today Saturday card: folded Coach box (v211) and 1 km runs');
 await p.evaluate(()=>startWorkout(6,5,'2026-11-07'));await p.clock.runFor(600);
 ok(/Adjusted by coach/.test(await p.locator('#workout').innerText()),'workout shows the badge');
 const notes=await p.evaluate(()=>{window.__p=null;openFinish=x=>{window.__p=x};finishWorkout();return window.__p.notes});
@@ -48,12 +48,12 @@ await p.evaluate(()=>closeWorkout());
 // Settings toggle
 await p.evaluate(()=>$('adjRow').click());await p.clock.runFor(200);
 ok(await p.evaluate(()=>PLAN[5].sat===PLAN0[5].sat&&localStorage.getItem('hrx_fred_planorig_v2')==='1'&&$('adjVal').textContent==='Off'),'Settings off: original plan');
-ok(!/Adjusted by coach/.test(await p.locator('#today').innerText()),'Today drops the badge when off');
+ok(!/Adjusted by coach|Coach changed today/.test(await p.locator('#today').innerText()),'Today drops the badge when off');
 await p.evaluate(()=>$('adjRow').click());await p.clock.runFor(200);ok(await p.evaluate(()=>PLAN[5].sat.includes('full volume')),'Settings on again: coach plan back');
 // viewing Will: his plan is the original
 ok(await p.evaluate(()=>{viewAthlete='will';const r=PLAN[5].sat===PLAN0[5].sat;viewAthlete=null;return r}),'Will (no plan in coach.json) sees the original');
 await p.close();
-p=await open('2026-11-07T08:00:00','will');ok(!/Adjusted by coach/.test(await p.locator('#today').innerText()),'Will\'s phone: no badge, original Saturday');await p.close();
+p=await open('2026-11-07T08:00:00','will');ok(!/Adjusted by coach|Coach changed today/.test(await p.locator('#today').innerText()),'Will\'s phone: no badge, original Saturday');await p.close();
 // coach prompt
 const pr=fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8');ok(/Adaptive plan \(v123/.test(pr)&&/"plan"/.test(pr),'coach prompt explains the plan field');
 ok(!errs.length,'no page errors '+errs.join(' | '));
