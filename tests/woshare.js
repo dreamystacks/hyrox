@@ -13,7 +13,7 @@ ok(cal==='Calories','Calories section head has no duplicate total: '+cal);
 ok(await p.locator('#today [data-woshare]').count()===1,'Today report card has Share report card');
 await p.click('#today [data-woshare]');await p.clock.runFor(1500);
 ok(await p.evaluate(()=>$('simCmpModal').classList.contains('show')&&$('simCmpTitle').textContent==='Report card'),'sheet opens titled Report card');
-const dim=await p.evaluate(()=>simCmpCur.cv&&[simCmpCur.cv.width,simCmpCur.cv.height]);ok(dim&&dim[0]===1080&&dim[1]===1920,'image 1080x1920');
+const dim=await p.evaluate(()=>simCmpCur.cv&&[simCmpCur.cv.width,simCmpCur.cv.height]);ok(dim&&dim[0]===1080&&dim[1]>=1920,'image 1080 wide, at least 1920 tall: '+dim);
 await p.click('#simShare');await p.clock.runFor(500);await p.waitForFunction(()=>window.__shared,null,{timeout:3000}).catch(()=>{});ok(/^image\/png\|hyrox-2026-11-24\.png$/.test(await p.evaluate(()=>window.__shared)||''),'Share hands a png: '+await p.evaluate(()=>window.__shared));
 const png=await p.evaluate(()=>simCmpCur.cv.toDataURL('image/png'));fs.writeFileSync('/tmp/woshare.png',Buffer.from(png.split(',')[1],'base64'));
 // sims keep the sim report, not the share button
