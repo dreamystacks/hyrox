@@ -23,9 +23,9 @@
       ],
       "tweaks": [
         {
-          "week": 9,
+          "week": 10,
           "day": "Mon",
-          "text": "Lunges are only the DB walking lunges now, at 30 lb per hand for 3 x 20 m (all sets were RIR 2 at 25 lb), with RowErg in the EMOM instead; keep the sled at 260 lb and carries at 70 lb until you log 10 s or more."
+          "text": "EMOM back to sled push 280 lb over 24 m and farmers 48 m at 2 x 32 kg, as you asked; back squat 3 x 5 at 165 lb (all 155 sets felt RIR 3+), keep the bar placement the same every set."
         },
         {
           "week": 9,
@@ -34,7 +34,7 @@
         }
       ],
       "loads": {
-        "crunch": 65,
+        "crunch": 70,
         "lunge": 44,
         "dblunge": 30,
         "carry": 70,
@@ -45,7 +45,9 @@
         "hammercurl": 30,
         "bayescurl": 55,
         "wallball": 14,
-        "dbbench": 60
+        "dbbench": 60,
+        "sledpush": 280,
+        "squat": 165
       },
       "unit": "lb",
       "plan": {
@@ -78,14 +80,15 @@
             "why": "Nov 23, Fred's call: the 4th minute stays a rest minute (sled push and pull at race weight do not fit in a minute yet; his 24 m push took 1:24 in the Nov 22 sim). RowErg replaces the EMOM lunges because the DB walking lunges come first."
           },
           "tue": {
-            "text": "7 x 1 km @ race pace of about 5:40/km, 90 s rest\nLegs: 10 burpee broad jumps before rep 2, 20 m sandbag lunges before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
-            "why": "Your Nov 18 reps averaged 5:37/km with a 13 s spread: hold about 5:40 for all 7, reps 2 and 4 on tired legs."
-          }
+            "text": "6 x 1 km @ race pace of about 5:40/km, 90 s rest\nLegs: 10 burpee broad jumps before rep 2, 24 m sandbag lunges before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Monday was RPE 9 and the EMOM failed (stopped at 15:42): 6 reps instead of 7 so your legs are fresh for Friday's full sim. Hold about 5:40 (Nov 18 average 5:37). Lunges 24 m to match your mat."
+          },
+          "runKm": 21
         },
         "10": {
           "mon": {
-            "text": "Back squat 3 x 5. DB walking lunges 12 kg per hand 3 x 20 m. Cable crunch 3x10. EMOM 16 min (4 rounds, same as week 9 until you nail it): 1) sled push 25 m race weight 2) RowErg 200 m 3) farmers 60 m, 2 x 32 kg (above race weight, grip) 4) rest",
-            "why": "Nov 23, Fred's call: week 9's EMOM was too big a jump from base, so it repeats until he nails it (all 4 rounds, every move inside the minute with 5 s or more left). Then it moves on toward the 20 min plan version."
+            "text": "Back squat 3 x 5. DB walking lunges 12 kg per hand 3 x 24 m. Cable crunch 3x10. EMOM 16 min (4 rounds, lighter until you nail it): 1) sled push 24 m 2) RowErg 200 m 3) farmers 48 m, 2 x 32 kg (above race weight, grip) 4) rest",
+            "why": "Nov 23 you failed the EMOM at 325 lb and 60 m (stopped at 15:42, RPE 9) and asked for sled 280 and farmers 48 m. Repeat this until all 4 rounds have 5 s or more left on every move, then step back up toward race weight. Distances in mat lengths (2 x 12 m, 3 x 16 m)."
           }
         }
       }
@@ -176,5 +179,5 @@
       }
     }
   },
-  "nightly": "2026-11-23T02:50:00Z"
+  "nightly": "2026-11-24T02:45:00Z"
 }
