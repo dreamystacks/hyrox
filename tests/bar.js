@@ -20,7 +20,7 @@ check('Log form, date input focused: bar still pushed down',await bar(),'transla
 await p.focus('#notesRoll summary').catch(()=>{});await p.evaluate(()=>{document.getElementById('notesRoll').open=true});await p.focus('#notes');await shrink(420-844);
 check('Log form, notes textarea focused (keyboard up): bar left alone',await bar(),'');
 // v190: a box still focused after the keyboard went down is not typing: the bar is realigned and the box blurred
-await p.focus('#notes');await shrink(33);await p.waitForTimeout(400);
+await p.focus('#notes');await p.waitForTimeout(1600);await shrink(33);await p.waitForTimeout(400);
 check('v190 stale focus, keyboard down: bar pushed down',await bar(),'translateY(33px)');
 check('v190 stale focus blurred',await p.evaluate(()=>document.activeElement.id||document.activeElement.tagName),'BODY');
 await p.evaluate(()=>document.activeElement.blur());await shrink(34);await p.waitForTimeout(450);
@@ -34,5 +34,9 @@ await p.evaluate(()=>{showView('today');visualViewport.height=innerHeight+41});a
 check('Today, viewport changed without any event: bar corrected within 700 ms',await bar(),'translateY(41px)');
 await p.evaluate(()=>{visualViewport.height=innerHeight});await p.waitForTimeout(700);
 check('viewport back to normal: transform cleared',await bar(),'');
+// v218: a fresh tap whose keyboard has not come up yet keeps its focus (the keyboard used to fold right back)
+await p.evaluate(()=>{showView('log');document.getElementById('notesRoll').open=true});await p.waitForTimeout(200);await p.focus('#notes');await shrink(35);await p.waitForTimeout(700);
+check('v218 fresh focus before the keyboard is up stays focused',await p.evaluate(()=>document.activeElement.id||document.activeElement.tagName),'notes');
+await p.evaluate(()=>{document.activeElement.blur();visualViewport.height=innerHeight});
 check('no page errors',errs.join('|'),'');
 await b.close();console.log(fails?fails+' FAILED':'ALL OK');process.exit(fails?1:0)})();
