@@ -34,7 +34,7 @@ await p.evaluate(()=>{closeWorkout();localStorage.removeItem('hrx_fred_workout_v
 p=await open('2026-11-10T08:00:00');
 ok(/Tired legs: 10 burpee broad jumps before rep 2, 20 m sandbag lunges before rep 4/.test(await p.locator('#today .td-session').innerText()),'Today Tuesday row shows the tired legs line');
 await p.evaluate(()=>startWorkout(7,1,'2026-11-10'));await p.clock.runFor(600);
-ok(await p.locator('#workout .wo-legs').count()===1,'workout Tuesday: legs line on the intervals');
+ok(await p.locator('#workout .wo-legs2').count()===1&&(await p.locator('#workout .wo-legs2 .wl-r').count())===2,'workout Tuesday: legs checklist on the intervals (v221)');
 ok(await p.evaluate(()=>{const x=woState();x.autoNext={parent:'w7-Tue-0',n:2,total:5,rest:90};woSave(x);return restNextTxt()})==='Now: 10 burpee broad jumps · rep 2 of 5 starts by itself','rest card before rep 2 says do the burpees');
 ok(await p.evaluate(()=>{const x=woState();x.autoNext={parent:'w7-Tue-0',n:3,total:5,rest:90};woSave(x);return restNextTxt()})==='Rep 3 of 5 starts by itself','rest card before rep 3 unchanged');
 await p.evaluate(()=>{closeWorkout();localStorage.removeItem('hrx_fred_workout_v2');currentWeek=7;showView('plan')});await p.clock.runFor(400);
