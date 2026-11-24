@@ -1531,6 +1531,11 @@ html body .tb-c.on{color:var(--acc)}
 #bwBig .bwb-card{background:var(--card);border-radius:22px;padding:6px 14px 14px;margin-top:12px}
 #bwBig .bwb-seg{margin-top:4px}
 
+/* v217 lighter body weight sheet */
+.bw2-tg{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}.bw2-last{font-size:13.5px;color:var(--text2);font-weight:550}
+.bwg2-tr{margin:16px 0 2px}.bwg2-one{display:flex;justify-content:space-between;gap:10px;margin-top:12px;font-size:14px;color:var(--text2)}.bwg2-one b{color:var(--text);font-weight:700}
+.bw2-hist{align-self:stretch;width:100%;box-sizing:border-box;min-width:0}.bw2-hist>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;cursor:pointer}.bw2-hist>summary::-webkit-details-marker{display:none}.bw2-hist>summary b{font-size:20px;font-weight:700}.bw2-hist>summary span{font-size:14px;color:var(--text2);font-weight:600}.bw2-hist[open]>summary{margin-bottom:8px}.bw2-hist .bwh-h{display:none!important}
+.bwb-svg .bw-pt{fill-opacity:.22!important}
 /* v213 flatten inside the sheet card */
 #bwWrap .bw2{gap:0}
 #bwWrap .bw2-card,#bwWrap .bwg2,#bwWrap .bw2-hero{background:none;box-shadow:none;border-radius:0;padding:18px 0;border-top:1px solid color-mix(in srgb,var(--text) 9%,transparent)}
@@ -2633,13 +2638,11 @@ function bwGoalHTML(who){const s=bwGoalStat(who);if(!s)return'';const g=s.g,u=un
  if(s.lb==null)return`<div class="bwg2"><div class="bwg2-h"><b>Goal ${f(g.lb)} ${u}</b><span class="bwt">Weigh in to start</span></div></div>`;
  const span=g.startLb-g.lb,pc=v=>Math.max(0,Math.min(100,(g.startLb-v)/span*100)),cur=pc(s.lb),pl=pc(s.plan),lost=g.startLb-s.lb,cp=(g.cps||[]).find(c=>s.wk<c.wk);
  const wksTo=cp?Math.max(1,cp.wk-s.wk):0,need=cp?(s.lb-cp.lb)/wksTo:0,stc=s.st==='behind'?'bad':s.st==='fast'?'warn':'good';
- return`<div class="bwg2"><div class="bwg2-h"><div><b>Goal ${f(g.lb)} ${u}</b><span>by ${dt(g.endDate)} · week ${g.endWk}</span></div><span class="bwt ${stc}">${esc(s.txt)}</span></div>
- <div class="bwg2-tr"><div class="bwg2-bar"><i class="bwg2-fill" style="width:${cur.toFixed(1)}%"></i>${(g.cps||[]).map(c=>`<i class="bwg2-cp" style="left:${pc(c.lb).toFixed(1)}%"></i>`).join('')}<i class="bwg2-pl" style="left:${pl.toFixed(1)}%"></i><i class="bwg2-me" style="left:${cur.toFixed(1)}%"></i></div>
- <div class="bwg2-ax"><span>${f(g.startLb)}</span>${(g.cps||[]).map(c=>`<span class="cpl" style="left:${pc(c.lb).toFixed(1)}%">${f(c.lb)}</span>`).join('')}<span>${f(g.lb)}</span></div>
- <div class="bwg2-lg"><span><i class="me"></i>You ${f(s.lb)}</span><span><i class="pl"></i>Plan ${f(s.plan)}</span>${(g.cps||[]).length?`<span><i class="cp"></i>Checkpoint</span>`:''}</div></div>
- <div class="bwg2-st"><div><span>Since wk ${g.startWk}</span><b class="${lost>0?'good':lost<0?'bad':''}">${lost>0?'−':lost<0?'+':'±'}${f(Math.abs(lost))}</b><em>${u}</em></div><div><span>Vs plan</span><b class="${s.d>1?'bad':s.d<-1.5?'warn':'good'}">${s.d>0?'+':s.d<0?'−':'±'}${f(Math.abs(s.d))}</b><em>${u} ${s.d>0?'above':'below'}</em></div><div><span>To go</span><b>${f(s.left)}</b><em>${u} left</em></div></div>
- ${cp?`<div class="bwg2-nx"><div><span>Next checkpoint</span><b>${f(cp.lb)} ${u} by ${dt(cp.date)}</b></div><div><span>Needed</span><b>${need>0?f(need)+' '+u+' / week':'Reached'}</b></div></div>`:''}
- <details class="bwg2-how"><summary>How the plan works</summary><p>${(g.cps||[]).length?`About ${f((g.startLb-g.cps[0].lb)/(g.cps[0].wk-g.startWk))} ${u} a week to the checkpoint (party weekends and Christmas), then ${f(g.rate)} ${u} a week`:`${f(g.rate)} ${u} a week from ${f(g.startLb)} ${u} (week ${g.startWk})`}, then hold it through Brisbane. Losing faster costs muscle and recovery. Progress uses your weekly average, not single weigh-ins.</p></details></div>`}
+ // v217 (Fred, Nov 24: too much information): one track (you and plan) and one line (to go, next checkpoint)
+ return`<div class="bwg2"><div class="bwg2-h"><div><b>Goal ${f(g.lb)} ${u}</b><span>by ${dt(g.endDate)}</span></div><span class="bwt ${stc}">${esc(s.txt)}</span></div>
+ <div class="bwg2-tr"><div class="bwg2-bar"><i class="bwg2-fill" style="width:${cur.toFixed(1)}%"></i><i class="bwg2-pl" style="left:${pl.toFixed(1)}%"></i><i class="bwg2-me" style="left:${cur.toFixed(1)}%"></i></div>
+ <div class="bwg2-ax"><span>${f(g.startLb)}</span><span>${f(g.lb)}</span></div></div>
+ <div class="bwg2-one"><span><b>${f(s.left)} ${u}</b> to go</span>${cp?`<span>Next <b>${f(cp.lb)} by ${dt(cp.date)}</b></span>`:''}</div></div>`}
 
 function saveBW(val){const v=parseFloat(String(val||'').replace(',','.'));if(!(v>30&&v<450)){toastMsg('Enter your weight, like 82.4');return false}const n=bwSlotNow(),cur=load(k('bench'),{}),t=new Date().toISOString(),key='bw_'+n.week+bwSuffix(n.slot);cur[key]={v:v.toFixed(1)+' '+unit(),t};store(k('bench'),cur);markDirty('bench',athlete,key,t);scheduleSync();toastMsg('Weigh-in saved');return true}
 // v213 weigh-in history by week (Fred, Nov 23): one row per week, newest first: dates, weekly average, change vs the week before, weigh-ins; tap a week for its days.
@@ -2651,19 +2654,26 @@ function bwHistHTML(L,u){if(!L.length)return'';const A=bwWeekAvg(L).sort((a,b)=>
 // The readout sits in its own strip above the plot (never over the dots); touch or drag picks the nearest weigh-in.
 let bwBigWho=null,bwBigRange='8w',bwRange='8w';
 // v213 one chart engine for the sheet and the full screen view: y axis, gridlines, weekly average line with a soft area, weigh-in dots, dashed plan line to the goal, today line
+// v217 trend: for each weigh-in, the average of the weigh-ins in the 7 days up to it; monotone cubic curve (no overshoot, no sharp corners)
+function bwTrend(L){const P=[...L].sort((a,b)=>a.x-b.x);if(!P.length)return[];const a0=P[0].x,a1=P[P.length-1].x,o=[];for(let t=a0;t<=a1+1e-6;t+=1/7){const w=P.filter(q=>q.x>t-1+1e-6&&q.x<=t+1e-6);if(w.length)o.push([t,w.reduce((s,q)=>s+q.kg,0)/w.length])}if(!o.length||Math.abs(o[o.length-1][0]-a1)>1e-6){const w=P.filter(q=>q.x>a1-1+1e-6);o.push([a1,w.reduce((s,q)=>s+q.kg,0)/w.length])}
+ return o.map((q,k)=>k===0||k===o.length-1?q:[q[0],(o[k-1][1]+2*q[1]+o[k+1][1])/4])}
+function bwSmooth(P){const n=P.length;if(!n)return'';const F=v=>v.toFixed(1);if(n<3)return'M'+P.map(q=>F(q[0])+','+F(q[1])).join(' L');
+ const d=[],m=[];for(let i=0;i<n-1;i++)d.push((P[i+1][1]-P[i][1])/((P[i+1][0]-P[i][0])||1e-6));m[0]=d[0];m[n-1]=d[n-2];for(let i=1;i<n-1;i++)m[i]=d[i-1]*d[i]<=0?0:2/(1/d[i-1]+1/d[i]);
+ let s='M'+F(P[0][0])+','+F(P[0][1]);for(let i=0;i<n-1;i++){const h=(P[i+1][0]-P[i][0])/3;s+=` C${F(P[i][0]+h)},${F(P[i][1]+m[i]*h)} ${F(P[i+1][0]-h)},${F(P[i+1][1]-m[i+1]*h)} ${F(P[i+1][0])},${F(P[i+1][1])}`}return s}
 function bwBigSVG(who,range,W=340,H=300){const L=bwList(who),A=bwWeekAvg(L).sort((a,b)=>a.week-b.week),G=bwGoal(who),u=unit(),pad={l:34,r:12,t:14,b:24},n=bwSlotNow(),nowX=(n.week||1)+(n.dow||0)/7;
  if(!L.length)return{svg:'',L};
  const last=Math.max(...L.map(p=>p.x)),first=Math.floor(Math.min(...L.map(p=>p.x))),from=range==='all'?1:range==='8w'?Math.max(1,first,Math.floor(nowX)-7):1,to=range==='all'?27.6:Math.min(27.6,Math.max(Math.ceil(last)+.6,Math.floor(nowX)+1.2));
  const x=w=>pad.l+(w-from)/(to-from)*(W-pad.l-pad.r);
  const pts=L.filter(p=>p.x>=from-.01&&p.x<=to),gin=G?(()=>{const lo=Math.max(from,G.startWk+.5),hi=Math.min(to,27.5),o=[];if(hi<=lo)return o;const ks=[lo,...G.pts.map(q=>q[0]+.5).filter(w=>w>lo&&w<hi),hi];ks.forEach(w=>o.push([w,G.planLb(w-.5)*LB]));return o})():[];
- const ks=pts.map(p=>p.kg).concat(gin.map(q=>q[1]));if(!ks.length)ks.push(L[L.length-1].kg);
- let mn=Math.min(...ks),mx=Math.max(...ks);const sp=Math.max(mx-mn,2*LB);mn-=sp*.1;mx+=sp*.1;const y=v=>pad.t+(mx-v)/(mx-mn)*(H-pad.t-pad.b);
+ const TR=bwTrend(L),tp=TR.filter(q=>q[0]>=from-.01&&q[0]<=to),ks=pts.map(p=>p.kg).concat(gin.map(q=>q[1]),tp.map(q=>q[1]));if(!ks.length)ks.push(L[L.length-1].kg);
+ let mn=Math.min(...ks),mx=Math.max(...ks);const sp=Math.max(mx-mn,2*LB);mn-=sp*.12;mx+=sp*.38;const y=v=>pad.t+(mx-v)/(mx-mn)*(H-pad.t-pad.b);
  const lo=+bwShow(mn),hi=+bwShow(mx),stp=[.5,1,2,5,10].find(t=>(hi-lo)/t<=5)||10,tk=v=>u==='lb'?v*LB:v,ticks=[];for(let t=Math.ceil(lo/stp)*stp;t<=hi;t+=stp)ticks.push(t);
  const grid=ticks.map(t=>`<line class="bwb-g" x1="${pad.l}" x2="${W-pad.r}" y1="${y(tk(t)).toFixed(1)}" y2="${y(tk(t)).toFixed(1)}"/><text class="bwb-ax" x="${pad.l-6}" y="${(y(tk(t))+3.5).toFixed(1)}" text-anchor="end">${t%1?t.toFixed(1):t}</text>`).join('');
  const span=to-from,wst=span>20?4:span>10?2:1,wl=[];for(let w=Math.ceil(from);w<=Math.floor(to-.4);w+=wst)wl.push(`<text class="bwb-ax" x="${x(w+.5).toFixed(1)}" y="${H-6}" text-anchor="middle">W${w}</text>`);
- const ax=A.filter(a=>a.week+.5>=from&&a.week+.5<=to),lp=ax.map(a=>[x(a.week+.5),y(a.kg)]);
- const area=lp.length>1?`<path class="bwb-area" d="M${lp[0][0].toFixed(1)},${H-pad.b} ${lp.map(q=>'L'+q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')} L${lp[lp.length-1][0].toFixed(1)},${H-pad.b} Z"/>`:'';
- const avg=lp.length>1?`<polyline class="bwb-avg" points="${lp.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')}"/>`:'';
+ // v217 (Fred, Nov 24: a softer trend line, like a moving average): 7 day rolling average through every weigh-in, drawn as a smooth curve
+ const lp=tp.map(q=>[x(q[0]+.07),y(q[1])]),cv=bwSmooth(lp);
+ const area=lp.length>1?`<path class="bwb-area" d="${cv} L${lp[lp.length-1][0].toFixed(1)},${H-pad.b} L${lp[0][0].toFixed(1)},${H-pad.b} Z"/>`:'';
+ const avg=lp.length>1?`<path class="bwb-avg" d="${cv}"/>`:'';
  const gl=gin.length>1?`<polyline class="bwb-plan bw-goal" points="${gin.map(q=>x(q[0]).toFixed(1)+','+y(q[1]).toFixed(1)).join(' ')}"/>`:'',
   goalLbl=G&&range==='all'?`<text class="bwb-gl" x="${W-pad.r}" y="${(y(G.kg)-6).toFixed(1)}" text-anchor="end">Goal ${bwShow(G.kg)}</text>`:'';
  const tx=nowX>=from&&nowX<=to?`<line class="bwb-now" x1="${x(nowX).toFixed(1)}" x2="${x(nowX).toFixed(1)}" y1="${pad.t}" y2="${H-pad.b}"/><text class="bwb-ax bwb-nowt" x="${x(nowX).toFixed(1)}" y="${pad.t-4}" text-anchor="middle">Today</text>`:'';
@@ -2671,14 +2681,14 @@ function bwBigSVG(who,range,W=340,H=300){const L=bwList(who),A=bwWeekAvg(L).sort
  return{svg,L}}
 function bwBigRead(L,i,who){const u=unit(),p=L[i],q=L[i-1];if(!p)return'';const d=q?(+bwShow(p.kg))-(+bwShow(q.kg)):null,W=PLAN[p.week-1],dt=W?dateAt(W.date,p.dow).toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'}):'';
  const a=bwWeekAvg(L).find(x=>x.week===p.week),G=bwGoal(who),pl=G?G.planLb(p.week):null;
- return`<div class="bwr-m"><b>${bwShow(p.kg)}<em> ${u}</em></b><span>${dt}</span></div><div class="bwr-s"><span><i>Change</i>${d==null?'First':`<b class="${d>0?'up':d<0?'dn':''}">${d>0?'+':d<0?'−':'±'}${Math.abs(d).toFixed(1)}</b>`}</span><span><i>Week ${p.week} avg</i><b>${a?bwShow(a.kg):'—'}</b></span>${pl!=null?`<span><i>Plan</i><b>${bwShow(pl*LB)}</b></span>`:''}</div>`}
+ return`<div class="bwr-m"><b>${bwShow(p.kg)}<em> ${u}</em></b><span>${dt}</span></div><div class="bwr-s"><span><i>vs previous</i>${d==null?'<b>First</b>':`<b class="${d>0?'up':d<0?'dn':''}">${d>0?'+':d<0?'−':'±'}${Math.abs(d).toFixed(1)}</b>`}</span></div>`}
 function bwWire(box,who,range,W,H){const {svg,L}=bwBigSVG(who,range,W,H),plot=box.querySelector('.bwb-plot'),rd=box.querySelector('.bwb-read');plot.innerHTML=svg||'<div class="cv-empty">No weigh-ins yet</div>';box.querySelectorAll('[data-bwr]').forEach(b=>b.classList.toggle('on',b.dataset.bwr===range));
  const sv=plot.querySelector('.bwb-svg');if(!sv){rd.innerHTML='';return}const pts=[...sv.querySelectorAll('.bwb-pt')],gd=sv.querySelector('.bw-guide');
  const sel=c=>{pts.forEach(e=>e.classList.toggle('sel',e===c));gd.setAttribute('x1',c.getAttribute('cx'));gd.setAttribute('x2',c.getAttribute('cx'));gd.classList.add('on');rd.innerHTML=bwBigRead(L,+c.dataset.i,who)};
  const pick=e=>{const r=sv.getBoundingClientRect(),vb=sv.viewBox.baseVal,sx=(e.clientX-r.left)/r.width*vb.width;let b=null,bd=1e9;pts.forEach(c=>{const dd=Math.abs(+c.getAttribute('cx')-sx);if(dd<=bd){bd=dd;b=c}});if(b)sel(b)};
  sv.addEventListener('pointerdown',e=>{pick(e);try{sv.setPointerCapture(e.pointerId)}catch{}});sv.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')pick(e)});
  if(pts.length)sel(pts.reduce((a,b)=>+b.dataset.i>+a.dataset.i?b:a))}
-const BW_RANGES=[['8w','8 weeks'],['season','Season'],['all','To Brisbane']],bwSegHTML=()=>`<div class="bwb-seg">${BW_RANGES.map(([k,l])=>`<button type="button" data-bwr="${k}">${l}</button>`).join('')}</div>`,bwLegHTML=G=>`<div class="bwb-lg"><span><i class="d"></i>Weigh-in</span><span><i class="a"></i>Weekly average</span>${G?'<span><i class="p"></i>Plan</span>':''}</div>`;
+const BW_RANGES=[['8w','8 weeks'],['season','Season'],['all','To Brisbane']],bwSegHTML=()=>`<div class="bwb-seg">${BW_RANGES.map(([k,l])=>`<button type="button" data-bwr="${k}">${l}</button>`).join('')}</div>`,bwLegHTML=G=>`<div class="bwb-lg"><span><i class="d"></i>Weigh-in</span><span><i class="a"></i>7 day average</span>${G?'<span><i class="p"></i>Plan</span>':''}</div>`;
 function bwBigRender(){const m=$('bwBig');if(m&&bwBigWho)bwWire(m,bwBigWho,bwBigRange,340,380)}
 function bwBigOpen(who){let m=$('bwBig');if(!m){m=document.createElement('div');m.id='bwBig';m.setAttribute('role','dialog');m.setAttribute('aria-label','Body weight chart');document.body.appendChild(m);m.addEventListener('click',e=>{const r=e.target.closest('[data-bwr]');if(r){bwBigRange=r.dataset.bwr;bwBigRender()}if(e.target.closest('[data-bwbx]'))bwBigClose()})}
  m.innerHTML=`<div class="bwb-h"><b>Body weight</b><button type="button" class="bwb-x" aria-label="Close" data-bwbx>✕</button></div>${bwSegHTML()}<div class="bwb-card"><div class="bwb-read" aria-live="polite"></div><div class="bwb-plot"></div>${bwLegHTML(bwGoal(who))}</div><p class="bwb-hint">Touch or slide along the chart to read each weigh-in.</p>`;
@@ -2689,12 +2699,12 @@ function renderBW(who){const el=$('bwWrap');if(!el)return;const mine=who===athle
  const fd=d=>d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'}),lw=lastP&&PLAN[lastP.week-1]?fd(dateAt(PLAN[lastP.week-1].date,lastP.dow)):'';
  const today=PLAN[n.week-1]?fd(dateAt(PLAN[n.week-1].date,n.dow)):'',curV=(L.find(p=>p.week===n.week&&p.slot===n.slot)||{}).kg;
  el.innerHTML=`<div class="bw2">
- <div class="bw2-hero"><div class="bw2-l"><span class="bw2-cap">${cur?`Week ${cur.week} average`:'Body weight'}</span><div class="bw2-big">${cur?bwShow(cur.kg):'—'}<small>${u}</small></div>${dv!=null?`<span class="bwt ${dv<0?'good':dv>0?'bad':''}">${dv<0?'▼':dv>0?'▲':''} ${Math.abs(dv).toFixed(1)} ${u} vs week ${prev.week}</span>`:''}</div>
- <div class="bw2-r">${lastP?`<span><i>Last weigh-in</i><b>${bwShow(lastP.kg)} ${u}</b><em>${lw}</em></span>`:''}<span><i>This week</i><b>${nw} ${nw===1?'weigh-in':'weigh-ins'}</b><em>Mon and Thu at least</em></span></div></div>
+ <div class="bw2-hero"><div class="bw2-l"><span class="bw2-cap">${cur?`Week ${cur.week} average`:'Body weight'}</span><div class="bw2-big">${cur?bwShow(cur.kg):'—'}<small>${u}</small></div><div class="bw2-tg">${dv!=null?`<span class="bwt ${dv<0?'good':dv>0?'bad':''}">${dv<0?'▼':dv>0?'▲':''} ${Math.abs(dv).toFixed(1)} ${u} vs last week</span>`:''}
+${lastP?`<span class="bw2-last">Last ${bwShow(lastP.kg)} ${u} · ${lw}</span>`:''}</div></div></div>
  ${bwGoalHTML(who)}
  <div class="bw2-card bw-cv-wrap"><div class="bw2-ch"><b>Trend</b><button class="bw-exp" type="button" data-bwbig aria-label="Expand the chart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>Full screen</button></div>${bwSegHTML()}<div class="bwb-read" aria-live="polite"></div><div class="bwb-plot bw-cv"></div>${bwLegHTML(G)}</div>
  ${mine?`<div class="bw2-card bw2-in"><div class="bw2-inh"><b>Log a weigh-in</b><span>${today} · morning, fasted</span></div><input class="wt" id="bwInput" inputmode="decimal" placeholder="${u}" value="${curV?bwShow(curV):''}"><button id="bwSaveP" type="button">${curV?'Update':'Save'}</button></div>`:''}
- <div class="bw2-card">${bwHistHTML(L,u)||'<div class="cv-empty">No weigh-ins yet</div>'}</div></div>`;
+ ${L.length?`<details class="bw2-card bw2-hist"><summary><b>History</b><span>${L.length} weigh-ins ›</span></summary>${bwHistHTML(L,u)}</details>`:''}</div>`;
  const card=el.querySelector('.bw-cv-wrap');bwWire(card,who,bwRange,340,230);card.addEventListener('click',e=>{const r=e.target.closest('[data-bwr]');if(r){bwRange=r.dataset.bwr;bwWire(card,who,bwRange,340,230)}if(e.target.closest('[data-bwbig]'))bwBigOpen(who)});
  const sb=el.querySelector('#bwSaveP');if(sb)sb.onclick=()=>{if(saveBW($('bwInput').value))renderBench()}}
 // sessions logged in a plan week by stored session name, so a swapped day still maps to the right card
