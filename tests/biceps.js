@@ -8,9 +8,13 @@ const open=async(t,logs=[])=>{const p=await b.newPage({viewport:{width:390,heigh
  await p.addInitScript(([lg])=>{localStorage.setItem('hrx_active_athlete','fred');localStorage.setItem('hrx_migrated','1');localStorage.setItem('hrx_fred_unit_v2',JSON.stringify('lb'));localStorage.setItem('hrx_fred_logs_v2',JSON.stringify(lg))},[logs]);
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('2026-10-23T07:00:00');
-const pl=await p.evaluate(()=>PLAN0.map(w=>[w.week,(w.tue.match(/incline DB curls ([\dx-]+)/)||[])[1],/Bayesian cable curls 3x10-12, hammer curls 3x10-12/.test(w.fri)]));
+const pl=await p.evaluate(()=>PLAN0.map(w=>[w.week,(w.tue.match(/(?:incline DB|EZ bar preacher) curls ([\dx-]+)/)||[])[1],/Bayesian cable curls 3x10-12, hammer curls 3x10-12/.test(w.fri)]));
 ok(pl.filter(x=>x[0]<=3).every(x=>x[1]==='3x10'&&!x[2]),'weeks 1 to 3 unchanged (history)');
 ok(pl.filter(x=>x[0]>=5&&x[0]<=24).every(x=>x[1]===([8,12,16,20].includes(x[0])?'3x8-12':'4x8-12')),'Tuesday incline curls 4x8-12, 3x8-12 in deloads, weeks 5 to 24');
+// v219 (Fred, Nov 24: hates incline curls): EZ bar preacher curls from week 10, weeks 1 to 9 keep incline (history)
+const pc=await p.evaluate(()=>PLAN0.map(w=>[w.week,/incline DB curls/.test(w.tue),/EZ bar preacher curls/.test(w.tue)]));
+ok(pc.filter(x=>x[0]<=9).every(x=>x[1]&&!x[2])&&pc.filter(x=>x[0]>=10&&x[0]<=26).every(x=>!x[1]&&x[2]),'v219: preacher curls from week 10, incline kept in weeks 1 to 9');
+ok(await p.evaluate(()=>guideKeys('EZ bar preacher curls 4x8-12')[0]==='preachcurl'&&!!GUIDES.preachcurl&&LOADABLE.preachcurl===2.5&&REST_BY_KEY.preachcurl===60),'v219: preacher curl guide, load step and rest');
 ok(pl.filter(x=>x[0]>=4&&x[0]<=24).every(x=>x[2]),'Friday adds Bayesian and hammer curls, weeks 4 to 24');
 ok(pl.filter(x=>x[0]>=25).every(x=>!x[2]),'taper weeks 25 to 27 unchanged');
 // Today Friday
@@ -39,6 +43,10 @@ ok(/Bayesian cable curls/.test(await p.locator('#today').innerText()),'Today wee
 // Tuesday week 5
 p=await open('2026-10-27T07:00:00');await p.evaluate(()=>startWorkout(5,1,'2026-10-27'));await p.clock.runFor(600);
 ok(await p.evaluate(()=>{const it=[...document.querySelectorAll('#workout .wo-item.sets')].find(e=>/Incline/i.test(e.innerText));return it.querySelectorAll('.st-r[data-row]').length})===4,'Tuesday week 5 incline curls 4 sets');await p.close();
+p=await open('2026-12-01T07:00:00');await p.evaluate(()=>startWorkout(10,1,'2026-12-01'));await p.clock.runFor(600);
+ok(await p.evaluate(()=>{const t=document.getElementById('workout').innerText;const it=[...document.querySelectorAll('#workout .wo-item.sets')].find(e=>/preacher/i.test(e.innerText));return !/Incline/i.test(t)&&it&&it.querySelectorAll('.st-r[data-row]').length===4})===true,'v219: Tuesday week 10 workout has preacher curls, 4 sets, no incline');await p.close();
+p=await open('2026-12-01T07:00:00');
+ok(/preacher/i.test(await p.locator('#today').innerText())&&!/incline/i.test(await p.locator('#today').innerText()),'v219: Today week 10 Tuesday lists preacher curls');await p.close();
 ok(/Biceps block \(plan change Oct 20/.test(fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8')),'coach prompt explains the biceps block');
 ok(!errs.length,'no page errors '+errs.join(' | '));
 await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
