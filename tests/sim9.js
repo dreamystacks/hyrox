@@ -22,6 +22,12 @@ await p.close();
 // v226: week 11 Friday on Wednesday (no finisher), rest Friday, Grady untouched
 for(const who of ['fred','will','grady']){const q=await open(who,'2026-12-09T10:00:00');const r=await q.evaluate(()=>({fri:PLAN[10].fri,mv:mvMap(11),td:(document.querySelector('#today .td-session')||{}).innerText||''}));
  ok(who==='grady'?(/Finisher: EMOM/.test(r.fri)&&!r.mv.Fri):(!/Finisher/.test(r.fri)&&r.mv.Fri==='Wed'&&/Moved from Fri/.test(r.td)),who+' week 11 Friday: '+(who==='grady'?'unchanged':'on Wednesday without the finisher'));await q.close()}
+// v227: chest at least once a week (Fred, Nov 25)
+{const q=await open('fred','2026-11-25T10:00:00');const r=await q.evaluate(()=>PLAN.slice(0,25).map(w=>({n:w.week,c:sessionItems('Fri',w.fri,w.week).some(i=>(guideKeys(i.title)||[]).some(g=>g==='bench'||g==='dbbench'))})));
+ ok(r.every(x=>x.c),'every Friday of weeks 1 to 25 has a chest press '+r.filter(x=>!x.c).map(x=>x.n));
+ const t=await q.evaluate(()=>[PLAN[8].fri.split('\n')[0],PLAN[11].fri.split('\n')[0],PLAN[21].fri.split('\n')[0],PLAN[23].fri.split('\n')[0]]);
+ ok(/OHP 3 x 5\. DB bench 3 x 8\.$/.test(t[0])&&/DB bench 3 x 8 @ 80%\.$/.test(t[1])&&/bench 3 x 5\./.test(t[2])&&/DB bench 2 x 8\.$/.test(t[3]),'week 9, 12, 22 and 24 chest lines '+t.join(' / '));
+ const td=await q.locator('#today .td-session').innerText();ok(/DB bench/.test(td),'Fred today (Wednesday, moved Friday) shows DB bench');await q.close()}
 const pr=fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8');ok(/v225/.test(pr)&&/weeks 11, 19, 21, 24/.test(pr),'coach prompt explains the move');
 const cj=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../coach.json'),'utf8'));ok(cj.athletes.fred.plan['9'].runKm===17&&cj.athletes.will.plan['9'].runKm===16&&cj.athletes.will.tweaks.some(t=>t.week===11&&t.day==='Sat'),'coach.json week 9 km and Will tweak on week 11');
 ok(!errs.length,'no page errors '+errs.join(' | '));await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
