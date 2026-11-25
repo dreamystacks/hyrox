@@ -30,7 +30,7 @@
         {
           "week": 9,
           "day": "Sat",
-          "text": "Full sim at 85% on Friday: start run 1 at 6:00, not faster (Sunday's half sim went 5:49 to 6:38, a 49 s fade), keep every 1 km within 15 s of it, and jog the first 200 m after burpee broad jumps and lunges before building back."
+          "text": "Half sim at race weight on Friday (stations 1 to 4 at full distance): start run 1 at 6:00, not faster, keep every 1 km within 15 s of it, and jog the first 200 m after the burpee broad jumps. Sleds at full race weight: short steady steps, no sprint start, and note how long each 12 m length takes."
         }
       ],
       "loads": {
@@ -83,7 +83,7 @@
             "text": "6 x 1 km @ race pace of about 5:40/km, 90 s rest\nLegs: 10 burpee broad jumps before rep 2, 24 m sandbag lunges before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
             "why": "Monday was RPE 9 and the EMOM failed (stopped at 15:42): 6 reps instead of 7 so your legs are fresh for Friday's full sim. Hold about 5:40 (Nov 18 average 5:37). Lunges 24 m to match your mat."
           },
-          "runKm": 21
+          "runKm": 17
         },
         "10": {
           "mon": {
@@ -118,9 +118,9 @@
           "text": "Still sick on Sunday: EMOM is 12 min (3 rounds) this Monday and lunges stay 10 kg for 2 x 20 m; if you still feel feverish or the knee goes above 2/10, stop and switch to step ups or skip the EMOM."
         },
         {
-          "week": 9,
+          "week": 11,
           "day": "Sat",
-          "text": "If the knee is 4/10 or more on Saturday, do 20 step ups per leg instead of the sandbag lunges in the sim; never lunge through it."
+          "text": "If the knee is 4/10 or more on Dec 12, do 20 step ups per leg instead of the sandbag lunges in the sim; never lunge through it."
         }
       ],
       "loads": {
@@ -174,7 +174,7 @@
             "text": "5 x 1 km @ race pace of about 6:15/km, 90 s rest\nLegs: 10 burpees (no jump) before rep 2, 10 step ups per leg before rep 4\nThen arms block A: Lateral raises 4x12-15, incline DB curls 4x8-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
             "why": "No run this week and 5 km last week (6:19 average): 5 reps instead of 7 before the full sim, knee safe tired legs work."
           },
-          "runKm": 20
+          "runKm": 16
         }
       }
     }

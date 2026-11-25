@@ -6,10 +6,10 @@ const open=async(t,who)=>{const p=await b.newPage({viewport:{width:390,height:84
  await p.addInitScript(w=>{localStorage.setItem('hrx_active_athlete',w);localStorage.setItem('hrx_migrated','1');localStorage.setItem(`hrx_${w}_unit_v2`,JSON.stringify('lb'))},who);
  await p.clock.install({time:new Date(t)});await p.goto(URL);await p.clock.runFor(5000);return p};
 let p=await open('2026-12-12T08:00:00','fred');
-ok(await p.evaluate(()=>RACES.length===1&&RACES[0].key==='bne'&&!adjLocked(11,'sat')),'Brisbane only, week 11 not locked');
+ok(await p.evaluate(()=>RACES.length===1&&RACES[0].key==='bne'&&adjLocked(11,'sat')),'Brisbane only, week 11 Saturday locked (v225 first full sim)');
 const d=await p.evaluate(()=>({sat:PLAN[10].sat,sun:PLAN[10].sun,notes:PLAN[10].notes,km:PLAN[10].runKm,base:PLAN0[10].sat,bmon:/3 x 20 m/.test(PLAN0[10].mon),w10:PLAN0[9].sat,w9:PLAN0[8].notes,items:sessionItems('Sat',PLAN[10].sat,PLAN[10]).map(i=>i.title)}));
-ok(/^Easy run 30 to 40 min in zone 2 in Nashville/.test(d.sat)&&/^Optional/.test(d.sun)&&/Friday's session on Wednesday/.test(d.notes)&&d.km===11,'Fred week 11: easy run Saturday, optional Sunday, Friday on Wednesday, 11 km');
-ok(/^Half sim, 80%: 4 x \(1 km \+ stations 1 to 4 full volume\)$/.test(d.base)&&d.bmon&&!/Nashville/.test(d.w10+d.w9),'base week 11 is a normal week, no Nashville text in weeks 9 and 10');
+ok(/^FULL SIM at 85%/.test(d.sat)&&/^Easy run/.test(d.sun)&&/Dec 12/.test(d.notes)&&d.km===21,'Fred week 11 (v225 trip changed): full sim Saturday Dec 12, zone 2 Sunday, 21 km');
+ok(/^FULL SIM at 85%: all 8, record splits$/.test(d.base)&&d.bmon&&!/Nashville/.test(d.w10+d.w9),'base week 11 has the first full sim (v225), no Nashville text in weeks 9 and 10');
 const td=await p.locator('#today').innerText();ok(/Easy run/.test(td)&&!/Nashville 1:40|days to Nashville/i.test(td),'Today Saturday: easy run, no Nashville race');
 await p.evaluate(()=>{currentWeek=11;showView('plan')});await p.clock.runFor(400);
 ok(!/HYROX Nashville|race option/i.test(await p.locator('#plan').innerText()),'Plan week 11: no race text');
