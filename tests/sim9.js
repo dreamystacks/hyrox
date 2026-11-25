@@ -19,6 +19,9 @@ const p=await open('fred','2026-12-12T09:00:00');
 const d=await p.evaluate(()=>({sat:PLAN[10].sat,sun:PLAN[10].sun,km:PLAN[10].runKm,segs:simSegments(PLAN[10]).length,td:document.querySelector('#today .td-session')?.innerText||''}));
 ok(/^FULL SIM/.test(d.sat)&&/^Easy run/.test(d.sun)&&d.km===21&&d.segs===16&&!/Nashville/.test(d.td),'Fred Dec 12: full sim, 16 parts, no Nashville '+d.segs);
 await p.close();
+// v226: week 11 Friday on Wednesday (no finisher), rest Friday, Grady untouched
+for(const who of ['fred','will','grady']){const q=await open(who,'2026-12-09T10:00:00');const r=await q.evaluate(()=>({fri:PLAN[10].fri,mv:mvMap(11),td:(document.querySelector('#today .td-session')||{}).innerText||''}));
+ ok(who==='grady'?(/Finisher: EMOM/.test(r.fri)&&!r.mv.Fri):(!/Finisher/.test(r.fri)&&r.mv.Fri==='Wed'&&/Moved from Fri/.test(r.td)),who+' week 11 Friday: '+(who==='grady'?'unchanged':'on Wednesday without the finisher'));await q.close()}
 const pr=fs.readFileSync(path.resolve(__dirname,'../coach/PROMPT.md'),'utf8');ok(/v225/.test(pr)&&/weeks 11, 19, 21, 24/.test(pr),'coach prompt explains the move');
 const cj=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../coach.json'),'utf8'));ok(cj.athletes.fred.plan['9'].runKm===17&&cj.athletes.will.plan['9'].runKm===16&&cj.athletes.will.tweaks.some(t=>t.week===11&&t.day==='Sat'),'coach.json week 9 km and Will tweak on week 11');
 ok(!errs.length,'no page errors '+errs.join(' | '));await b.close();console.log(f?f+' FAILED':'all ok');process.exit(f?1:0)})();
