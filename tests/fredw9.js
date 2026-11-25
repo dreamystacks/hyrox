@@ -8,9 +8,9 @@ const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.click('[data-who
 const cj0=require('../coach.json');const r=await p.evaluate(()=>{const w=PLAN[8];return {live:w.fri,items:sessionItems('Fri',w.fri,w).map(x=>x.title),fa:PLAN_ATH.fred[9],wi:PLAN_ATH.will[9]||null,base:PLAN0[8].fri}});
 f(r.fa&&!/Finisher/.test(r.fa.fri),'Fred week 9 Friday has no finisher');
 f(r.fa&&/Wall ball technique 2 x 10/.test(r.fa.fri),'technique sets kept');
-f(r.fa&&/OHP 3 x 5/.test(r.fa.fri)&&/hammer curls/.test(r.fa.fri),'lifts and arms kept');
+f(r.fa&&/OHP 3 x 5/.test(r.fa.fri)&&/Bayesian cable curls/.test(r.fa.fri)&&!/hammer curls/.test(r.fa.fri),'lifts and arms kept (v228: hammer curls on Tuesday)');
 f(r.fa&&/Staff party/.test(r.fa.notes),'notes explain the moves');
-f(r.wi&&!/Finisher/.test(r.wi.fri)&&!/technique/.test(r.wi.fri)&&/hammer curls/.test(r.wi.fri)&&/Staff party/.test(r.wi.notes),'Will week 9 same moves, no technique sets (v212)');
+f(r.wi&&!/Finisher/.test(r.wi.fri)&&!/technique/.test(r.wi.fri)&&/Bayesian cable curls/.test(r.wi.fri)&&/Staff party/.test(r.wi.notes),'Will week 9 same moves, no technique sets (v212)');
 f(!(cj0.athletes.will.plan['9']||{}).fri,'Will coach Friday override removed');
 f(!/Finisher/.test(r.live)&&!r.items.some(t=>/EMOM/i.test(t)),'live Friday plan for Fred has no EMOM item: '+r.items.join(' | '));
 f(!errs.length,'no page errors '+errs.join(';'));
