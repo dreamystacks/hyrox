@@ -38,7 +38,7 @@
         "lunge": 44,
         "dblunge": 30,
         "carry": 70,
-        "lateral": 20,
+        "lateral": 22.5,
         "inclinecurl": 30,
         "tricepoh": 90,
         "facepull": 75,
@@ -121,6 +121,11 @@
           "week": 11,
           "day": "Sat",
           "text": "If the knee is 4/10 or more on Dec 12, do 20 step ups per leg instead of the sandbag lunges in the sim; never lunge through it."
+        },
+        {
+          "week": 10,
+          "day": "Tue",
+          "text": "Full 7 x 1 km again at about 6:15/km; if the knee goes above 2/10 after Friday's sim, stop at 5 reps."
         }
       ],
       "loads": {
@@ -131,7 +136,7 @@
         "wallball": 14,
         "lateral": 15,
         "inclinecurl": 22.5,
-        "tricepoh": 60
+        "tricepoh": 65
       },
       "unit": "lb",
       "plan": {
@@ -175,9 +180,21 @@
             "why": "No run this week and 5 km last week (6:19 average): 5 reps instead of 7 before the full sim, knee safe tired legs work."
           },
           "runKm": 16
+        },
+        "10": {
+          "tue": {
+            "text": "7 x 1 km @ race pace of about 6:15/km, 75 s rest\nLegs: 10 burpees (no jump) before rep 2, 10 step ups per leg before rep 4\nThen arms block A: Lateral raises 4x12-15, EZ bar preacher curls 4x8-12, hammer curls 3x10-12, overhead triceps ext 3x10, hanging leg raises 3x10-12",
+            "why": "Nov 24 you ran 5 x 1 km at 6:17 average, only 12 s spread, RPE 6, knee 0: back to the full 7 reps at the same pace, knee safe tired legs work one more week."
+          }
+        }
+      },
+      "answers": {
+        "q20261124223553": {
+          "a": "Yes, you are ready for more. Your 5 x 1 km on Tuesday averaged 6:17 with only 12 s between reps at RPE 6 and no knee pain, so I put next Tuesday back to the full 7 x 1 km at about 6:15/km. Do this Sunday's 40 to 50 min zone 2 run (about 7 km) too, and add distance only on Sundays while the knee stays under 3/10.",
+          "at": "2026-11-26T02:45:00Z"
         }
       }
     }
   },
-  "nightly": "2026-11-24T02:45:00Z"
+  "nightly": "2026-11-26T02:45:00Z"
 }
